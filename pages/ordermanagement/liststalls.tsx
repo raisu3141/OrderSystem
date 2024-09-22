@@ -10,7 +10,7 @@ interface Stall {
   image: string
 }
 
-export default function ListStalls() {
+export function ListStalls() {
   const [stallList, setStallList] = useState<Stall[]>([])
 
   useEffect(() => {
@@ -48,3 +48,5 @@ export default function ListStalls() {
     </div>
   )
 }
+
+export default ListStalls;
