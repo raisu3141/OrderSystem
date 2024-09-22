@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Head from 'next/head'
 import StallsCard from '../../components/StallsCard'
-import Image from 'next/image'
 
 
 interface Stall {
