@@ -21,18 +21,20 @@ export default function Home() {
       <h1 className="text-4xl font-bold">
         Rootのページだよ！
       </h1>
-      <Link 
-        href="/examplepage" 
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-      >
-        画面遷移の例だよ！
-      </Link>
-      <Link 
-        href="/ordermanegementPage" 
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-      >
-        注文管理ページにいくよ！
-      </Link>
+      <div className="flex space-x-4">
+        <Link
+          href="/examplepage"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+        >
+          画面遷移の例だよ！
+        </Link>
+        <Link
+          href="/ordermanagement/liststalls"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+        >
+          注文管理ページにいくよ！
+        </Link>
+      </div>
     </div>
   );
 }
