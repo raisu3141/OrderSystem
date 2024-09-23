@@ -18,7 +18,7 @@ const ProductDataSchema = new mongoose.Schema({
   // 商品画像URL
   "productImageUrl" : {
     type: mongoose.Schema.Types.String,
-    required: true,
+    required: false,
     default: "https://via.placeholder.com/150",
   },
 
@@ -26,7 +26,6 @@ const ProductDataSchema = new mongoose.Schema({
   "price": {
     type: mongoose.Schema.Types.Number,
     required: true,
-    default: 0,
     min: 0,
   },
 

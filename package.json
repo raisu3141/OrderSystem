@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "nodemon",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -11,6 +11,7 @@
   "dependencies": {
     "mongoose": "^8.6.3",
     "next": "14.2.13",
+    "nodemon": "^3.1.7",
     "react": "^18",
     "react-dom": "^18"
   },

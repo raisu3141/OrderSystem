@@ -40,14 +40,23 @@ const OrderDataSchema = new mongoose.Schema({
   "clientName": {
     type: mongoose.Schema.Types.String,
     required: true,
-    validate: {
-      validator: (v) => {
-        // カタカナのみ許可
-        const katakanaRegex = /^[\u30A0-\u30FF]+$/;
-        return katakanaRegex.test(v);
+    validate: [
+      {
+        validator: (v) => {
+          // カタカナのみ許可
+          const katakanaRegex = /^[\u30A0-\u30FF]+$/;
+          return katakanaRegex.test(v);
+        },
+        message: "カタカナで入力してください",
       },
-      message: "clientName is required",
-    },
+      {
+        validator: (v) => {
+          // 10文字以内
+          return v.length <= 10;
+        },
+        message: "10文字以内で入力してください",
+      },
+    ],
   },
 
   // 注文時間

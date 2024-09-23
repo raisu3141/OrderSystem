@@ -32,6 +32,13 @@ const StoreDataSchema = new mongoose.Schema({
     min: 0,
   },
 
+  "openDay": {
+    type: mongoose.Schema.Types.Number,
+    required: true,
+    min: 1,
+  },
+
+
 }, {
   // 追加・更新日時を自動で保存
   timestamps: true,
