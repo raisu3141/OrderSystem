@@ -2,12 +2,6 @@
 import mongoose from 'mongoose';
 
 const StoreDataSchema = new mongoose.Schema({
-  // 屋台ID
-  "_id": {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    unique: true,
-  },
 
   // 屋台名
   "storeName": {
@@ -18,7 +12,7 @@ const StoreDataSchema = new mongoose.Schema({
   // 屋台画像URL
   "storeImageUrl" : {
     type: mongoose.Schema.Types.String,
-    required: true,
+    required: false,
     default: "https://via.placeholder.com/150",
   },
 
@@ -26,7 +20,7 @@ const StoreDataSchema = new mongoose.Schema({
   "productList": [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'ProductData', // ProductDataコレクションを参照
-    required: true,
+    required: false,
     unique: true,
   }],
   
