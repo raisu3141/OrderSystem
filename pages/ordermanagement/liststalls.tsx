@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Head from 'next/head'
 import StallsCard from '../../components/StallsCard'
-import styles from '../../styles/Home.module.css'
+import Header from '../../components/header'
 
 
 interface Stall {
@@ -31,15 +31,7 @@ export function ListStalls() {
       <Head>
         <title>屋台一覧</title>
       </Head>
-      <nav className={styles.nav}>
-        <ul>
-          <li>
-            <Link href="/" className="nav-link">
-              NANCA
-            </Link>
-          </li>
-        </ul>
-      </nav>
+      <Header />
       <div className="min-h-screen p-8 pb-20 font-[family-name:var(--font-geist-sans)]">
         <div className="sticky top-0 bg-black border-b-2 border-gray-300 p-4 z-10 flex items-center justify-between mb-8">
           <h1 className="text-4xl font-bold">屋台一覧</h1>

@@ -7,7 +7,7 @@ interface StallCardProps {
   image: string
 }
 
-export default function YataiCard({ id, name, image }: StallCardProps) {
+export function StallCard({ id, name, image }: StallCardProps) {
   return (
     <Link href={`/yatai/${id}`} className="block">
       <div className="border rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -25,3 +25,5 @@ export default function YataiCard({ id, name, image }: StallCardProps) {
     </Link>
   )
 }
+
+export default StallCard;
