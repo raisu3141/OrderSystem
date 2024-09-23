@@ -25,7 +25,7 @@ const StoreDataSchema = new mongoose.Schema({
   }],
   
   // 待ち時間
-  "waitTime": {
+  "storeWaitTime": {
     type: mongoose.Schema.Types.Number,
     required: true,
     default: 0,
