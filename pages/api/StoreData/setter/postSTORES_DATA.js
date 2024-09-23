@@ -1,4 +1,4 @@
-// pages/api/getSTORES_DATA.js
+// pages/api/postSTORES_DATA.js
 import connectToDatabase from '../../../../lib/mongoose';
 import StoreData from '../../../../models/StoreData';
 
