@@ -1,6 +1,6 @@
 // pages/api/getSTORES_DATA.js
-import connectToDatabase from '../../lib/mongoose';
-import StoreData from '../../models/StoreData';
+import connectToDatabase from '../../../../lib/mongoose';
+import StoreData from '../../../../models/StoreData';
 
 export default async function handler(req, res) {
   await connectToDatabase();
