@@ -2,13 +2,6 @@
 import mongoose from 'mongoose';
 
 const ProductDataSchema = new mongoose.Schema({
-  // 商品ID
-  "_id": {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    unique: true,
-  },
-
   // 屋台ID
   "storeId": {
     type: mongoose.Schema.Types.ObjectId,

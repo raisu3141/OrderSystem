@@ -2,14 +2,7 @@
 import mongoose from 'mongoose';
 
 const StoreOrderSchema = new mongoose.Schema({
-  // 注文ID
-  "_id": {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    unique: true,
-  },
-
-  // 注文リスト
+// 注文リスト
   "orderList": [{
     // 商品ID
     "productId": {

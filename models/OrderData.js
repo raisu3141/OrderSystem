@@ -2,13 +2,6 @@
 import mongoose from 'mongoose';
 
 const OrderDataSchema = new mongoose.Schema({
-  // 注文ID
-  "_id": {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    unique: true,
-  },
-
   // 整理券番号
   "tiketNumber": {
     type: mongoose.Schema.Types.Number,
