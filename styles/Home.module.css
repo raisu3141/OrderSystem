@@ -14,6 +14,12 @@
     max-width: 1200px; 
     padding: 0 20px; 
 } 
+
+.container {
+    min-height: 100vh; /* 全体の最小高さを画面サイズに */
+    padding: 1rem 2rem 5rem; /* 上部のパディングと下部の余白 */
+    font-family: var(--font-geist-sans); /* フォントの設定 */
+}
  
 .nav { 
     background-color: #ebebeb; 
