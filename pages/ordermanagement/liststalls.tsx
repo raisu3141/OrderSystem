@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import Head from 'next/head'
 import StallsCard from '../../components/StallsCard'
 import Header from '../../components/header'
-
+import Styles from '../../styles/Home.module.css'
 
 interface Stall {
   id: number
@@ -31,16 +30,11 @@ export function ListStalls() {
       <Head>
         <title>屋台一覧</title>
       </Head>
-      <Header />
-      <div className="min-h-screen p-8 pb-20 font-[family-name:var(--font-geist-sans)]">
-        <div className="sticky top-0 bg-black border-b-2 border-gray-300 p-4 z-10 flex items-center justify-between mb-8">
+      {/* コンポーネントで作成したヘッダーを使用 */}
+      <Header /> 
+      <div className={Styles.container}>
+        <div className="sticky top-0 bg-white border-b-2 border-gray-300 p-4 z-10 flex items-center justify-between mb-8">
           <h1 className="text-4xl font-bold">屋台一覧</h1>
-          <Link 
-            href="/" 
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
-          >
-            Rootに戻る
-          </Link>
         </div>
         {/* 屋台一覧を表示 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
