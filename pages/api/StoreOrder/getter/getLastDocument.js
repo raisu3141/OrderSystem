@@ -4,8 +4,6 @@ import StoreOrder from '../../../../models/StoreOrder';
 export default async function handler(req, res) {
   await connectToDatabase();
 
-  const { id } = req.query;
-
   try {
     const storeOrder = await StoreOrder.findOne().sort({ createdAt: -1 });
     if (!storeOrder) {
