@@ -2,6 +2,13 @@
 import mongoose from 'mongoose';
 
 const StoreOrderSchema = new mongoose.Schema({
+
+  //整理券番号
+  "tiketNumber":{
+    type: mongoose.Schema.Types.Number,
+    required: true,
+    default: false,
+  },
 // 注文リスト
   "orderList": [{
     // 商品ID
