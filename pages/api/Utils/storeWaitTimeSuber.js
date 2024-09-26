@@ -1,5 +1,5 @@
 // pages/api/Utils/storeWaitTimeSuber.js
-import connectToDatabase from '../../../../lib/mongoose';
+import connectToDatabase from '../../../lib/mongoose';
 import StoreOrder from '../../../models/StoreOrder';
 import ProductData from '../../../models/ProductData';
 import StoreData from '../../../models/StoreData';
