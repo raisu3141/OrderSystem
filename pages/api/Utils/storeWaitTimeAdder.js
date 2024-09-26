@@ -1,11 +1,12 @@
 // pages/api/Utils/storeWaitTimeAdder.js
-import OrderData from '../models/OrderData';
-import ProductData from '../models/ProductData';
-import StoreData from '../models/StoreData';
+import connectToDatabase from '../../../../lib/mongoose';
+import ProductData from '../../../models/ProductData';
+import StoreData from '../../../models/StoreData';
+import StoreData from '../../../models/StoreData';
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
-      await processOrder(req, res);
+      await storeWaitTimeAdder(req, res);
     } else {
       res.status(405).json({ message: 'Method Not Allowed' });
     }
@@ -15,6 +16,7 @@ export default async function handler(req, res) {
 export const storeWaitTimeAdder = async (req, res) => {
   const { orderList } = req.body;
 
+  await connectToDatabase();
   try {
     // 屋台ごとの待ち時間を管理するオブジェクト
     const storeWaitTimes = {};
