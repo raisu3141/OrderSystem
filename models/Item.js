@@ -12,4 +12,4 @@ const ItemSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.models.Item || mongoose.model('Item', ItemSchema);
+export default mongoose.models.Item || mongoose.model('Item', ItemSchema, 'mock_Item');

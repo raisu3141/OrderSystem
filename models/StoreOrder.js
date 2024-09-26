@@ -2,6 +2,14 @@
 import mongoose from 'mongoose';
 
 const StoreOrderSchema = new mongoose.Schema({
+
+  //注文情報Id
+  "orderId":{
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'OrderData',
+  },
+
 // 注文リスト
   "orderList": [{
     // 商品ID
@@ -61,4 +69,4 @@ const StoreOrderSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-export default mongoose.models.StoreOrder || mongoose.model('StoreOrder', StoreOrderSchema);
+export default mongoose.models.StoreOrder || mongoose.model('StoreOrder', StoreOrderSchema, 'mock_StoreOrder');

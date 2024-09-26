@@ -59,17 +59,9 @@ const OrderDataSchema = new mongoose.Schema({
     ],
   },
 
-  // 注文時間
-  "orderTime": {
-    type: mongoose.Schema.Types.Date,
-    required: true,
-    default: Date.now,
-  },
-
-
 }, {
   // 追加・更新日時を自動で保存
   timestamps: true,
 });
 
-export default mongoose.models.OrderData || mongoose.model('OrderData', OrderDataSchema);
+export default mongoose.models.OrderData || mongoose.model('OrderData', OrderDataSchema, 'mock_OrderData');
