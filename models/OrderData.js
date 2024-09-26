@@ -64,4 +64,4 @@ const OrderDataSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-export default mongoose.models.OrderData || mongoose.model('OrderData', OrderDataSchema, 'mock_OrderData');
+export default mongoose.models.OrderData || mongoose.model('OrderData', OrderDataSchema);

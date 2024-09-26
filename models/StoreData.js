@@ -44,4 +44,4 @@ const StoreDataSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-export default mongoose.models.StoreData || mongoose.model('StoreData', StoreDataSchema, 'mock_StoreData');
+export default mongoose.models.StoreData || mongoose.model('StoreData', StoreDataSchema);
