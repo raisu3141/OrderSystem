@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import OrderTicket from '@/components/ordermanege/orderticket'
+import OrderTicket from '../../components/ordermanege/orderticket'
 
 interface OrderticketManagerProps {
   storeId: string;

@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { useQuery } from 'react-query'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/ticketcard'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from '../../components/ui/button'
+import { Card, CardContent } from '../../components/ui/ticketcard'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
 import { Loader2 } from 'lucide-react'
 
 interface OrderList {

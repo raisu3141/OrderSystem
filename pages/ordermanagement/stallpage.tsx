@@ -1,6 +1,6 @@
 import Head from "next/head";
-import Styles from "@/styles/Home.module.css";
-import OrderticketManager from "@/components/ordermanege/orderticketmanager";
+import Styles from "../../styles/Home.module.css";
+import OrderticketManager from "../../components/ordermanege/orderticketmanager";
 
 
 interface StallPageProps {
