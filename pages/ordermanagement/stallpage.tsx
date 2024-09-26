@@ -1,10 +1,13 @@
-import Header from "@/components/header";
 import Head from "next/head";
 import Styles from "@/styles/Home.module.css";
+import OrderticketManager from "@/components/ordermanege/orderticketmanager";
 
-export default function StallPage1() {
 
+interface StallPageProps {
+  storeId: string;
+}
 
+export default function StallPage1({ storeId }: StallPageProps) {
 
     return (
       <div>
@@ -17,6 +20,7 @@ export default function StallPage1() {
             <div className="sticky top-0 bg-white border-b-2 border-gray-300 p-4 z-10 flex items-center justify-between mb-8">
               <h1 className="text-4xl font-bold">屋台１</h1>
             </div>
+            <OrderticketManager storeId={storeId} />
           </div>
       </div>
     )
