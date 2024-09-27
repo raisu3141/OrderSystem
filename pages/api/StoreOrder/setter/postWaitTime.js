@@ -1,4 +1,7 @@
 // pages/api/StoreOrder/setter/postWaitTime.js
+
+//このファイルは基本的に使わない！機能をstoreWaitTimeAdderに統合しているから!一応残しているだけ！
+
 import StoreOrder from '../../models/StoreOrder';
 import { storeWaitTimeAdder } from '../../Utils/storeWaitTimeAdder';
 
