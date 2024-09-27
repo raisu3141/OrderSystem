@@ -23,7 +23,6 @@ export async function getServerSideProps() {
 }
 
 
-
 // Homeコンポーネントのpropsに型を指定
 interface HomeProps {
   items: Item[];
