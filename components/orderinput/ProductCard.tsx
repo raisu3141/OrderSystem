@@ -13,19 +13,22 @@ interface ProductCardProps {
 
 export function ProductCard({ id, storeId, productName, productImageURL, price, cookTime, stock }: ProductCardProps) {
   return (
-    <div className="border rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 w-30">
-      <Image
-        src={productImageURL}
-        alt={productName}
-        width={300}
-        height={200}
-        className="w-full h-48 object-contain rounded-t-lg"
-      />
-      <div className="p-4">
-        <h2 className="text-xl font-semibold">{productName}</h2>
-        <h2 className="text-xl font-semibold">￥{price}</h2>
+    <button>
+      <div className="bg-white border rounded-lg transition-shadow duration-300 w-30">
+        <Image
+          src={productImageURL}
+          alt={productName}
+          width={300}
+          height={200}
+          className="w-full h-48 object-contain rounded-t-lg"
+        />
+        <div className="p-4">
+          <h2 className="text-xl font-semibold">{productName}</h2>
+          <h2 className="text-xl font-semibold">￥{price}</h2>
+        </div>
       </div>
-    </div>
+    </button>
+
 
   )
 }

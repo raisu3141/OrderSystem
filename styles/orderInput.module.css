@@ -1,0 +1,26 @@
+.maincontainer {
+  height: calc(100vh - 80px);
+  /* ヘッダーの高さに応じて調整 */
+}
+
+.cart {
+  width: 90%;
+  height: 85%;
+  background-color: #ffffff;
+  padding: 1rem;
+  margin: 0;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  /* スクロールエリアが必要に応じて動作 */
+}
+
+
+.cartcontainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  height: calc(100vh - 80px);
+  width: 25%;
+}

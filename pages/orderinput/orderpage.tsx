@@ -1,27 +1,31 @@
-import { useState, useEffect } from 'react'
-import Head from 'next/head'
-import Header from '../../components/header'
-import Styles from '../../styles/Home.module.css'
-import ProductCard from '@/components/orderinput/ProductCard'
-import { Cart } from '@/components/orderinput/ProductCart'
-import { ScrollArea } from '@radix-ui/react-scroll-area'
-
-interface Product {
-  id: number,                 // 商品ID
-  storeId: number,            // 屋台ID
-  productName: string,        // 商品名
-  productImageURL: string,    // 商品画像
-  price: number,             // 値段
-  cookTime: number,          // 調理時間
-  stock: number,             // 在庫数
-}
+import { useState, useEffect } from 'react';
+import Head from 'next/head';
+import Header from '../../components/header';
+import Styles from '../../styles/orderInput.module.css';
+import { ScrollArea } from '@radix-ui/react-scroll-area';
+import { CartItem, Product } from '@/lib/types';
+import Cart from '@/components/orderinput/ProductCart';
+import { ProductList } from '@/components/orderinput/ProductList';
 
 export function OrderPage() {
-  const [productList, setProductList] = useState<Product[]>([])
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [productList, setProductList] = useState<Product[]>([]);
+
+  const addToCart = (product: Product, quantity: number) => {
+    setCart(prevCart => {
+      const existingItem = prevCart.find(item => item.id === product.id);
+      if (existingItem) {
+        return prevCart.map(item =>
+          item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+        );
+      }
+      return [...prevCart, { ...product, quantity }as CartItem];
+    });
+  };
+
+  const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   useEffect(() => {
-    // APIが出来次第、APIからデータを取得する
-    // 以下はモックデータ
     const mockProductList: Product[] = [
       {
         id: 1,
@@ -44,7 +48,7 @@ export function OrderPage() {
       {
         id: 3,
         storeId: 103,
-        productName: "うどん",
+        productName: "ホットドッグ",
         productImageURL: "/images/hotdog.png",
         price: 700,
         cookTime: 12,
@@ -68,68 +72,29 @@ export function OrderPage() {
         cookTime: 5,
         stock: 30,
       },
-      {
-        id: 6,
-        storeId: 105,
-        productName: "らむね",
-        productImageURL: "/images/ramune.png",
-        price: 300,
-        cookTime: 5,
-        stock: 30,
-      },
-      {
-        id: 6,
-        storeId: 105,
-        productName: "らむね",
-        productImageURL: "/images/ramune.png",
-        price: 300,
-        cookTime: 5,
-        stock: 30,
-      },
-      {
-        id: 6,
-        storeId: 105,
-        productName: "らむね",
-        productImageURL: "/images/ramune.png",
-        price: 300,
-        cookTime: 5,
-        stock: 30,
-      },
-      {
-        id: 6,
-        storeId: 105,
-        productName: "らむね",
-        productImageURL: "/images/ramune.png",
-        price: 300,
-        cookTime: 5,
-        stock: 30,
-      },
-    ]
-    setProductList(mockProductList)
-  }, [])
+      
+    ];
+    setProductList(mockProductList);
+  }, []);
 
   return (
     <div>
       <Head>
         <title>注文入力</title>
       </Head>
-      {/* コンポーネントで作成したヘッダーを使用 */}
       <Header />
-      <div className={Styles.container}>
-        <div className="flex h-screen">
-          <ScrollArea className="flex-1 overflow-auto p-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {productList.map((product) => (
-                <ProductCard key={product.id} {...product} />
-              ))}
-            </div>
-          </ScrollArea>
-          <Cart />
-        </div>
+      <div className={`${Styles.maincontainer} flex`}>
+        <ScrollArea className="flex-1 overflow-auto p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {productList.map((product) => (
+              <ProductList key={product.id} {...product} addToCart={addToCart} />
+            ))}
+          </div>
+        </ScrollArea>
+        <Cart cart={cart}/>
       </div>
     </div>
-  )
+  );
 }
-
 
 export default OrderPage;
