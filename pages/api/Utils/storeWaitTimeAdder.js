@@ -52,22 +52,20 @@ export const storeWaitTimeAdder = async (req, res) => {
         })
       );
 
-      // 各屋台の待ち時間をStoreOrderに反映
-      for (const storeId in storeWaitTimes) {
-        
-        const waitTime = storeWaitTimes[storeId];
+			for (const storeId in storeWaitTimes) {
+				const waitTime = storeWaitTimes[storeId];
+				
+				// 対応するStoreOrderを取得
+				const storeOrder = await StoreOrder.findOne({ "orderList.storeId": storeId });
 
-        // 対応するStoreOrderを取得し、waitTimeを更新
-        const storeOrder = await StoreOrder.findOne({ storeId });
+				if (!storeOrder) {
+						return res.status(404).json({ message: `StoreOrder for storeId ${storeId} not found` });
+				}
 
-        if (!storeOrder) {
-            return res.status(404).json({ message: `StoreOrder for storeId ${storeId} not found` });
-        }
-
-        // StoreOrderのwaitTimeを更新
-        storeOrder.waitTime = waitTime;
-        await storeOrder.save();
-      }
+				// StoreOrderのwaitTimeを更新
+				storeOrder.waitTime = waitTime;
+				await storeOrder.save();
+			}
   
       return res.status(200).json({ storeWaitTimes });
   
