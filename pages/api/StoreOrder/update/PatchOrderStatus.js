@@ -6,18 +6,19 @@ export default async function handler(req, res) {
   await connectToDatabase();
 
   const { id } = req.query;  // クエリパラメータからidを取得
-  const { getStatus } = req.body; // 更新するcookStatusをリクエストボディから取得
+  const { cookStatus, getStatus } = req.body; // 更新するcookStatusをリクエストボディから取得
 
   // cookStatusがtrueまたはfalse以外の場合のバリデーション
-  if (typeof getStatus !== 'boolean') {
+  if (typeof cookStatus !== 'boolean') {
+    return res.status(400).json({ success: false, message: 'cookStatus must be a boolean value' });
+  }
+  if (typeof getStatus !== 'boolean'){
     return res.status(400).json({ success: false, message: 'getStatus must be a boolean value' });
   }
 
   try {
-    const updatedStatus = await StoreOrder.findByIdAndUpdate(id, { getStatus: getStatus }, {
-      new: true, // 更新後のドキュメントを返す
-      runValidators: true, // バリデーションを実行
-    });
+    const updatedStatus = await StoreOrder.findByIdAndUpdate(id, { cookStatus, getStatus }, { new: true });
+      res.status(200).json(updatedStatus);
 
     if (!updatedStatus) {
       return res.status(404).json({ success: false, message: 'Status not found' });
