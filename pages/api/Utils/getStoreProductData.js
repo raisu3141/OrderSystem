@@ -6,12 +6,13 @@ import StoreData from '../../../models/StoreData'; // StoreData モデルをイ�
 export default async function handler(req, res) {
   await connectToDatabase();
   try {
-    // StoreData モデルを使用してクエリを実行し、productList を populate
-    const storeProducts = await StoreData.findOne({storeName: "demoStore"})
-      .populate('productList')
-      .then((storeProduct) => { return storeProduct.productList })
+    // StoreDataモデルを使用してクエリを実行し、productList を populate
+    const storeProducts = await StoreData.find({}, 'storeName productList openDay')
+      .populate('productList', 'productName productImageUrl price stock')
+      .then((storeProduct) => { return storeProduct })
       .catch((error) => { return error });
     res.status(200).json(storeProducts);  // 取得したデータをクライアントに返す
+
   } catch (error) {
     res.status(500).json({
       message: 'データの取得に失敗しました',
