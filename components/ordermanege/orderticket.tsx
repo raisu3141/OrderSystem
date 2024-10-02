@@ -7,21 +7,23 @@ import { Loader2 } from 'lucide-react'
 
 interface OrderList {
   name: string
-  quantity: number
+  orderQuantity: number
 }
 
 interface Order {
-  orderid: number
+  orderId: number
   customerName: string
-  orderlist: OrderList[]
-  status: 'preparing' | 'ready' | 'completed'
+  orderList: OrderList[]
+  cookStatus: boolean
+  getStatus: boolean
 }
 
 async function fetchOrders(storeId: string, cookStatus: boolean, getStatus: boolean): Promise<Order[]> {
-  const response = await fetch(`/api/orders?storeId=${storeId}&cookStatus=${cookStatus}&getStatus=${getStatus}`)
+  const response = await fetch(`/api/StoreOrder/getter/getOrders?storeId=${storeId}`)
   if (!response.ok) {
     throw new Error('Failed to fetch orders')
   }
+  console.log(response.json())
   return response.json()
 }
 
@@ -57,27 +59,27 @@ export default function OrderTicket({ storeId }: OrderticketProps) {
   }
 
   const renderOrderCard = (order: Order) => (
-    <Card key={order.orderid} className="mb-4 bg-gray-100">
+    <Card key={order.orderId} className="mb-4 bg-gray-100">
       <CardContent className="p-4">
         <div className="flex items-start">
           <div className="flex-shrink-0 w-20 mr-4">
             <div className="text-sm text-gray-500">整理券番号</div>
-            <div className="text-4xl font-bold">{order.orderid}</div>
+            <div className="text-4xl font-bold">{order.orderId}</div>
           </div>
           <div className="flex-grow">
             <div className="text-sm mb-2">{order.customerName}</div>
             <ul className="space-y-1">
-              {order.orderlist.map((item, index) => (
+              {order.orderList.map((item, index) => (
                 <li key={index} className="flex justify-between text-sm">
                   <span>{item.name}</span>
-                  <span>× {item.quantity}</span>
+                  <span>× {item.orderQuantity}</span>
                 </li>
               ))}
             </ul>
           </div>
           <div className="flex-shrink-0 ml-4">
             <Button 
-              onClick={() => updateOrderStatus(order.orderid, order.status === 'preparing' ? 'ready' : 'completed')}
+              onClick={() => updateOrderStatus(order.orderId, order.cookStatus === true ? 'ready' : 'completed')}
               className="w-24 bg-gray-200 text-black hover:bg-gray-300"
             >
               調理完了

@@ -9,6 +9,9 @@ interface StallPageProps {
 
 export default function StallPage1({ storeId }: StallPageProps) {
 
+  //あとで変える
+  storeId = "66f39c46a058dd3bbb14526c";
+
     return (
       <div>
           <Head>
