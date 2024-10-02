@@ -12,7 +12,21 @@ export default async function handler(req, res) {
           {path: 'orderId', select: 'clientName tiketNumber'}, 
           {path: 'orderList.productId', select: 'productName productImageUrl'},
         ]);
-      return res.status(200).json(allStoreOrder);
+
+      const formattedOrders = allStoreOrder.map(order => ({
+        orderId:order.orderId._id,
+        tiketNumber: order.orderId.tiketNumber,
+        clientName: order.orderId.clientName,   
+        orderList: order.orderList.map(item => ({
+          productId: item.productId._id,
+          productName: item.productId.productName,
+          orderQuantity: item.orderQuantity,
+        })),
+        cookStatus: order.cookStatus,            
+        getStatus: order.getStatus,              
+      }));
+
+      return res.status(200).json(formattedOrders);
     } catch (error) {
       console.error(error); // エラーをコンソールに出力
       res.status(400).json({ success: false, error: error.message });
