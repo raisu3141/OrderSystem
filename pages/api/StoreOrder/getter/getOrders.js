@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
       const formattedOrders = allStoreOrder.map(order => ({
         orderId:order.orderId._id,
-        tiketNumber: order.orderId.tiketNumber,
+        ticketNumber: order.orderId.tiketNumber,
         clientName: order.orderId.clientName,   
         orderList: order.orderList.map(item => ({
           productId: item.productId._id,

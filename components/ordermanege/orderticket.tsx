@@ -18,7 +18,7 @@ interface Order {
   orderList: OrderList[];
   cookStatus: boolean;
   getStatus: boolean;
-  tiketNumber: number;
+  ticketNumber: number;
   clientName: string;
 }
 
@@ -74,7 +74,7 @@ export default function OrderTicket({ storeId }: OrderticketProps) {
         <div className="flex items-start">
           <div className="flex-shrink-0 w-20 mr-4">
             <div className="text-sm text-gray-500">整理券番号</div>
-            <div className="text-4xl font-bold">{order.tiketNumber}</div>
+            <div className="text-4xl font-bold">{order.ticketNumber}</div>
           </div>
           <div className="flex-grow">
             <div className="text-sm mb-2">{order.clientName}</div>
