@@ -21,7 +21,8 @@ const StoreDataSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'ProductData', // ProductDataコレクションを参照
     required: false,
-    unique: true,
+    // このユニークは設定すると、最初メニュー情報のない屋台を複数作る際にエラーになるため、使わない。
+    // unique: true,
   }],
   
   // 待ち時間
