@@ -7,6 +7,7 @@ export default async function handler(req, res) {
 
   const { id } = req.query;  // クエリパラメータからidを取得
   const { cookStatus, getStatus } = req.body; // 更新するcookStatusをリクエストボディから取得
+  console.log(req.body);
 
   // cookStatusがtrueまたはfalse以外の場合のバリデーション
   if (typeof cookStatus !== 'boolean') {

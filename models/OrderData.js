@@ -11,6 +11,13 @@ const OrderDataSchema = new mongoose.Schema({
     min: 0,
   },
 
+  //LINEのユーザーID
+  "LineUserId":{
+    type: mongoose.Schema.Types.String,
+    required: false,
+    unique: true,
+  },
+
   // 注文リスト
   "orderList": [{
     // 商品ID
