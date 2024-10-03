@@ -61,4 +61,6 @@ const StoreOrderSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-export default mongoose.models.StoreOrder || mongoose.model('StoreOrder', StoreOrderSchema);
+// export default mongoose.models.StoreOrder || mongoose.model('StoreOrder', StoreOrderSchema);
+
+export default StoreOrderSchema;

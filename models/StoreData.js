@@ -38,6 +38,12 @@ const StoreDataSchema = new mongoose.Schema({
     min: 1,
   },
 
+  "storeOrder": {
+    type: mongoose.Schema.Types.String,
+    required: false,
+  },
+
+
 
 }, {
   // 追加・更新日時を自動で保存
