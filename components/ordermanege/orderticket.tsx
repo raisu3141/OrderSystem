@@ -5,26 +5,45 @@ import { Card, CardContent } from '../../components/ui/ticketcard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
 import { Loader2 } from 'lucide-react'
 
+interface Product {
+  productId: string;
+  productName: string;
+  productImageUrl: string;
+}
+
 interface OrderList {
-  name: string
-  orderQuantity: number
+  productId: Product;
+  orderQuantity: number;
+}
+
+interface OrderId {
+  orderId: string;
+  tiketNumber: number;
+  clientName: string;
 }
 
 interface Order {
-  orderId: number
-  customerName: string
-  orderList: OrderList[]
-  cookStatus: boolean
-  getStatus: boolean
+  _id: string;
+  orderId: OrderId;
+  orderList: OrderList[];
+  cookStatus: boolean;
+  getStatus: boolean;
+  orderTime: string; // もし必要であれば、注文日時も保持
 }
 
-async function fetchOrders(storeId: string, cookStatus: boolean, getStatus: boolean): Promise<Order[]> {
-  const response = await fetch(`/api/StoreOrder/getter/getOrders?storeId=${storeId}`)
-  if (!response.ok) {
-    throw new Error('Failed to fetch orders')
-  }
-  console.log(response.json())
-  return response.json()
+async function fetchOrders(storeId: string, cookStatus: boolean, getStatus: boolean): Promise<Order[]> { 
+  const response = await fetch(`/api/StoreOrder/getter/getOrders?storeId=${storeId}`, { 
+    headers: { 
+      // 'Cache-Control': 'no-cache', 
+      // 'Pragma': 'no-cache' 
+    } 
+  }); 
+  if (!response.ok) { 
+    throw new Error('Failed to fetch orders'); 
+  } 
+  const data = await response.json(); // 取得したデータを変数に格納
+  console.log(data); // データをコンソールに出力
+  return data; // データを返す
 }
 
 interface OrderticketProps {
@@ -46,7 +65,7 @@ export default function OrderTicket({ storeId }: OrderticketProps) {
     { refetchInterval: 5000 } // Refetch every 5 seconds
   )
 
-  const updateOrderStatus = async (orderId: number, newStatus: 'ready' | 'completed') => {
+  const updateOrderStatus = async (orderId: string, newStatus: 'ready' | 'completed') => {
     await fetch(`/api/orders/${orderId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -59,19 +78,19 @@ export default function OrderTicket({ storeId }: OrderticketProps) {
   }
 
   const renderOrderCard = (order: Order) => (
-    <Card key={order.orderId} className="mb-4 bg-gray-100">
+    <Card key={order.orderId.orderId} className="mb-4 bg-gray-100">
       <CardContent className="p-4">
         <div className="flex items-start">
           <div className="flex-shrink-0 w-20 mr-4">
             <div className="text-sm text-gray-500">整理券番号</div>
-            <div className="text-4xl font-bold">{order.orderId}</div>
+            <div className="text-4xl font-bold">{order.orderId.tiketNumber}</div>
           </div>
           <div className="flex-grow">
-            <div className="text-sm mb-2">{order.customerName}</div>
+            <div className="text-sm mb-2">{order.orderId.clientName}</div>
             <ul className="space-y-1">
               {order.orderList.map((item, index) => (
                 <li key={index} className="flex justify-between text-sm">
-                  <span>{item.name}</span>
+                  <span>{item.productId.productName}</span>
                   <span>× {item.orderQuantity}</span>
                 </li>
               ))}
@@ -79,7 +98,7 @@ export default function OrderTicket({ storeId }: OrderticketProps) {
           </div>
           <div className="flex-shrink-0 ml-4">
             <Button 
-              onClick={() => updateOrderStatus(order.orderId, order.cookStatus === true ? 'ready' : 'completed')}
+              onClick={() => updateOrderStatus(order.orderId.orderId, order.cookStatus === true ? 'ready' : 'completed')}
               className="w-24 bg-gray-200 text-black hover:bg-gray-300"
             >
               調理完了
