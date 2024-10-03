@@ -5,30 +5,21 @@ import { Card, CardContent } from '../../components/ui/ticketcard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
 import { Loader2 } from 'lucide-react'
 
-interface Product {
-  productId: string;
-  productName: string;
-  productImageUrl: string;
-}
+
 
 interface OrderList {
-  productId: Product;
+  productId: string;
+  productName: string;
   orderQuantity: number;
 }
 
-interface OrderId {
-  orderId: string;
-  tiketNumber: number;
-  clientName: string;
-}
-
 interface Order {
-  _id: string;
-  orderId: OrderId;
+  orderId: string;
   orderList: OrderList[];
   cookStatus: boolean;
   getStatus: boolean;
-  orderTime: string; // もし必要であれば、注文日時も保持
+  ticketNumber: number;
+  clientName: string;
 }
 
 async function fetchOrders(storeId: string, cookStatus: boolean, getStatus: boolean): Promise<Order[]> { 
@@ -78,19 +69,19 @@ export default function OrderTicket({ storeId }: OrderticketProps) {
   }
 
   const renderOrderCard = (order: Order) => (
-    <Card key={order.orderId.orderId} className="mb-4 bg-gray-100">
+    <Card key={order.orderId} className="mb-4 bg-gray-100">
       <CardContent className="p-4">
         <div className="flex items-start">
           <div className="flex-shrink-0 w-20 mr-4">
             <div className="text-sm text-gray-500">整理券番号</div>
-            <div className="text-4xl font-bold">{order.orderId.tiketNumber}</div>
+            <div className="text-4xl font-bold">{order.ticketNumber}</div>
           </div>
           <div className="flex-grow">
-            <div className="text-sm mb-2">{order.orderId.clientName}</div>
+            <div className="text-sm mb-2">{order.clientName}</div>
             <ul className="space-y-1">
               {order.orderList.map((item, index) => (
                 <li key={index} className="flex justify-between text-sm">
-                  <span>{item.productId.productName}</span>
+                  <span>{item.productName}</span>
                   <span>× {item.orderQuantity}</span>
                 </li>
               ))}
@@ -98,7 +89,7 @@ export default function OrderTicket({ storeId }: OrderticketProps) {
           </div>
           <div className="flex-shrink-0 ml-4">
             <Button 
-              onClick={() => updateOrderStatus(order.orderId.orderId, order.cookStatus === true ? 'ready' : 'completed')}
+              onClick={() => updateOrderStatus(order.orderId, order.cookStatus === true ? 'ready' : 'completed')}
               className="w-24 bg-gray-200 text-black hover:bg-gray-300"
             >
               調理完了
