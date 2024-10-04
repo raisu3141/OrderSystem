@@ -22,9 +22,11 @@ interface Order {
   clientName: string;
 }
 
+// 屋台Id, 調理状況, 受け渡し状況を指定してあてはまる注文を取得
 async function fetchOrders(storeId: string, cookStatus: boolean, getStatus: boolean): Promise<Order[]> { 
   const response = await fetch(`/api/StoreOrder/getter/getOrders?storeId=${storeId}`, { 
     headers: { 
+      // デバッグ用 データを更新しないようにする
       // 'Cache-Control': 'no-cache', 
       // 'Pragma': 'no-cache' 
     } 
@@ -34,6 +36,7 @@ async function fetchOrders(storeId: string, cookStatus: boolean, getStatus: bool
   } 
   const data = await response.json(); // 取得したデータを変数に格納
   console.log(data); // データをコンソールに出力
+
   return data; // データを返す
 }
 
@@ -44,23 +47,29 @@ interface OrderticketProps {
 export default function OrderTicket({ storeId }: OrderticketProps) {
   const [activeTab, setActiveTab] = useState<'preparing' | 'ready'>('preparing')
 
+  // 調理待ちの注文を取得
   const { data: preparingOrders, isLoading: isLoadingPreparing, error: errorPreparing } = useQuery(
     ['orders', storeId, true, false],
     () => fetchOrders(storeId, true, false),
-    { refetchInterval: 5000 } // Refetch every 5 seconds
+    { refetchInterval: 5000 } // 5秒ごとに再取得
   )
 
+  // 受け渡し待ちの注文を取得
   const { data: readyOrders, isLoading: isLoadingReady, error: errorReady } = useQuery(
     ['orders', storeId, false, true],
     () => fetchOrders(storeId, false, true),
-    { refetchInterval: 5000 } // Refetch every 5 seconds
+    { refetchInterval: 5000 } // 5秒ごとに再取得
   )
 
-  const updateOrderStatus = async (orderId: string, newStatus: 'ready' | 'completed') => {
-    await fetch(`/api/orders/${orderId}`, {
+  // 注文のステータスを更新
+  const updateOrderStatus = async (storeId: string, orderId: string, newStatus: 'ready' | 'completed') => {
+
+    const cookStatus = newStatus === 'ready' ? true : false
+    const getStatus = newStatus === 'completed' ? true : false
+    await fetch(`/api/StoreOrder/update/PatchOrderStatus?storeId=${storeId}?orderId=${orderId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: newStatus }),
+      body: JSON.stringify({ cookStatus, getStatus }),
     })
     await Promise.all([
       fetchOrders(storeId, true, false),
@@ -89,7 +98,7 @@ export default function OrderTicket({ storeId }: OrderticketProps) {
           </div>
           <div className="flex-shrink-0 ml-4">
             <Button 
-              onClick={() => updateOrderStatus(order.orderId, order.cookStatus === true ? 'ready' : 'completed')}
+              onClick={() => updateOrderStatus(storeId, order.orderId, order.cookStatus === true ? 'ready' : 'completed')}
               className="w-24 bg-gray-200 text-black hover:bg-gray-300"
             >
               調理完了
