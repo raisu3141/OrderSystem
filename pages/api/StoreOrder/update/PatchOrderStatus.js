@@ -1,13 +1,14 @@
 // pages/api/updateCookStatus.js
+import mongoose from 'mongoose';
 import connectToDatabase from '../../../../lib/mongoose';
-import StoreOrder from '../../../../models/StoreOrder';
+import StoreOrderSchema from '../../../../models/StoreOrder';
 
 export default async function handler(req, res) {
   await connectToDatabase();
 
-  const { id } = req.query;  // クエリパラメータからidを取得
+  const { storeName, orderId } = req.query;  // クエリパラメータからidを取得
   const { cookStatus, getStatus } = req.body; // 更新するcookStatusをリクエストボディから取得
-  console.log(req.body);
+  const collectionName = storeName + "_orders";
 
   // cookStatusがtrueまたはfalse以外の場合のバリデーション
   if (typeof cookStatus !== 'boolean') {
@@ -18,7 +19,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    const updatedStatus = await StoreOrder.findByIdAndUpdate(id, { cookStatus, getStatus }, { new: true });
+    const StoreOrder = mongoose.model(collectionName, StoreOrderSchema);
+    const updatedStatus = await StoreOrder.findOneAndUpdate(
+      {orderId: orderId}, 
+      { 
+        cookStatus: cookStatus, 
+        getStatus: getStatus 
+      }, 
+      {new: true }
+    );
+
       res.status(200).json(updatedStatus);
 
     if (!updatedStatus) {
