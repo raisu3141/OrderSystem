@@ -69,10 +69,6 @@ const StoreOrderSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-if (!mongoose.modelNames().includes('demostore_orders')) {
-  mongoose.model('demostore_orders', StoreOrderSchema);
-}
-
 // export default mongoose.models.StoreOrder || mongoose.model('StoreOrder', StoreOrderSchema);
 
 export default StoreOrderSchema;

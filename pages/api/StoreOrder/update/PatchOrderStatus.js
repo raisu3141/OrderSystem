@@ -20,6 +20,7 @@ export default async function handler(req, res) {
   }
 
   try {
+    // すでにモデルが存在する場合は再定義しない
     let StoreOrder;
     if (mongoose.modelNames().includes(collectionName)) {
         StoreOrder = mongoose.model(collectionName);
