@@ -2,10 +2,10 @@ import Head from 'next/head'
 import OrderTicket from '../../components/ordermanege/orderticket'
 
 interface OrderticketManagerProps {
-  storeId: string;
+  storeName: string;
 }
 
-export default function OrderticketManager({ storeId }: OrderticketManagerProps) {
+export default function OrderticketManager({ storeName }: OrderticketManagerProps) {
   return (
     <div>
       <Head>
@@ -13,7 +13,7 @@ export default function OrderticketManager({ storeId }: OrderticketManagerProps)
         <meta name="description" content="NANCA 注文管理システム" />
       </Head>
       <main>
-        <OrderTicket storeId={storeId} />
+        <OrderTicket storeName={storeName} />
       </main>
     </div>
   )

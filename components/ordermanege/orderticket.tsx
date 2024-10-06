@@ -14,17 +14,17 @@ interface OrderList {
 }
 
 interface Order {
-  orderId: string;
-  orderList: OrderList[];
+  clientName: string;
   cookStatus: boolean;
   getStatus: boolean;
+  orderId: string;
+  orderList: OrderList[];
   ticketNumber: number;
-  clientName: string;
 }
 
 // 屋台Id, 調理状況, 受け渡し状況を指定してあてはまる注文を取得
-async function fetchOrders(storeId: string, cookStatus: boolean, getStatus: boolean): Promise<Order[]> { 
-  const response = await fetch(`/api/StoreOrder/getter/getOrders?storeId=${storeId}`, { 
+async function fetchOrders(storeName: string, cookStatus: boolean, getStatus: boolean): Promise<Order[]> { 
+  const response = await fetch(`/api/StoreOrder/getter/getOrders?storeName=${storeName}`, { 
     headers: { 
       // デバッグ用 データを更新しないようにする
       // 'Cache-Control': 'no-cache', 
@@ -41,39 +41,39 @@ async function fetchOrders(storeId: string, cookStatus: boolean, getStatus: bool
 }
 
 interface OrderticketProps {
-  storeId: string;
+  storeName: string;
 }
 
-export default function OrderTicket({ storeId }: OrderticketProps) {
+export default function OrderTicket({ storeName }: OrderticketProps) {
   const [activeTab, setActiveTab] = useState<'preparing' | 'ready'>('preparing')
 
   // 調理待ちの注文を取得
   const { data: preparingOrders, isLoading: isLoadingPreparing, error: errorPreparing } = useQuery(
-    ['orders', storeId, true, false],
-    () => fetchOrders(storeId, true, false),
+    ['orders', storeName, true, false],
+    () => fetchOrders(storeName, true, false),
     { refetchInterval: 5000 } // 5秒ごとに再取得
   )
 
   // 受け渡し待ちの注文を取得
   const { data: readyOrders, isLoading: isLoadingReady, error: errorReady } = useQuery(
-    ['orders', storeId, false, true],
-    () => fetchOrders(storeId, false, true),
+    ['orders', storeName, false, true],
+    () => fetchOrders(storeName, false, true),
     { refetchInterval: 5000 } // 5秒ごとに再取得
   )
 
   // 注文のステータスを更新
-  const updateOrderStatus = async (storeId: string, orderId: string, newStatus: 'ready' | 'completed') => {
+  const updateOrderStatus = async (storeName: string, orderId: string, newStatus: 'ready' | 'completed') => {
 
     const cookStatus = newStatus === 'ready' ? true : false
     const getStatus = newStatus === 'completed' ? true : false
-    await fetch(`/api/StoreOrder/update/PatchOrderStatus?storeId=${storeId}?orderId=${orderId}`, {
+    await fetch(`/api/StoreOrder/update/PatchOrderStatus?storeName=${storeName}?orderId=${orderId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cookStatus, getStatus }),
     })
     await Promise.all([
-      fetchOrders(storeId, true, false),
-      fetchOrders(storeId, false, true),
+      fetchOrders(storeName, true, false),
+      fetchOrders(storeName, false, true),
     ])
   }
 
@@ -98,7 +98,7 @@ export default function OrderTicket({ storeId }: OrderticketProps) {
           </div>
           <div className="flex-shrink-0 ml-4">
             <Button 
-              onClick={() => updateOrderStatus(storeId, order.orderId, order.cookStatus === true ? 'ready' : 'completed')}
+              onClick={() => updateOrderStatus(storeName, order.orderId, order.cookStatus === true ? 'ready' : 'completed')}
               className="w-24 bg-gray-200 text-black hover:bg-gray-300"
             >
               調理完了
