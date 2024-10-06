@@ -10,6 +10,7 @@ export default async function handler(req, res) {
   const { cookStatus, getStatus } = req.body; // 更新するcookStatusをリクエストボディから取得
   const collectionName = storeName + "_orders";
 
+
   // cookStatusがtrueまたはfalse以外の場合のバリデーション
   if (typeof cookStatus !== 'boolean') {
     return res.status(400).json({ success: false, message: 'cookStatus must be a boolean value' });
@@ -19,7 +20,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const StoreOrder = mongoose.model(collectionName, StoreOrderSchema);
+    let StoreOrder;
+    if (mongoose.modelNames().includes(collectionName)) {
+        StoreOrder = mongoose.model(collectionName);
+    } else {
+        StoreOrder = mongoose.model(collectionName, StoreOrderSchema);
+    }
     const updatedStatus = await StoreOrder.findOneAndUpdate(
       {orderId: orderId}, 
       { 

@@ -66,7 +66,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
 
     const cookStatus = newStatus === 'ready' ? true : false
     const getStatus = newStatus === 'completed' ? true : false
-    await fetch(`/api/StoreOrder/update/PatchOrderStatus?storeName=${storeName}?orderId=${orderId}`, {
+    await fetch(`/api/StoreOrder/update/PatchOrderStatus?storeName=${storeName}&orderId=${orderId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cookStatus, getStatus }),
