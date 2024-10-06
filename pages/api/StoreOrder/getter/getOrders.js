@@ -1,28 +1,14 @@
-// pages/api/getOrders.js
-import mongoose from 'mongoose';  // mongooseのインポートを追加
+// pages/api/getORDERs.js
 import connectToDatabase from '../../../../lib/mongoose';
-import StoreOrderSchema from '../../../../models/StoreOrder';
+import StoreOrder from '../../../../models/StoreOrder';
 import OrderData from '../../../../models/OrderData';
 import ProductData from '../../../../models/ProductData';
-import { cloneElement } from 'react';
 
 export default async function handler(req, res) {
-    const { storeName } = req.query;
-    const collectionName = storeName + "_orders";
-
     await connectToDatabase();
     const { storeId } = req.query;
     try {
-      const collections = await mongoose.connection.db.listCollections({ name: collectionName }).toArray();
-    
-      if (collections.length === 0) {
-        // コレクションが存在しない場合はエラーレスポンスを返す
-        return res.status(404).json({ success: false, message: `Collection '${collectionName}' does not exist.` });
-      }
-  
-      // コレクションが存在する場合のみモデルを取得
-      const StoreOrder = mongoose.model(collectionName, StoreOrderSchema);
-      const allStoreOrder = await StoreOrder.find({}, "orderId orderList.productId orderList.orderQuantity cookStatus getStatus orderTime")
+      const allStoreOrder = await StoreOrder.find({} ,"orderId orderList.productId orderList.orderQuantity cookStatus getStatus orderTime")
         .populate([
           {path: 'orderId', select: 'clientName tiketNumber'}, 
           {path: 'orderList.productId', select: 'productName productImageUrl'},

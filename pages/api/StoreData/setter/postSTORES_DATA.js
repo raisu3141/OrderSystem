@@ -2,8 +2,6 @@
 import connectToDatabase from '../../../../lib/mongoose';
 import StoreData from '../../../../models/StoreData';
 
-
-// 使うことはないファイル　createSTPRE_DATAに変更・統合した。
 export default async function handler(req, res) {
   await connectToDatabase();
   try {

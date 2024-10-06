@@ -21,8 +21,7 @@ const StoreDataSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'ProductData', // ProductDataコレクションを参照
     required: false,
-    // このユニークは設定すると、最初メニュー情報のない屋台を複数作る際にエラーになるため、使わない。
-    // unique: true,
+    unique: true,
   }],
   
   // 待ち時間
@@ -39,16 +38,10 @@ const StoreDataSchema = new mongoose.Schema({
     min: 1,
   },
 
-  "storeOrder": {
-    type: mongoose.Schema.Types.String,
-    required: false,
-  },
-
-
 
 }, {
   // 追加・更新日時を自動で保存
   timestamps: true,
 });
 
-export default mongoose.models.StoreData || mongoose.model('StoreData', StoreDataSchema, "mock_StoreData");
+export default mongoose.models.StoreData || mongoose.model('StoreData', StoreDataSchema, 'mock_StoreData');
