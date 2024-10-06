@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 
 const OrderDataSchema = new mongoose.Schema({
   // 整理券番号
-  "tiketNumber": {
+  "ticketNumber": {
     type: mongoose.Schema.Types.Number,
     required: true,
     unique: true,
@@ -71,4 +71,4 @@ const OrderDataSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-export default mongoose.models.OrderData || mongoose.model('OrderData', OrderDataSchema, "mock_OrderData");
+export default mongoose.models.OrderData || mongoose.model('OrderData', OrderDataSchema);

@@ -58,4 +58,4 @@ const ProductDataSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-export default mongoose.models.ProductData || mongoose.model('ProductData', ProductDataSchema, "mock_ProductData");
+export default mongoose.models.ProductData || mongoose.model('ProductData', ProductDataSchema);
