@@ -33,7 +33,7 @@ export default async function handler(req, res) {
 
     // 結果を返す
     if (maxCountId) {
-      res.status(200).json({ success: true, maxCountId });
+      res.status(200).json({"_id": maxCountId});
     } else {
       res.status(404).json({ success: false, message: `No products found ${productIds}` });
     }
