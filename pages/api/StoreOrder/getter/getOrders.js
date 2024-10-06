@@ -23,13 +23,13 @@ export default async function handler(req, res) {
       const StoreOrder = mongoose.model(collectionName, StoreOrderSchema);
       const allStoreOrder = await StoreOrder.find({}, "orderId orderList.productId orderList.orderQuantity cookStatus getStatus orderTime")
         .populate([
-          {path: 'orderId', select: 'clientName tiketNumber'}, 
+          {path: 'orderId', select: 'clientName ticketNumber'}, 
           {path: 'orderList.productId', select: 'productName productImageUrl'},
         ]);
 
       const formattedOrders = allStoreOrder.map(order => ({
         orderId:order.orderId._id,
-        tiketNumber: order.orderId.tiketNumber,
+        ticketNumber: order.orderId.ticketNumber,
         clientName: order.orderId.clientName,   
         orderList: order.orderList.map(item => ({
           productId: item.productId._id,
