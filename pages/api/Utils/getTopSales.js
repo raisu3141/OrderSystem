@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   await connectToDatabase();
 
   try {
-    const productData = await ProductData.find({}, "storeId productName soldCount")
+    const productData = await ProductData.find({}, "storeId productName soldCount productImageUrl")
     .populate([
         {path: 'storeId', select:"storeName"}
     ]);
@@ -17,6 +17,7 @@ export default async function handler(req, res) {
     const formatData = productData.map(data => ({
         storeName: data.storeId.storeName,
         productName: data.productName,
+        productImageUrl: data.productImageUrl,
         soldCount: data.soldCount
     }));
 
