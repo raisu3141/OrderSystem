@@ -24,3 +24,12 @@
   height: calc(100vh - 80px);
   width: 25%;
 }
+
+.ordercartcontainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  height: 100%;
+  width: 50%;
+}

@@ -4,7 +4,8 @@ import Header from '../../components/header';
 import Styles from '../../styles/orderInput.module.css';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { CartItem, Product } from '@/lib/types';
-import Cart from '@/components/orderinput/ProductCart';
+// import Cart from '@/components/orderinput/ProductCart';
+import Cart from '@/components/orderinput/testCart';
 import { ProductList } from '@/components/orderinput/ProductList';
 
 export function OrderPage() {
@@ -19,11 +20,9 @@ export function OrderPage() {
           item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
         );
       }
-      return [...prevCart, { ...product, quantity }as CartItem];
+      return [...prevCart, { ...product, quantity } as CartItem];
     });
   };
-
-  const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   useEffect(() => {
     const mockProductList: Product[] = [
@@ -72,10 +71,22 @@ export function OrderPage() {
         cookTime: 5,
         stock: 30,
       },
-      
+
     ];
     setProductList(mockProductList);
   }, []);
+
+  const removeFromCart = (id: number) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== id));
+  };
+
+  const quantityChange = (id: number, quantity: number) => {
+    setCart(prevCart =>
+      prevCart.map(item =>
+        item.id === id ? { ...item, quantity } : item
+      )
+    );
+  };
 
   return (
     <div>
@@ -91,7 +102,8 @@ export function OrderPage() {
             ))}
           </div>
         </ScrollArea>
-        <Cart cart={cart}/>
+        {/* <Cart cart={cart} /> */}
+        <Cart cart={cart} onRemove={removeFromCart} onQuantityChange={quantityChange}/> {/* onRemoveを渡す */}
       </div>
     </div>
   );

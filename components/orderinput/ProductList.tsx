@@ -12,6 +12,7 @@ export function ProductList({ id, storeId, productName, productImageURL, price, 
   const [isOpen, setIsOpen] = useState(false); // ダイアログのオープン状態を管理
 
   const handleAddToCart = () => {
+    console.log('Adding to cart:', { id, storeId, productName, productImageURL, price, cookTime, stock }, quantity); // デバッグ用
     addToCart({ id, storeId, productName, productImageURL, price, cookTime, stock }, quantity);
     setQuantity(1); // 数量をリセット
     setIsOpen(false); // ダイアログを閉じる
@@ -20,7 +21,11 @@ export function ProductList({ id, storeId, productName, productImageURL, price, 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="bg-white w-full h-auto aspect-square flex flex-col items-center justify-center p-0 ">
+        <Button 
+        variant="outline"
+        className="bg-white w-full h-auto aspect-square flex flex-col items-center justify-center p-0 "
+        disabled={stock === 0}
+        >
           <div className="bg-gray-500 w-full h-48">
             <img
               src={productImageURL}
