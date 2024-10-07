@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react'
 import { useQuery } from 'react-query'
 import { Button } from '../../components/ui/button'
@@ -34,11 +36,11 @@ async function fetchOrders(storeName: string, status: 'preparing' | 'ready' | 'c
   return data.filter(order => {
     switch (status) {
       case 'preparing':
-        return order.cookStatus === true && order.getStatus === false;
-      case 'ready':
-        return order.cookStatus === false && order.getStatus === true;
-      case 'completed':
         return order.cookStatus === false && order.getStatus === false;
+      case 'ready':
+        return order.cookStatus === true && order.getStatus === false;
+      case 'completed':
+        return order.cookStatus === true && order.getStatus === true;
       default:
         return false;
     }
@@ -82,7 +84,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
     ])
   }
 
-  const renderOrderCard = (order: Order) => (
+  const renderOrderCard = (order: Order, status: 'preparing' | 'ready') => (
     <Card key={order.orderId} className="mb-4 bg-gray-100">
       <CardContent className="p-4">
         <div className="flex items-start">
@@ -90,8 +92,10 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
             <div className="text-sm text-gray-500">整理券番号</div>
             <div className="text-4xl font-bold">{order.ticketNumber}</div>
           </div>
-          <div className="flex-grow">
+          <div className="flex-shrink-0 w-20 mr-4">
             <div className="text-sm mb-2">{order.clientName}</div>
+          </div>
+          <div className="flex-grow">
             <ul className="space-y-1">
               {order.orderList.map((item, index) => (
                 <li key={index} className="flex justify-between text-sm">
@@ -103,10 +107,10 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
           </div>
           <div className="flex-shrink-0 ml-4">
             <Button 
-              onClick={() => updateOrderStatus(storeName, order.orderId, order.cookStatus === true ? 'ready' : 'completed')}
+              onClick={() => updateOrderStatus(storeName, order.orderId, status === 'preparing' ? 'ready' : 'completed')}
               className="w-24 bg-gray-200 text-black hover:bg-gray-300"
             >
-              調理完了
+              {status === 'preparing' ? '調理完了' : '受け渡し完了'}
             </Button>
           </div>
         </div>
@@ -124,22 +128,31 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
 
   return (
     <div className="container mx-auto p-4">
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'preparing' | 'ready')}>
-        <TabsList className="grid w-full grid-cols-2 mb-4">
-          <TabsTrigger value="preparing" className="text-lg">注文一覧</TabsTrigger>
-          <TabsTrigger value="ready" className="text-lg">受け渡し</TabsTrigger>
-        </TabsList>
-        <TabsContent value="preparing">
-          <div>
-            {preparingOrders?.map(renderOrderCard)}
-          </div>
-        </TabsContent>
-        <TabsContent value="ready">
-          <div>
-            {readyOrders?.map(renderOrderCard)}
-          </div>
-        </TabsContent>
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'preparing' | 'ready')}> 
+        <TabsList className="grid w-full grid-cols-2 mb-4"> 
+          <TabsTrigger  
+            value="preparing"  
+            className={`text-lg px-4 py-2 ${activeTab === 'preparing' ? 'border-b-2 border-blue-500' : ''}`}>
+            調理待ち
+          </TabsTrigger>  
+          <TabsTrigger  
+            value="ready"  
+            className={`text-lg px-4 py-2 ${activeTab === 'ready' ? 'border-b-2 border-red-500' : ''}`}>
+            受け渡し待ち
+          </TabsTrigger>  
+        </TabsList> 
+        <TabsContent value="preparing"> 
+          <div> 
+            {preparingOrders?.map(order => renderOrderCard(order, 'preparing'))} 
+          </div> 
+        </TabsContent> 
+        <TabsContent value="ready"> 
+          <div> 
+            {readyOrders?.map(order => renderOrderCard(order, 'ready'))} 
+          </div> 
+        </TabsContent> 
       </Tabs>
+
     </div>
   )
 }

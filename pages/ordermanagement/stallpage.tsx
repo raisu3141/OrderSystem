@@ -27,7 +27,7 @@ export default function StallPage() {
         <div className="sticky top-0 bg-white border-b-2 border-gray-300 p-4 z-10 flex items-center justify-between mb-8">
           <h1 className="text-4xl font-bold">{name}</h1>
         </div>
-        <OrderticketManager storeName={storeName} />
+        <OrderticketManager storeName={storeName} name={name} />
       </div>
     </div>
   )

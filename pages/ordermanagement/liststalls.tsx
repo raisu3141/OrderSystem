@@ -17,7 +17,7 @@ export function ListStalls() {
     // APIが出来次第、APIからデータを取得する
     // 以下はモックデータ
     const mockStallList: Stall[] = [
-      { storeName: 'demostore', name: 'デモの屋台', image: '/images/yatai1.png' },
+      { storeName: 'demoshop', name: 'デモの屋台', image: '/images/yatai1.png' },
       { storeName: '2', name: '屋台２', image: '/images/yatai1.png' },
       { storeName: '3', name: '屋台３', image: '/images/yatai1.png' },
       { storeName: '4', name: '屋台４', image: '/images/yatai1.png' },
