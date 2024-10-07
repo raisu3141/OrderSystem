@@ -11,6 +11,13 @@ const OrderDataSchema = new mongoose.Schema({
     min: 0,
   },
 
+  //LINEのユーザーID
+  "LineUserId":{
+    type: mongoose.Schema.Types.String,
+    required: false,
+    unique: true,
+  },
+
   // 注文リスト
   "orderList": [{
     // 商品ID
@@ -58,14 +65,6 @@ const OrderDataSchema = new mongoose.Schema({
       },
     ],
   },
-
-  // 注文時間
-  "orderTime": {
-    type: mongoose.Schema.Types.Date,
-    required: true,
-    default: Date.now,
-  },
-
 
 }, {
   // 追加・更新日時を自動で保存

@@ -2,6 +2,14 @@
 import mongoose from 'mongoose';
 
 const StoreOrderSchema = new mongoose.Schema({
+
+  //注文情報Id
+  "orderId":{
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'OrderData',
+  },
+
 // 注文リスト
   "orderList": [{
     // 商品ID
