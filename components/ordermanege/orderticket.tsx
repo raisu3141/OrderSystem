@@ -23,21 +23,26 @@ interface Order {
 }
 
 // 屋台Id, 調理状況, 受け渡し状況を指定してあてはまる注文を取得
-async function fetchOrders(storeName: string, cookStatus: boolean, getStatus: boolean): Promise<Order[]> { 
-  const response = await fetch(`/api/StoreOrder/getter/getOrders?storeName=${storeName}`, { 
-    headers: { 
-      // デバッグ用 データを更新しないようにする
-      // 'Cache-Control': 'no-cache', 
-      // 'Pragma': 'no-cache' 
-    } 
-  }); 
+async function fetchOrders(storeName: string, status: 'preparing' | 'ready' | 'completed'): Promise<Order[]> { 
+  const response = await fetch(`/api/StoreOrder/getter/getOrders?storeName=${storeName}`); 
   if (!response.ok) { 
     throw new Error('Failed to fetch orders'); 
   } 
-  const data = await response.json(); // 取得したデータを変数に格納
-  console.log(data); // データをコンソールに出力
+  const data: Order[] = await response.json();
 
-  return data; // データを返す
+  // statusの値によってフィルタリング
+  return data.filter(order => {
+    switch (status) {
+      case 'preparing':
+        return order.cookStatus === true && order.getStatus === false;
+      case 'ready':
+        return order.cookStatus === false && order.getStatus === true;
+      case 'completed':
+        return order.cookStatus === false && order.getStatus === false;
+      default:
+        return false;
+    }
+  });
 }
 
 interface OrderticketProps {
@@ -49,15 +54,15 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
 
   // 調理待ちの注文を取得
   const { data: preparingOrders, isLoading: isLoadingPreparing, error: errorPreparing } = useQuery(
-    ['orders', storeName, true, false],
-    () => fetchOrders(storeName, true, false),
+    ['orders', storeName, 'perparing'],
+    () => fetchOrders(storeName, 'preparing'),
     { refetchInterval: 5000 } // 5秒ごとに再取得
   )
 
   // 受け渡し待ちの注文を取得
   const { data: readyOrders, isLoading: isLoadingReady, error: errorReady } = useQuery(
-    ['orders', storeName, false, true],
-    () => fetchOrders(storeName, false, true),
+    ['orders', storeName, 'ready'],
+    () => fetchOrders(storeName, 'ready'),
     { refetchInterval: 5000 } // 5秒ごとに再取得
   )
 
@@ -72,8 +77,8 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
       body: JSON.stringify({ cookStatus, getStatus }),
     })
     await Promise.all([
-      fetchOrders(storeName, true, false),
-      fetchOrders(storeName, false, true),
+      fetchOrders(storeName, 'preparing'),
+      fetchOrders(storeName, 'ready'),
     ])
   }
 
