@@ -44,8 +44,6 @@ const StoreDataSchema = new mongoose.Schema({
     required: false,
   },
 
-
-
 }, {
   // 追加・更新日時を自動で保存
   timestamps: true,
