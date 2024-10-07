@@ -132,12 +132,12 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
         <TabsList className="grid w-full grid-cols-2 mb-4"> 
           <TabsTrigger  
             value="preparing"  
-            className={`text-lg px-4 py-2 ${activeTab === 'preparing' ? 'border-b-2 border-blue-500' : ''}`}>
+            className={`text-lg px-4 py-2 ${activeTab === 'preparing' ? 'border-b-2 border-orange-500' : ''}`}>
             調理待ち
           </TabsTrigger>  
           <TabsTrigger  
             value="ready"  
-            className={`text-lg px-4 py-2 ${activeTab === 'ready' ? 'border-b-2 border-red-500' : ''}`}>
+            className={`text-lg px-4 py-2 ${activeTab === 'ready' ? 'border-b-2 border-green-500' : ''}`}>
             受け渡し待ち
           </TabsTrigger>  
         </TabsList> 
