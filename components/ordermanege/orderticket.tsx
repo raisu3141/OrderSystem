@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react'
 import { useQuery } from 'react-query'
 import { Button } from '../../components/ui/button'
@@ -23,21 +25,26 @@ interface Order {
 }
 
 // 屋台Id, 調理状況, 受け渡し状況を指定してあてはまる注文を取得
-async function fetchOrders(storeName: string, cookStatus: boolean, getStatus: boolean): Promise<Order[]> { 
-  const response = await fetch(`/api/StoreOrder/getter/getOrders?storeName=${storeName}`, { 
-    headers: { 
-      // デバッグ用 データを更新しないようにする
-      // 'Cache-Control': 'no-cache', 
-      // 'Pragma': 'no-cache' 
-    } 
-  }); 
+async function fetchOrders(storeName: string, status: 'preparing' | 'ready' | 'completed'): Promise<Order[]> { 
+  const response = await fetch(`/api/StoreOrder/getter/getOrders?storeName=${storeName}`); 
   if (!response.ok) { 
     throw new Error('Failed to fetch orders'); 
   } 
-  const data = await response.json(); // 取得したデータを変数に格納
-  console.log(data); // データをコンソールに出力
+  const data: Order[] = await response.json();
 
-  return data; // データを返す
+  // statusの値によってフィルタリング
+  return data.filter(order => {
+    switch (status) {
+      case 'preparing':
+        return order.cookStatus === false && order.getStatus === false;
+      case 'ready':
+        return order.cookStatus === true && order.getStatus === false;
+      case 'completed':
+        return order.cookStatus === true && order.getStatus === true;
+      default:
+        return false;
+    }
+  });
 }
 
 interface OrderticketProps {
@@ -49,15 +56,15 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
 
   // 調理待ちの注文を取得
   const { data: preparingOrders, isLoading: isLoadingPreparing, error: errorPreparing } = useQuery(
-    ['orders', storeName, true, false],
-    () => fetchOrders(storeName, true, false),
+    ['orders', storeName, 'perparing'],
+    () => fetchOrders(storeName, 'preparing'),
     { refetchInterval: 5000 } // 5秒ごとに再取得
   )
 
   // 受け渡し待ちの注文を取得
   const { data: readyOrders, isLoading: isLoadingReady, error: errorReady } = useQuery(
-    ['orders', storeName, false, true],
-    () => fetchOrders(storeName, false, true),
+    ['orders', storeName, 'ready'],
+    () => fetchOrders(storeName, 'ready'),
     { refetchInterval: 5000 } // 5秒ごとに再取得
   )
 
@@ -72,12 +79,12 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
       body: JSON.stringify({ cookStatus, getStatus }),
     })
     await Promise.all([
-      fetchOrders(storeName, true, false),
-      fetchOrders(storeName, false, true),
+      fetchOrders(storeName, 'preparing'),
+      fetchOrders(storeName, 'ready'),
     ])
   }
 
-  const renderOrderCard = (order: Order) => (
+  const renderOrderCard = (order: Order, status: 'preparing' | 'ready') => (
     <Card key={order.orderId} className="mb-4 bg-gray-100">
       <CardContent className="p-4">
         <div className="flex items-start">
@@ -85,8 +92,10 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
             <div className="text-sm text-gray-500">整理券番号</div>
             <div className="text-4xl font-bold">{order.ticketNumber}</div>
           </div>
-          <div className="flex-grow">
+          <div className="flex-shrink-0 w-20 mr-4">
             <div className="text-sm mb-2">{order.clientName}</div>
+          </div>
+          <div className="flex-grow">
             <ul className="space-y-1">
               {order.orderList.map((item, index) => (
                 <li key={index} className="flex justify-between text-sm">
@@ -98,10 +107,10 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
           </div>
           <div className="flex-shrink-0 ml-4">
             <Button 
-              onClick={() => updateOrderStatus(storeName, order.orderId, order.cookStatus === true ? 'ready' : 'completed')}
+              onClick={() => updateOrderStatus(storeName, order.orderId, status === 'preparing' ? 'ready' : 'completed')}
               className="w-24 bg-gray-200 text-black hover:bg-gray-300"
             >
-              調理完了
+              {status === 'preparing' ? '調理完了' : '受け渡し完了'}
             </Button>
           </div>
         </div>
@@ -119,22 +128,31 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
 
   return (
     <div className="container mx-auto p-4">
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'preparing' | 'ready')}>
-        <TabsList className="grid w-full grid-cols-2 mb-4">
-          <TabsTrigger value="preparing" className="text-lg">注文一覧</TabsTrigger>
-          <TabsTrigger value="ready" className="text-lg">受け渡し</TabsTrigger>
-        </TabsList>
-        <TabsContent value="preparing">
-          <div>
-            {preparingOrders?.map(renderOrderCard)}
-          </div>
-        </TabsContent>
-        <TabsContent value="ready">
-          <div>
-            {readyOrders?.map(renderOrderCard)}
-          </div>
-        </TabsContent>
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'preparing' | 'ready')}> 
+        <TabsList className="grid w-full grid-cols-2 mb-4"> 
+          <TabsTrigger  
+            value="preparing"  
+            className={`text-lg px-4 py-2 ${activeTab === 'preparing' ? 'border-b-2 border-orange-500' : ''}`}>
+            調理待ち
+          </TabsTrigger>  
+          <TabsTrigger  
+            value="ready"  
+            className={`text-lg px-4 py-2 ${activeTab === 'ready' ? 'border-b-2 border-green-500' : ''}`}>
+            受け渡し待ち
+          </TabsTrigger>  
+        </TabsList> 
+        <TabsContent value="preparing"> 
+          <div> 
+            {preparingOrders?.map(order => renderOrderCard(order, 'preparing'))} 
+          </div> 
+        </TabsContent> 
+        <TabsContent value="ready"> 
+          <div> 
+            {readyOrders?.map(order => renderOrderCard(order, 'ready'))} 
+          </div> 
+        </TabsContent> 
       </Tabs>
+
     </div>
   )
 }

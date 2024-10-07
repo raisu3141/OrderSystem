@@ -2,14 +2,14 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 interface StallCardProps {
-  id: number
+  storeName: string
   name: string
   image: string
 }
 // props => コンポーネントにおける引数
-export function StallCard({ id, name, image }: StallCardProps) { 
+export function StallCard({ storeName, name, image }: StallCardProps) { 
   return ( 
-    <Link href={`/ordermanagement/stallpage`} className="block"> 
+    <Link href={`/ordermanagement/stallpage?storeName=${encodeURIComponent(storeName)}&name=${encodeURIComponent(name)}`} className="block"> 
       <div className="border rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"> 
         <Image 
           src={image} 
