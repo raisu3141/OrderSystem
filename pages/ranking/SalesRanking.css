@@ -1,0 +1,26 @@
+.container {
+    justify-content: center; /* 水平方向の中央揃え */
+    align-items: flex-start; /* 垂直方向の上揃え */
+    height: 100vh; /* ビューポートの高さに合わせる */
+    font-size: 30px;
+  }
+.imagecontainer {
+    display: flex; /*横並び*/
+    flex-direction: column; /*縦に並べる*/
+    align-items: flex-start; /* 左揃え */
+    margin: 40px;
+}
+.imageranker{
+    display: flex; /* 横並びにする */
+}
+.rankfontsize{
+    font-size: 25px;
+}
+.namesfontmargin{
+    font-size: 25px;
+    margin: 30px;
+}
+.itemmrgin{
+    font-size: 25px;
+    margin: 40px;
+}
