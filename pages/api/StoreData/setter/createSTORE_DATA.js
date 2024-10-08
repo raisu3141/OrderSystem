@@ -1,31 +1,54 @@
-import mongoose from 'mongoose';  // mongooseのインポートを追加
+import mongoose from 'mongoose';
 import connectToDatabase from '../../../../lib/mongoose';
 import StoreData from '../../../../models/StoreData';
 import StoreOrderSchema from '../../../../models/StoreOrder';
+import multer from 'multer';
+import { uploadToGCS } from '../../../../lib/gcs'; // GCSへのアップロード関数
+
+// multerのストレージ設定
+const upload = multer({
+  storage: multer.memoryStorage(), // メモリにファイルを保持
+});
+
+// multerミドルウェアを外部関数として定義
+const uploadMiddleware = upload.single('image');
 
 export default async function handler(req, res) {
+  // multerミドルウェアを適用
+  await new Promise((resolve, reject) => {
+    uploadMiddleware(req, res, (err) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
+  }).catch((err) => {
+    console.error("Multer error:", err);
+    return res.status(500).json({ success: false, message: 'Error uploading image', error: err.message });
+  });
+
   await connectToDatabase();
 
-  let storeID;  // storeIDをスコープの外で宣言
+  let storeID;
   let storeName;
 
   // 屋台作成
   try {
+    console.log(req.body); // ここでreq.bodyがundefinedの場合、リクエストの内容を確認
     const store = new StoreData(req.body);
     await store.save();
     storeID = store._id;
     storeName = store.storeName;
   } catch (error) {
-    // エラーメッセージを含めた詳細を表示
     console.error("Error saving store data:", error);
     return res.status(401).json({
       success: false,
       message: "Error saving store data",
-      error: error.message, // エラーメッセージを含める
+      error: error.message,
     });
   }
 
-  // storeNameが正しく取得されていない場合、処理を終了
   if (!storeName) {
     return res.status(402).json({
       success: false,
@@ -33,12 +56,32 @@ export default async function handler(req, res) {
     });
   }
 
+  try {
+    // 画像をGCSにアップロード
+    const publicUrl = await uploadToGCS(req.file);
+    console.log('URL:', publicUrl);
+
+    // 画像のURLをStoreDataに追加
+    const updatedStoreData = await StoreData.findByIdAndUpdate(
+      storeID,
+      { $set: { storeImageUrl: publicUrl } },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedStoreData) {
+      return res.status(404).json({ success: false, message: 'Store not found' });
+    }
+
+    res.status(201).json({ success: true, imageUrl: publicUrl });
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    return res.status(500).json({ success: false, message: "Error uploading image" });
+  }
+
   // 屋台Nを作成   
   try {
-    // 動的にモデルを作成
     const StoreOrder = mongoose.model(storeName + "_Order", StoreOrderSchema);
 
-    // 仮データ挿入
     const tempDoc = new StoreOrder({
       tiketNumber: 1,
       orderList: [],
@@ -46,23 +89,20 @@ export default async function handler(req, res) {
     });
     await tempDoc.save();
     
-    // 保存直後にドキュメントを削除
     await StoreOrder.findByIdAndDelete(tempDoc._id);
     console.log('コレクションのみが作成されました');
   } catch (error) {
-    // エラーメッセージを含めた詳細を表示
     console.error("Error creating storeOrder data:", error);
     return res.status(403).json({
       success: false,
       message: "Error creating storeOrder data",
-      error: error.message, // エラーメッセージを含める
+      error: error.message,
     });
   }
 
   // 屋台データにStoreOrderのコレクション名を格納
   try {
     const updateFields = { storeOrder: storeName + "_Order" };
-    // Find the store by _id and update it with the new fields
     const updatedStore = await StoreData.findByIdAndUpdate(
       storeID, 
       updateFields, 
@@ -73,15 +113,20 @@ export default async function handler(req, res) {
       return res.status(404).json({ success: false, message: 'Store not found' });
     }
 
-    // 更新されたデータを返す
     res.status(200).json(updatedStore);
   } catch (error) {
-    // エラーメッセージを含めた詳細を表示
     console.error("Error updating store data:", error);
     return res.status(400).json({
       success: false,
       message: "Error updating store data",
-      error: error.message, // エラーメッセージを含める
+      error: error.message,
     });
   }
 }
+
+// multerを使って画像ファイルを処理するための設定
+export const config = {
+  api: {
+    bodyParser: false,  // multerで処理するために無効化
+  },
+};

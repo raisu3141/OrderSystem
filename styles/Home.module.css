@@ -1,0 +1,42 @@
+@font-face { 
+    font-family: 'Silkscreen'; 
+    src: url('/fonts/Silkscreen-Bold.ttf') format('truetype'); /* 'format' を修正 */
+    font-weight: 400; 
+    font-style: normal; 
+} 
+ 
+.Row { 
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    align-items: center; 
+    margin: 0 auto; 
+    max-width: 1200px; 
+    padding: 0 20px; 
+} 
+
+.container {
+    min-height: 100vh; /* 全体の最小高さを画面サイズに */
+    padding: 1rem 2rem 5rem; /* 上部のパディングと下部の余白 */
+    font-family: var(--font-geist-sans); /* フォントの設定 */
+}
+ 
+.nav { 
+    background-color: #ebebeb; 
+    height: 80px; 
+} 
+ 
+.nav ul { 
+    flex-direction: row; 
+    padding: 0; 
+    padding-left: 2rem; 
+} 
+ 
+.nav li { 
+    font-family: 'Silkscreen', sans-serif; /* フォントファミリーを指定 */
+    color: black; 
+    text-align: left; 
+    position: sticky; 
+    padding: 1rem; 
+    font-size: 36px; 
+}

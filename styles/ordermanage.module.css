@@ -1,0 +1,20 @@
+.button {
+    border: 2px solid #000; /* 枠線を追加 */
+    padding: 0.5rem 1rem; /* ボタン内のパディング */
+    background-color: #ffffff; /* 初期の背景色 */
+    color: #000; /* テキストの色 */
+    font-size: 1rem; /* フォントサイズ */
+    font-weight: bold; /* 太字 */
+    border-radius: 0.375rem; /* 角を少し丸く */
+    cursor: pointer; /* マウスオーバーでカーソルをポインタに */
+    transition: background-color 0.3s ease; /* 色の変化を滑らかに */
+}
+
+.button:hover {
+    background-color: #f0f0f0; /* ホバー時の背景色 */
+}
+
+.button:active {
+    background-color: #d1d5db; /* クリック時の背景色 */
+    border-color: #4b5563; /* 枠線の色も変更 */
+}
