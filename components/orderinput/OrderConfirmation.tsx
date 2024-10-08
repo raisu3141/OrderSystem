@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import Styles from '../../styles/orderInput.module.css'; // スタイルのインポート
-import { CartItem } from '@/lib/types'; // カートアイテムの型をインポート
+import { CartItem } from '../../lib/types'; // カートアイテムの型をインポート
 import OrderCompleted from "./OrderCompleted";
 
 interface OrderConfirmationProps {

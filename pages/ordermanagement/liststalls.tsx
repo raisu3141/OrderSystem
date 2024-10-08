@@ -5,7 +5,7 @@ import Header from '../../components/header'
 import Styles from '../../styles/Home.module.css'
 
 interface Stall {
-  id: number
+  storeName: string
   name: string
   image: string
 }
@@ -17,10 +17,10 @@ export function ListStalls() {
     // APIが出来次第、APIからデータを取得する
     // 以下はモックデータ
     const mockStallList: Stall[] = [
-      { id: 1, name: '屋台１', image: '/images/yatai1.png' },
-      { id: 2, name: '屋台２', image: '/images/yatai1.png' },
-      { id: 3, name: '屋台３', image: '/images/yatai1.png' },
-      { id: 4, name: '屋台４', image: '/images/yatai1.png' },
+      { storeName: 'demoshop', name: 'デモの屋台', image: '/images/yatai1.png' },
+      { storeName: '2', name: '屋台２', image: '/images/yatai1.png' },
+      { storeName: '3', name: '屋台３', image: '/images/yatai1.png' },
+      { storeName: '4', name: '屋台４', image: '/images/yatai1.png' },
     ]
     setStallList(mockStallList)
   }, [])
@@ -39,7 +39,7 @@ export function ListStalls() {
         {/* 屋台一覧を表示 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {stallList.map((stall) => (
-            <StallsCard key={stall.id} {...stall} />
+            <StallsCard key={stall.storeName} {...stall} />
           ))}
         </div>
       </div>

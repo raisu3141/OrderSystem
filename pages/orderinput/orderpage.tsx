@@ -3,10 +3,9 @@ import Head from 'next/head';
 import Header from '../../components/header';
 import Styles from '../../styles/orderInput.module.css';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
-import { CartItem, Product } from '@/lib/types';
-// import Cart from '@/components/orderinput/ProductCart';
-import Cart from '@/components/orderinput/testCart';
-import { ProductList } from '@/components/orderinput/ProductList';
+import { CartItem, Product } from '../../lib/types';
+import Cart from '../../components/orderinput/ProductCart';
+import { ProductList } from '../../components/orderinput/ProductList';
 
 export function OrderPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
