@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 
 const OrderDataSchema = new mongoose.Schema({
   // 整理券番号
-  "tiketNumber": {
+  "ticketNumber": {
     type: mongoose.Schema.Types.Number,
     required: true,
     unique: true,
@@ -12,7 +12,7 @@ const OrderDataSchema = new mongoose.Schema({
   },
 
   //LINEのユーザーID
-  "LineUserId":{
+  "lineUserId":{
     type: mongoose.Schema.Types.String,
     required: false,
     unique: true,
