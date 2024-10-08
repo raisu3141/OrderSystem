@@ -3,14 +3,13 @@ import OrderTicket from '../../components/ordermanege/orderticket'
 
 interface OrderticketManagerProps {
   storeName: string;
-  name: string;
 }
 
-export default function OrderticketManager({ storeName, name }: OrderticketManagerProps) {
+export default function OrderticketManager({ storeName }: OrderticketManagerProps) {
   return (
     <div>
       <Head>
-        <title>{name}</title>
+        <title>{storeName}</title>
         <meta name="description" content="NANCA 注文管理システム" />
       </Head>
       <main>
