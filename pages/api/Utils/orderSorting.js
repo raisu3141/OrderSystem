@@ -4,14 +4,13 @@ import StoreOrderSchema from'../../../models/StoreOrder'; // ProductData モデ�
 import orderData from'../../../models/OrderData';
 import StoreData from '../../../models/StoreData'; // StoreData モデルをインポート
 
-export default async function handler(req, res){
+export default async function orderSorting(orderId, session){
     await connectToDatabase();
-    const {orderId} = req.query;
     
     try{
         //全屋台名を取得・リストに分けるためのデータ作成
         let stores = [];
-        const storeData = await StoreData.find({}, "storeName storeWaitTime");
+        const storeData = await StoreData.find({}, "storeName storeWaitTime").session(session);
         storeData.forEach(data => {
             stores.push({[data.storeName]: [], waitTime: data.storeWaitTime});
         });
@@ -19,12 +18,9 @@ export default async function handler(req, res){
         //注文の受け取り
         const orders = await orderData.findById(orderId, "_id orderList")
         .populate([
-            {path: "orderList.storeId", select: "storeName"}
-        ]);
+            {path: "orderList.storeId", select: "storeName", session}
+        ]).session(session);
 
-        if (!orders) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
-        }
 
         //StoreOrderSchemaにフォーマットを合わせる
         const formatOrders = {
@@ -67,14 +63,11 @@ export default async function handler(req, res){
             });
           
             // データベースに保存
-            await allStoreOrder.save();
+            await allStoreOrder.save({ session });
           }
-        console.log(stores);
-        return res.status(200).json({ success: true, data: cleaneData });
     }
     catch(error){
         console.error(error); // エラーをコンソールに出力
-        res.status(500).json({ success: false, error: error.message })
     }
 }
 
