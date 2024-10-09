@@ -12,7 +12,7 @@ const OrderDataSchema = new mongoose.Schema({
   },
 
   //LINEのユーザーID
-  "LineUserId":{
+  "lineUserId":{
     type: mongoose.Schema.Types.String,
     required: false,
     unique: true,
