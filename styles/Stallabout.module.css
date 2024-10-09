@@ -21,23 +21,30 @@
   }
 }
 
+@font-face {
+  font-family: "Silkscreen";
+  src: url("./Silkscreen-Bold.ttf") format("truetype");
+  src: url("./Silkscreen-Regular.ttf") format("truetype");
+}
+
 
 .header {
   width: 100%;
   background-color: #3a3a3a;
   color: white;
   font-family: 'Silkscreen', sans-serif;
-  padding: 1.25rem;
+  padding-left: 4.4em;
   text-align: left;
 }
 
 .logo {
-  font-size: 24px;
+  font-size: 3rem;
   letter-spacing: 2px;
+  padding: 0.5rem;
 }
 
 .heading {
-  font-size: 2.5vw;
+  font-size: 2.5em;
   color: #333;
   margin: 0 5%;
   padding: 20px 0; 
@@ -63,9 +70,217 @@
   background-color: #4d95e3;
 }
 
+.dayButtons {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 2em;
+  margin-left: 7em;
+}
+
+.dayButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  padding: 10px 20px;
+  cursor: pointer;
+  position: relative;
+  color: #333;
+}
+
+.dayButton:hover {
+  color: #555;
+}
+
+.active {
+  color: #000;
+}
+
+.active::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+}
+
+
 .form {
-  margin-top: 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
+  padding: 0 20px;
+}
+
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.trashIcon {
+  font-size: 1.5rem;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.selectButton {
+  background-color: #B8D5F4;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 100vh;
+  margin-right: 10px;
+}
+
+.selectButton.cancel {
+  background-color: #2664f6;
+  color: white;
+}
+
+.selectButton:hover {
+  background-color: #4d95e3; /* ホバー時の色も追加ボタンと統一 */
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 背景を暗くする */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 50vw;
+  max-height: 90vh;
+  max-width: 800px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.formTitle {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+}
+
+.daySelection {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+  margin-top: 2vw;
+}
+
+.formDayButton {
+  background-color: #e0e0e0;
+  border: none;
+  padding: 10px 20px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.formDayButtonActive {
+  background-color: #333;
+  color: white;
+}
+
+.uploadLabel {
+  display: block;
+  margin: 20px auto;
+  text-align: center;
+  border: 2px dashed #ccc;
+  padding: 20px;
+  width: 100%;
+  max-width: 500px;
+  height: 200px;
+  cursor: pointer;
+  border-radius: 5px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.uploadLabel img {
+  display: none; /* デフォルトで画像を非表示にする */
+}
+
+.uploadLabel img.uploadedImage {
+  display: block; /* アップロード後に表示 */
+}
+
+.uploadInput {
+  display: none;
+}
+
+.placeholderBox {
+  font-size: 1rem;
+  color: #888;
+  margin-top: 10px;
+  line-height: 180px;
+}
+
+.uploadedImage {
+  width:100%;
+  height: 100%;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 5px;
+}
+
+.stallNameLabel {
+  display: block;
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  text-align: left;
+}
+
+.stallNameInput {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.submitButton {
+  background-color: #B8D5F4;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 300px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.submitButton:hover {
+  background-color: #4d95e3;
 }

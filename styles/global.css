@@ -10,7 +10,7 @@ button[type="submit"] {
     padding: 10px;
     border: none;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 100vh;
 }
   
 button[type="submit"]:hover {
