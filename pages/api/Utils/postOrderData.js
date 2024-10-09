@@ -2,13 +2,31 @@
 import connectToDatabase from "../../../lib/mongoose";
 import OrderData from "../../../models/OrderData";
 import ProductData from "../../../models/ProductData";
+// import "./orderSorting"; (もとき実装中)
 
 export default async function handler(req, res) {
   const client = await connectToDatabase(); // データベースに接続
   const session = await client.startSession(); // セッションを開始
-  session.startTransaction(); // トランザクションを開始
 
   try {
+    // 各商品の在庫が足りているか確認
+    const stockStatusList = await checkStock(req.body.orderList, session);
+
+    // 在庫不足があるか確認
+    const allStocksEnoughStatus = stockStatusList.every(
+      (stockStatus) => stockStatus.stockEnoughStatus
+    );
+
+    // 在庫不足の場合はエラーレスポンスを返す
+    if (!allStocksEnoughStatus) {
+      return res.status(400).json({
+        stockStatusList,
+        message: "在庫が不足しています",
+      });
+    }
+
+    session.startTransaction(); // トランザクションを開始
+
     // 注文処理を実行
     const result = await processOrder(
       req.body.orderList,
@@ -16,23 +34,17 @@ export default async function handler(req, res) {
       session
     );
 
-    // 在庫不足の場合はエラーレスポンスを返す
-    if (
-      !result.stockStatusList.every(
-        (stockStatus) => stockStatus.stockEnoughStatus
-      )
-    ) {
-      return res.status(400).json({
-        stockStatusList: result.stocks,
-        message: "在庫が不足しています",
-      });
-    }
+    // 屋台ごとに注文商品をソート (もとき実装中)
+    // orderSorting(result.orderId, session);
 
-    // トランザクションをコミット
-    await session.commitTransaction();
+    await session.commitTransaction();  // トランザクションをコミット
 
     // 成功レスポンスを返す
-    return res.status(200).json(result);
+    res.status(200).json({
+      ticketNumber: result.ticketNumber,
+      clientName: result.clientName,
+      stockStatusList,
+    });
   } catch (error) {
     await session.abortTransaction(); // エラー時はロールバック
     return res.status(500).json({
@@ -44,39 +56,8 @@ export default async function handler(req, res) {
   }
 }
 
-// 在庫・売上個数を更新し、結果を返す関数
+// 在庫・売上個数を更新し、注文データを返す関数
 const processOrder = async (orderList, clientName, session) => {
-  // 全商品の在庫を取得
-  const allProductStocks = await ProductData.find({}, "stock").session(session);
-
-  // すべての商品の在庫が十分かチェック
-  const stockStatusList = allProductStocks.map((productStock) => {
-    const order = orderList.find(
-      (order) => order.productId === productStock._id.toString()
-    );
-    const stockEnoughStatus = order
-      ? productStock.stock > order.orderQuantity
-      : true;
-
-    return {
-      productId: productStock._id.toString(),
-      stock: productStock.stock,
-      stockEnoughStatus,
-    };
-  });
-
-  // 在庫不足があるか確認
-  const allStocksEnoughStatus = stockStatusList.every(
-    (stockStatus) => stockStatus.stockEnoughStatus
-  );
-  if (!allStocksEnoughStatus) {
-    return {
-      ticketNumber: null,
-      clientName,
-      stockStatusList,
-    };
-  }
-
   // 在庫と売上個数を更新
   const updateStockQuery = orderList.map((order) =>
     ProductData.updateMany(
@@ -105,30 +86,40 @@ const processOrder = async (orderList, clientName, session) => {
   });
   await newOrderData.save({ session });
 
-  // stockStatusList を更新
-  const updatedProductStocks = await ProductData.find({}, "stock").session(session);
-  const updatedStockStatusList = updatedProductStocks.map((productStock) => {
+  // 注文IDの取得
+  const orderId = newOrderData._id;
+
+  return {
+    ticketNumber: newTicketNumber,
+    orderId,
+  };
+};
+
+// 注文商品の在庫が足りてるかチェックする関数
+const checkStock = async (orderList, session) => {
+  // すべての商品の在庫が十分かチェック
+  const allProductStocks = await ProductData.find({}, "stock").session(session);
+  const stockStatusList = allProductStocks.map((productStock) => {
     const order = orderList.find(
       (order) => order.productId === productStock._id.toString()
     );
     const stockEnoughStatus = order
       ? productStock.stock >= order.orderQuantity
       : true;
+    
+    const stock = order && stockEnoughStatus
+      ? productStock.stock - order.orderQuantity
+      : productStock.stock;
 
     return {
       productId: productStock._id,
-      stock: productStock.stock,
+      stock,
       stockEnoughStatus,
     };
   });
 
-  
-  return {
-    ticketNumber: newTicketNumber,
-    clientName,
-    stockStatusList: updatedStockStatusList,
-  };
-};
+  return stockStatusList;
+}
 
 // 整理券番号を生成する関数
 const generateTicketNumber = async (session) => {
