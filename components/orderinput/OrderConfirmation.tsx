@@ -12,7 +12,7 @@ interface OrderConfirmationProps {
   cart: CartItem[]; // カートの内容を受け取る
   totalAmount: number; // 合計金額を受け取る
   onClose: () => void; // 閉じるための関数を受け取る
-  onRemove: (id: number) => void; // 削除関数を追加
+  onRemove: (id: string) => void; // 削除関数を追加
 }
 
 export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove }: OrderConfirmationProps) {
@@ -26,7 +26,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
     setDepositAmount(undefined);
     setIsOpen(false);
     for (let i = 0; i < cart.length; i++) {
-      onRemove(cart[i].id);
+      onRemove(cart[i]._id);
     }
   };
 
@@ -87,7 +87,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
             <div className={Styles.cart}>
               <ScrollArea className="h-[calc(95%-4rem)] overflow-auto border-b-2 mt-2">
                 {cart.map(item => (
-                  <div key={item.id} className="border-b-2 mb-3">
+                  <div key={item._id} className="border-b-2 mb-3">
                     <div className="flex items-center justify-between space-x-4 mb-3">
                       <div className="flex items-center space-x-4">
                         <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
@@ -125,7 +125,9 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         <Button
           className="w-[50%] mt-4"
           onClick={() => { setIsOpen(true); onClose(); }} // ダイアログを開く
-          disabled={!clientName} // お名前が入力されていない場合はボタンを無効化
+          // お名前が入力されていない、受取金額が支払い金額より少ない場合はボタンを無効化
+          disabled={!clientName || (depositAmount !== undefined && depositAmount < totalAmount)} 
+
         >
           注文
         </Button>

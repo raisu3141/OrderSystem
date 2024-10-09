@@ -8,13 +8,13 @@ interface ProductListProps extends Product {
   addToCart: (product: Product, quantity: number) => void;
 }
 
-export function ProductList({ id, storeId, productName, productImageURL, price, cookTime, stock, addToCart }: ProductListProps) {
+export function ProductList({ _id, storeId, productName, productImageURL, price, cookTime, stock, addToCart }: ProductListProps) {
   const [quantity, setQuantity] = useState(1);
   const [isOpen, setIsOpen] = useState(false); // ダイアログのオープン状態を管理
 
   const handleAddToCart = () => {
-    console.log('Adding to cart:', { id, storeId, productName, productImageURL, price, cookTime, stock }, quantity); // デバッグ用
-    addToCart({ id, storeId, productName, productImageURL, price, cookTime, stock }, quantity);
+    console.log('Adding to cart:', { _id, storeId, productName, productImageURL, price, cookTime, stock }, quantity); // デバッグ用
+    addToCart({ _id, storeId, productName, productImageURL, price, cookTime, stock }, quantity);
     setQuantity(1); // 数量をリセット
     setIsOpen(false); // ダイアログを閉じる
   };

@@ -1,6 +1,5 @@
 import { DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { useRouter } from "next/router";
 
 interface OrderConfirmationProps {
   clientName: string | undefined;
@@ -8,7 +7,6 @@ interface OrderConfirmationProps {
 }
 
 export default function OrderCompleted({ clientName, onClose }: OrderConfirmationProps) {
-  const router = useRouter();
 
   return (
     <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[80vh] max-h-[80vh]">

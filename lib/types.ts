@@ -1,6 +1,6 @@
 export interface Product {
-    id: number,                 // 商品ID
-    storeId: number,            // 屋台ID
+    _id: string,                 // 商品ID
+    storeId: string,            // 屋台ID
     productName: string,        // 商品名
     productImageURL: string,    // 商品画像
     price: number,             // 値段

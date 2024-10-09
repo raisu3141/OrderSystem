@@ -9,19 +9,12 @@ import { ProductList } from '../../components/orderinput/ProductList';
 import { set } from 'mongoose';
 
 interface StoreProduct {
-  id: string,
+  _id: string,
   storeName: string,
   productList: Product[],
   openDay: number,
 }
 
-interface ProtductList {
-  id: string,
-  productName: string,
-  productImageURL: string,
-  price: number,
-  stock: number,
-}
 
 async function fetchProductList(): Promise<Product[]> {
   try {
@@ -31,9 +24,10 @@ async function fetchProductList(): Promise<Product[]> {
     }
     const data: StoreProduct[] = await response.json();
     console.log('Fetched product list:', data); // データを出力して確認
-
+    
     const allProducts: Product[] = data.flatMap(store => store.productList);
     console.log('All products:', allProducts); // データを出力して確認
+
     return allProducts;
   } catch (error) {
     console.error(error);
@@ -45,89 +39,34 @@ export function OrderPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [productList, setProductList] = useState<Product[]>([]);
 
-  // useEffect(() => {
-  //   fetchProductList();
-
-  //   const loadProducts = async () => {
-  //     const products = await fetchProductList();
-  //     setProductList(products);
-  //   }
-  //   loadProducts();
-  // }, []);
+  useEffect(() => {
+    const loadProducts = async () => {
+      const products = await fetchProductList();
+      setProductList(products);
+    }
+    loadProducts();
+  }, []);
 
   const addToCart = (product: Product, quantity: number) => {
     setCart(prevCart => {
-      const existingItem = prevCart.find(item => item.id === product.id);
+      const existingItem = prevCart.find(item => item._id === product._id);
       if (existingItem) {
         return prevCart.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+          item._id === product._id ? { ...item, quantity: item.quantity + quantity } : item
         );
       }
       return [...prevCart, { ...product, quantity } as CartItem];
     });
   };
 
-  useEffect(() => {
-    const mockProductList: Product[] = [
-      {
-        id: 1,
-        storeId: 101,
-        productName: "焼きそば",
-        productImageURL: "/images/yakisoba.png",
-        price: 600,
-        cookTime: 10,
-        stock: 20,
-      },
-      {
-        id: 2,
-        storeId: 102,
-        productName: "たこ焼き",
-        productImageURL: "/images/takoyaki.png",
-        price: 800,
-        cookTime: 15,
-        stock: 15,
-      },
-      {
-        id: 3,
-        storeId: 103,
-        productName: "ホットドッグ",
-        productImageURL: "/images/hotdog.png",
-        price: 700,
-        cookTime: 12,
-        stock: 25,
-      },
-      {
-        id: 4,
-        storeId: 104,
-        productName: "カレーライス",
-        productImageURL: "/images/curry.png",
-        price: 900,
-        cookTime: 20,
-        stock: 10,
-      },
-      {
-        id: 5,
-        storeId: 105,
-        productName: "らむね",
-        productImageURL: "/images/ramune.png",
-        price: 300,
-        cookTime: 5,
-        stock: 30,
-      },
-
-    ];
-    setProductList(mockProductList);
-    fetchProductList();
-  }, []);
-
-  const removeFromCart = (id: number) => {
-    setCart(prevCart => prevCart.filter(item => item.id !== id));
+  const removeFromCart = (id: string) => {
+    setCart(prevCart => prevCart.filter(item => item._id !== id));
   };
 
-  const quantityChange = (id: number, quantity: number) => {
+  const quantityChange = (id: string, quantity: number) => {
     setCart(prevCart =>
       prevCart.map(item =>
-        item.id === id ? { ...item, quantity } : item
+        item._id === id ? { ...item, quantity } : item
       )
     );
   };
@@ -142,7 +81,7 @@ export function OrderPage() {
         <ScrollArea className="flex-1 overflow-auto p-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {productList.map((product) => (
-              <ProductList key={product.id} {...product} addToCart={addToCart} />
+              <ProductList key={product._id} {...product} addToCart={addToCart} />
             ))}
           </div>
         </ScrollArea>
