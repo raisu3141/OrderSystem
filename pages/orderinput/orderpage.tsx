@@ -6,10 +6,54 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { CartItem, Product } from '../../lib/types';
 import Cart from '../../components/orderinput/ProductCart';
 import { ProductList } from '../../components/orderinput/ProductList';
+import { set } from 'mongoose';
+
+interface StoreProduct {
+  id: string,
+  storeName: string,
+  productList: Product[],
+  openDay: number,
+}
+
+interface ProtductList {
+  id: string,
+  productName: string,
+  productImageURL: string,
+  price: number,
+  stock: number,
+}
+
+async function fetchProductList(): Promise<Product[]> {
+  try {
+    const response = await fetch(`/api/Utils/getStoreProductData`);
+    if (!response.ok) {
+      throw new Error('Faided to fetch product list');
+    }
+    const data: StoreProduct[] = await response.json();
+    console.log('Fetched product list:', data); // データを出力して確認
+
+    const allProducts: Product[] = data.flatMap(store => store.productList);
+    console.log('All products:', allProducts); // データを出力して確認
+    return allProducts;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
 
 export function OrderPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [productList, setProductList] = useState<Product[]>([]);
+
+  // useEffect(() => {
+  //   fetchProductList();
+
+  //   const loadProducts = async () => {
+  //     const products = await fetchProductList();
+  //     setProductList(products);
+  //   }
+  //   loadProducts();
+  // }, []);
 
   const addToCart = (product: Product, quantity: number) => {
     setCart(prevCart => {
@@ -73,6 +117,7 @@ export function OrderPage() {
 
     ];
     setProductList(mockProductList);
+    fetchProductList();
   }, []);
 
   const removeFromCart = (id: number) => {
@@ -101,8 +146,7 @@ export function OrderPage() {
             ))}
           </div>
         </ScrollArea>
-        {/* <Cart cart={cart} /> */}
-        <Cart cart={cart} onRemove={removeFromCart} onQuantityChange={quantityChange}/> {/* onRemoveを渡す */}
+        <Cart cart={cart} onRemove={removeFromCart} onQuantityChange={quantityChange} /> {/* onRemoveを渡す */}
       </div>
     </div>
   );

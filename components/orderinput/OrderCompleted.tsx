@@ -1,4 +1,4 @@
-import { DialogContent, DialogHeader } from "../ui/dialog";
+import { DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { useRouter } from "next/router";
 
@@ -9,10 +9,11 @@ interface OrderConfirmationProps {
 
 export default function OrderCompleted({ clientName, onClose }: OrderConfirmationProps) {
   const router = useRouter();
-  
+
   return (
     <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[80vh] max-h-[80vh]">
-      <DialogHeader className="text-5xl font-semibold">注文完了</DialogHeader>
+      <DialogTitle className="text-5xl font-semibold">注文完了</DialogTitle>
+      {/* <DialogHeader className="text-5xl font-semibold">注文完了</DialogHeader> */}
 
       <div className="w-full h-full flex flex-col items-center text-2xl mt-12">
         <p>整理券番号</p>
@@ -21,7 +22,7 @@ export default function OrderCompleted({ clientName, onClose }: OrderConfirmatio
         <p className="mt-14">LINE BOTで整理番号を</p>
         <p>入力してください</p>
       </div>
-      
+
 
       {/* 閉じる */}
       <Button

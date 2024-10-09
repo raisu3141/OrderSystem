@@ -5,6 +5,8 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import Styles from '../../styles/orderInput.module.css'; // スタイルのインポート
 import { CartItem } from '../../lib/types'; // カートアイテムの型をインポート
 import OrderCompleted from "./OrderCompleted";
+import { set } from "mongoose";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 interface OrderConfirmationProps {
   cart: CartItem[]; // カートの内容を受け取る
@@ -16,6 +18,7 @@ interface OrderConfirmationProps {
 export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove }: OrderConfirmationProps) {
   const [depositAmount, setDepositAmount] = useState<number | undefined>(); // お預かり金額のステート
   const [clientName, setClientName] = useState<string | undefined>(); // お名前のステート
+  const [errorMessage, setErrorMessage] = useState<string>(''); // エラーメッセージのステート
   const [isOpen, setIsOpen] = useState(false); // ダイアログのオープン状態を管理
 
   const resetForm = () => {
@@ -27,21 +30,34 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const katakanaRegex = /^[ァ-ヶー]+$/;
+
+    if (katakanaRegex.test(inputValue) || inputValue === '') {
+      setClientName(inputValue)
+      setErrorMessage('')
+    } else {
+      setErrorMessage('お名前はカタカナで入力してください')
+    }
+  }
+
   return (
     <>
       <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[80vh] max-h-[80vh]">
-        <DialogHeader className="text-4xl font-semibold">注文確認</DialogHeader>
+        <DialogTitle className="text-4xl font-semibold">注文確認</DialogTitle>
+        {/* <DialogHeader className="text-4xl font-semibold">注文確認</DialogHeader> */}
 
         {/* 横並びのレイアウト */}
         <div className="w-full h-full flex flex-row items-center">
           <div className=" w-[50%] h-full flex flex-col items-center">
             {/* 名前入力 */}
-            <div className="text-xl font-semibold mt-10">お名前</div>
+            <div className="text-xl font-semibold mt-10"><p>お名前(カタカナ)</p></div>
             <input
               type="text"
               className="w-[70%] h-10 border-2 rounded-md"
               placeholder="コウセンタロウ"
-              onChange={(e) => setClientName(e.target.value)}
+              onChange={handleInputChange}
             />
             {/* お預かり金額入力 */}
             <div className="text-xl font-semibold mt-5">お預かり金額</div>
@@ -108,7 +124,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         {/* 注文ボタン */}
         <Button
           className="w-[50%] mt-4"
-          onClick={() => {setIsOpen(true); onClose();}} // ダイアログを開く
+          onClick={() => { setIsOpen(true); onClose(); }} // ダイアログを開く
           disabled={!clientName} // お名前が入力されていない場合はボタンを無効化
         >
           注文
@@ -117,7 +133,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         {/* OrderCompleted コンポーネントに clientName を渡す */}
-        <OrderCompleted clientName={clientName} onClose={() => {setIsOpen(false); resetForm();}} />
+        <OrderCompleted clientName={clientName} onClose={() => { setIsOpen(false); resetForm(); }} />
       </Dialog>
     </>
   );

@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { Product } from "../../lib/types";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface ProductListProps extends Product {
   addToCart: (product: Product, quantity: number) => void;
@@ -21,10 +22,10 @@ export function ProductList({ id, storeId, productName, productImageURL, price, 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button 
-        variant="outline"
-        className="bg-white w-full h-auto aspect-square flex flex-col items-center justify-center p-0 "
-        disabled={stock === 0}
+        <Button
+          variant="outline"
+          className="bg-white w-full h-auto aspect-square flex flex-col items-center justify-center p-0 "
+          disabled={stock === 0}
         >
           <div className="bg-gray-500 w-full h-48">
             <img
@@ -40,6 +41,9 @@ export function ProductList({ id, storeId, productName, productImageURL, price, 
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-white flex flex-col items-center">
+        <VisuallyHidden>
+          <DialogTitle>個数入力ダイアログ</DialogTitle>
+        </VisuallyHidden>
         <img
           src={productImageURL}
           alt={productName}
