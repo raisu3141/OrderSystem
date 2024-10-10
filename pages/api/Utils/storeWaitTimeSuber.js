@@ -1,4 +1,3 @@
-// pages/api/Utils/storeWaitTimeSuber.js
 import connectToDatabase from '../../../lib/mongoose';
 import ProductData from '../../../models/ProductData';
 import StoreData from '../../../models/StoreData';
@@ -16,36 +15,41 @@ export const storeWaitTimeSuber = async (req, res) => {
 
     await connectToDatabase();
     try {
-        let subtime = 0; // 初期化
+        const storeWaitTimes = {}; // 各屋台の待ち時間を管理するオブジェクト
 
+        // 注文リストの処理
         for (const order of orderList) {
-            // 注文リストの取得
             const { productId, storeId, orderQuantity } = order;
 
-            // メニューと屋台を取得
+            // 商品と屋台を取得
             const product = await ProductData.findById(productId);
-            const store = await StoreData.findById(storeId);
-
-            // メニューと屋台が取れたかエラー処理
-            if (!product || !store) {
-                return res.status(404).json({ message: '商品または屋台が見つかりませんでした。' });
+            if (!product) {
+                return res.status(404).json({ message: `商品ID ${productId} が見つかりませんでした。` });
             }
 
+            // 調理時間を計算して減少させる待ち時間を加算
             const cookTime = product.cookTime * orderQuantity;
-            subtime += cookTime;
+            storeWaitTimes[storeId] = (storeWaitTimes[storeId] || 0) + cookTime;
         }
 
-        // 屋台の待ち時間更新
-        const store = await StoreData.findById(orderList[0].storeId); // 最後の注文のstoreIdで取得
-        store.storeWaitTime -= subtime;
+        // 屋台の待ち時間を更新
+        await Promise.all(
+            Object.keys(storeWaitTimes).map(async (storeId) => {
+                const store = await StoreData.findById(storeId);
+                if (!store) {
+                    return res.status(404).json({ message: `屋台ID ${storeId} が見つかりませんでした。` });
+                }
 
-        await store.save();
+                // 待ち時間を減らし、負の値にならないように調整
+                store.storeWaitTime = Math.max(0, store.storeWaitTime - storeWaitTimes[storeId]);
+                await store.save();
+            })
+        );
 
-        // データを返す必要はないが、処理が成功したことを返す
-        return res.status(200).json({ status: true });
+        return res.status(200).json({ status: true, storeWaitTimes });
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'エラーが発生しました' });
+        return res.status(500).json({ message: 'エラーが発生しました。', error: error.message });
     }
 }
