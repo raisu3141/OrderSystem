@@ -62,13 +62,27 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
   const preparingOrders = allOrders?.filter(order => !order.cookStatus && !order.getStatus)
   const readyOrders = allOrders?.filter(order => order.cookStatus && !order.getStatus)
 
-  const updateOrderStatus = async (storeName: string, orderId: string, newStatus: 'ready' | 'completed') => {
+  const updateOrderStatus = async (storeName: string, order: Order, newStatus: 'ready' | 'completed') => {
     const cookStatus = newStatus === 'ready' ? true : false
     const getStatus = newStatus === 'completed' ? true : false
-    await fetch(`/api/StoreOrder/update/PatchOrderStatus?storeName=${storeName}&orderId=${orderId}`, {
+    // 注文の状態を更新
+    await fetch(`/api/StoreOrder/update/PatchOrderStatus?storeName=${storeName}&orderId=${order.orderId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cookStatus, getStatus }),
+    })
+    
+    // 注文待ち時間の更新
+    await fetch(`/api/Utils/storeWaitTimeSuber`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        orderList: [{
+          productId: order.orderList[0].productId,
+          storeName: storeName,
+          orderQuantity: order.orderList[0].orderQuantity
+        }]
+      }),
     })
     // Refetch all orders after updating
     await fetchOrders(storeName, 'all')
@@ -98,7 +112,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
           <div className="flex-shrink-0 ml-4">
             {!order.getStatus && (
               <Button 
-                onClick={() => updateOrderStatus(storeName, order.orderId, order.cookStatus ? 'completed' : 'ready')}
+                onClick={() => updateOrderStatus(storeName, order, order.cookStatus ? 'completed' : 'ready')}
                 className="w-24 bg-gray-200 text-black hover:bg-gray-300"
               >
                 {order.cookStatus ? '受け渡し完了' : '調理完了'}
