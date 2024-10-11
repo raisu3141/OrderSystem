@@ -38,3 +38,6 @@ service-account-file.json
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# service-account-file.json
+service-account-file.json
