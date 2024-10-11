@@ -11,7 +11,22 @@ export default async function handler(req, res) {
       .populate('productList', 'productName productImageUrl price stock')
       .then((storeProduct) => { return storeProduct })
       .catch((error) => { return error });
-    res.status(200).json(storeProducts);  // 取得したデータをクライアントに返す
+
+    // フロントに渡せるようにフォーマット
+    const formattedStoreProducts = storeProducts.map((storeProduct) => ({
+      storeId: storeProduct._id,
+      storeName: storeProduct.storeName,
+      productList: storeProduct.productList.map((product) => ({
+        productId: product._id,
+        productName: product.ProductName,
+        productImageUrl: product.productImageUrl,
+        price: product.price,
+        stock: product.stock,
+      })),
+      openDay: storeProduct.openDay
+    }));
+
+    res.status(200).json(formattedStoreProducts);  // 取得したデータをクライアントに返す
 
   } catch (error) {
     res.status(500).json({
