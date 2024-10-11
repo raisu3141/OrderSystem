@@ -6,6 +6,7 @@ const TicketManagementSchema = new mongoose.Schema({
   "name": {
     type: mongoose.Schema.Types.String,
     required: true,
+    default: "ticketNumber",
   },
 
   // 整理券番号
@@ -13,8 +14,8 @@ const TicketManagementSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.Number,
     required: true,
     unique: true,
-    default: 0,
-    min: 0,
+    default: 1,
+    min: 1,
   },
   
 }, {
