@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader } from "../ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import Styles from '../../styles/orderInput.module.css'; // スタイルのインポート
 import { CartItem } from '../../lib/types'; // カートアイテムの型をインポート
 import OrderCompleted from "./OrderCompleted";
-import { set } from "mongoose";
-import { DialogTitle } from "@radix-ui/react-dialog";
 
 interface OrderConfirmationProps {
   cart: CartItem[]; // カートの内容を受け取る
@@ -39,6 +37,39 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
       setErrorMessage('')
     } else {
       setErrorMessage('お名前はカタカナで入力してください')
+    }
+  }
+
+  const postOrder = async () => {
+    // cartからorderListを作成
+    const orderList = cart.map(item => ({
+      productId: item._id,
+      storeId: item.storeId,
+      orderQuantity: item.quantity,
+    }));
+
+    // リクエストボディを作成
+    const requestBody = {
+      clientName,
+      orderList,
+    };
+
+    const response = await fetch('/api/Utils/postOrderData', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    if (response.ok) {
+      console.log('Order completed');
+      console.log('requestBody:', requestBody);
+      
+    } else {
+      console.error('Failed to post order');
+      console.log('requestBody:', requestBody);
+      console.log('requestBody:', JSON.stringify(requestBody, null, 2));
     }
   }
 
@@ -124,9 +155,9 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         {/* 注文ボタン */}
         <Button
           className="w-[50%] mt-4"
-          onClick={() => { setIsOpen(true); onClose(); }} // ダイアログを開く
+          onClick={() => { postOrder(); setIsOpen(true); onClose(); }} // ダイアログを開く
           // お名前が入力されていない、受取金額が支払い金額より少ない場合はボタンを無効化
-          disabled={!clientName || (depositAmount !== undefined && depositAmount < totalAmount)} 
+          disabled={!clientName || (depositAmount !== undefined && depositAmount < totalAmount)}
 
         >
           注文

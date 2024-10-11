@@ -25,7 +25,14 @@ async function fetchProductList(): Promise<Product[]> {
     const data: StoreProduct[] = await response.json();
     console.log('Fetched product list:', data); // データを出力して確認
     
-    const allProducts: Product[] = data.flatMap(store => store.productList);
+    //const allProducts: Product[] = data.flatMap(store => store.productList);
+    const allProducts: Product[] = data.flatMap(store => 
+      store.productList.map(product => ({
+        ...product,
+        storeId: store._id // storeId を各商品に追加
+      }))
+    );
+
     console.log('All products:', allProducts); // データを出力して確認
 
     return allProducts;

@@ -1,4 +1,4 @@
-import { DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { DialogContent, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 
 interface OrderConfirmationProps {
