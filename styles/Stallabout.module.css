@@ -217,7 +217,7 @@
   border: 2px dashed #ccc;
   padding: 20px;
   width: 100%;
-  max-width: 500px;
+  max-width: 400px;
   height: 200px;
   cursor: pointer;
   border-radius: 5px;
@@ -284,4 +284,39 @@
 
 .submitButton:hover {
   background-color: #4d95e3;
+}
+
+.stallList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  justify-items: center;
+}
+
+.stallCard {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 100%;
+  max-width: 350px;
+}
+
+.stallCard:hover {
+  transform: translateY(-5px);
+}
+
+.stallImage {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.stallCard h2 {
+  font-size: 1.2rem;
+  margin: 10px 0;
 }
