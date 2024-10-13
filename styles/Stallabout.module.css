@@ -320,3 +320,41 @@
   font-size: 1.2rem;
   margin: 10px 0;
 }
+
+.backButton {
+  display: inline-block;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.backArrow {
+  font-size: 2rem;
+  color: #666; /* Lighter color */
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  font-size: 1.5rem;
+  color: #333;
+  margin: 0;
+}
+
+.menuItem {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.productImage {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
