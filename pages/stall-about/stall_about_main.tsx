@@ -71,26 +71,43 @@ const StallAboutMain = () => {
 
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();  // デフォルトのフォーム送信動作を無効化
-
-        const stallData = {
-            storeName: stallName,  // 入力された屋台名
-            storeImageUrl: uploadedImage,  // アップロードされた画像
-            openDay: selectedDay,  // 選択された日（1日目か2日目）
-            productList: [],  // 商品リスト（最初は空）
-            storeWaitTime: 0,  // 待ち時間（後で更新可能）
-        };
-
-        // MongoDBにデータを保存
-        const storeId = await saveStallData(stallData);
-
-        // 新しく作成された屋台をリストに追加して画面に表示
-        setStalls(prev => [
-            ...prev,
-            { _id: storeId, ...stallData }
-        ]);
-
-        handleCloseForm();  // フォームを閉じる
+    
+        const formData = new FormData();
+        formData.append('storeName', stallName);  // 入力された屋台名
+        formData.append('openDay', selectedDay.toString());  // 選択された日
+    
+        // input 要素が存在するか確認
+        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+        if (fileInput && fileInput.files && fileInput.files[0]) {
+            const imageFile = fileInput.files[0];  // ファイルオブジェクトを取得
+            formData.append('image', imageFile);
+        } else {
+            console.error("No file selected or input element not found");
+        }
+    
+        try {
+            const response = await fetch('/api/StoreData/setter/createSTORE_DATA', {
+                method: 'POST',
+                body: formData,  // FormData を使用
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to save stall data');
+            }
+    
+            const result = await response.json();
+            setStalls(prev => [
+                ...prev,
+                { _id: result._id, storeName: stallName, Image: uploadedImage, openDay: selectedDay }
+            ]);
+            handleCloseForm();  // フォームを閉じる
+        } catch (error) {
+            console.error('Error saving stall data:', error);
+        }
     };
+    
+    
+    
 
     const handleStallClick = (stallId: string) => {
         router.push(`/stall-about/${stallId}`);
