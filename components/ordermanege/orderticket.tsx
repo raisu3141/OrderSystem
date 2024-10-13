@@ -7,6 +7,8 @@ import { Card, CardContent } from '../../components/ui/ticketcard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
 import { AlertCircle, Loader2 } from 'lucide-react'
 
+import styles from '../../components/ordermanege/orderticket.module.css'
+
 interface OrderList {
   productId: string;
   productName: string;
@@ -191,11 +193,11 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
       </Tabs> 
 
       <button 
-        className="fixed z-50 bottom-4 left-4 py-3 px-4 bg-blue-500 text-white rounded-md shadow-lg hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50" 
+        className={`${styles.button} ${showAllOrders ? styles.buttonSecondary : styles.buttonPrimary}`}
         onClick={showAllOrders ? handleHideAllOrders : handleShowAllOrders} 
       > 
-        {showAllOrders ? '注文を分けて表示' : '全ての注文を表示'} 
-      </button> 
+        {showAllOrders ? '分けて表示' : '全て表示'} 
+      </button>
     </div>
 
   )
