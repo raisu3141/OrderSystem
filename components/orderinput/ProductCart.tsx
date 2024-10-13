@@ -35,12 +35,12 @@ export default function Cart({ cart, onRemove, onQuantityChange }: CartProps) {
           <h2 className="text-center text-xl font-semibold mb-1 border-b-2">注文内容</h2>
           <ScrollArea className="h-[calc(85%-4rem)] overflow-auto">
             {cart.map(item => (
-              <div key={item._id} className="border-b-2 mb-1">
+              <div key={item.productId} className="border-b-2 mb-1">
                 <div className="flex items-center justify-between space-x-4 mb-3">
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
                       <img
-                        src={item.productImageURL}
+                        src={item.productImageUrl}
                         alt={item.productName}
                         className="w-12 h-12 object-cover"
                       />
@@ -54,11 +54,11 @@ export default function Cart({ cart, onRemove, onQuantityChange }: CartProps) {
                     <Button
                       variant="link"
                       className="text-gray-500 p-0"
-                      onClick={() => handleRemove(item._id)}
+                      onClick={() => handleRemove(item.productId)}
                     >×</Button>
                     <select
                       value={item.quantity}
-                      onChange={(e) => handleQuantityChange(item._id, Number(e.target.value))}
+                      onChange={(e) => handleQuantityChange(item.productId, Number(e.target.value))}
                       className="w-16 h-9 border-b-2 rounded-md"
                     >
                       {Array.from({ length: Math.min(item.stock, 10) }, (_, index) => ( // 最大数量を制限

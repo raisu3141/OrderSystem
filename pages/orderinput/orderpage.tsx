@@ -56,10 +56,10 @@ export function OrderPage() {
 
   const addToCart = (product: Product, quantity: number) => {
     setCart(prevCart => {
-      const existingItem = prevCart.find(item => item._id === product._id);
+      const existingItem = prevCart.find(item => item.productId === product.productId);
       if (existingItem) {
         return prevCart.map(item =>
-          item._id === product._id ? { ...item, quantity: item.quantity + quantity } : item
+          item.productId === product.productId ? { ...item, quantity: item.quantity + quantity } : item
         );
       }
       return [...prevCart, { ...product, quantity } as CartItem];
@@ -67,13 +67,13 @@ export function OrderPage() {
   };
 
   const removeFromCart = (id: string) => {
-    setCart(prevCart => prevCart.filter(item => item._id !== id));
+    setCart(prevCart => prevCart.filter(item => item.productId !== id));
   };
 
   const quantityChange = (id: string, quantity: number) => {
     setCart(prevCart =>
       prevCart.map(item =>
-        item._id === id ? { ...item, quantity } : item
+        item.productId === id ? { ...item, quantity } : item
       )
     );
   };
@@ -88,7 +88,7 @@ export function OrderPage() {
         <ScrollArea className="flex-1 overflow-auto p-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {productList.map((product) => (
-              <ProductList key={product._id} {...product} addToCart={addToCart} />
+              <ProductList key={product.productId} {...product} addToCart={addToCart} />
             ))}
           </div>
         </ScrollArea>

@@ -8,13 +8,13 @@ interface ProductListProps extends Product {
   addToCart: (product: Product, quantity: number) => void;
 }
 
-export function ProductList({ _id, storeId, productName, productImageURL, price, cookTime, stock, addToCart }: ProductListProps) {
+export function ProductList({ productId, storeId, productName, productImageUrl, price, stock, addToCart }: ProductListProps) {
   const [quantity, setQuantity] = useState(1);
   const [isOpen, setIsOpen] = useState(false); // ダイアログのオープン状態を管理
 
   const handleAddToCart = () => {
-    console.log('Adding to cart:', { _id, storeId, productName, productImageURL, price, cookTime, stock }, quantity); // デバッグ用
-    addToCart({ _id, storeId, productName, productImageURL, price, cookTime, stock }, quantity);
+    console.log('Adding to cart:', { productId, storeId, productName, productImageUrl, price, stock }, quantity); // デバッグ用
+    addToCart({ productId, storeId, productName, productImageUrl, price, stock }, quantity);
     setQuantity(1); // 数量をリセット
     setIsOpen(false); // ダイアログを閉じる
   };
@@ -29,7 +29,7 @@ export function ProductList({ _id, storeId, productName, productImageURL, price,
         >
           <div className="bg-gray-500 w-full h-48">
             <img
-              src={productImageURL}
+              src={productImageUrl}
               alt={productName}
               className="w-full h-48 object-cover"
             />
@@ -45,7 +45,7 @@ export function ProductList({ _id, storeId, productName, productImageURL, price,
           <DialogTitle>個数入力ダイアログ</DialogTitle>
         </VisuallyHidden>
         <img
-          src={productImageURL}
+          src={productImageUrl}
           alt={productName}
           className="w-50 h-48 object-contain mb-4"
         />

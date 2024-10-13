@@ -24,7 +24,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
     setDepositAmount(undefined);
     setIsOpen(false);
     for (let i = 0; i < cart.length; i++) {
-      onRemove(cart[i]._id);
+      onRemove(cart[i].productId);
     }
   };
 
@@ -43,7 +43,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
   const postOrder = async () => {
     // cartからorderListを作成
     const orderList = cart.map(item => ({
-      productId: item._id,
+      productId: item.productId,
       storeId: item.storeId,
       orderQuantity: item.quantity,
     }));
@@ -118,12 +118,12 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
             <div className={Styles.cart}>
               <ScrollArea className="h-[calc(95%-4rem)] overflow-auto border-b-2 mt-2">
                 {cart.map(item => (
-                  <div key={item._id} className="border-b-2 mb-3">
+                  <div key={item.productId} className="border-b-2 mb-3">
                     <div className="flex items-center justify-between space-x-4 mb-3">
                       <div className="flex items-center space-x-4">
                         <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
                           <img
-                            src={item.productImageURL}
+                            src={item.productImageUrl}
                             alt={item.productName}
                             className="w-12 h-12 object-cover"
                           />
@@ -157,7 +157,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
           className="w-[50%] mt-4"
           onClick={() => { postOrder(); setIsOpen(true); onClose(); }} // ダイアログを開く
           // お名前が入力されていない、受取金額が支払い金額より少ない場合はボタンを無効化
-          disabled={!clientName || (depositAmount !== undefined && depositAmount < totalAmount)}
+          disabled={!clientName || (depositAmount === undefined || depositAmount < totalAmount)}
 
         >
           注文
