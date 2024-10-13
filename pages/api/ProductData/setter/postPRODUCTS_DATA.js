@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 
   await connectToDatabase();
   let storeID;  // storeIDをスコープの外で宣言
-  let productID;
+  let productID;  // productIDをスコープの外で宣言
   try {
     // 新しいProductDataを保存
     const Product = new ProductData(req.body);
@@ -81,7 +81,7 @@ export default async function handler(req, res) {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    res.status(201).json({ success: true, imageUrl: publicUrl });
+    res.status(200).json(updatedProductData);
   } catch (error) {
     console.error("Error uploading image:", error);
     return res.status(500).json({ success: false, message: "Error uploading image" });

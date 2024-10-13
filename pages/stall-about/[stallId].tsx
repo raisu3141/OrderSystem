@@ -75,7 +75,6 @@ const StallMenuContents = () => {
   
     const formData = new FormData();
     formData.append('storeName', stallData.storeName);  // storeName を追加
-    formData.append('openDay', stallData.openDay.toString());  // openDay を追加
     formData.append('productName', menuName);
     formData.append('price', price.toString());
     formData.append('stock', stock.toString());
