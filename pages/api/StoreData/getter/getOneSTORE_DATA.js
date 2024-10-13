@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import connectToDatabase from '../../../../lib/mongoose';
 import StoreData from '../../../../models/StoreData';
+import ProductData from '../../../../models/ProductData';
 
 export default async function handler(req, res) {
   await connectToDatabase();
@@ -16,8 +17,10 @@ export default async function handler(req, res) {
       throw new Error(`Invalid store ID format: ${req.body._id}`);
     }
 
-    const storeId = (req.body._id);
-    const store = await StoreData.findOne({ _id: storeId });
+    const storeId = req.body._id;
+
+    // StoreDataを検索し、productListをポピュレート
+    const store = await StoreData.findOne({ _id: storeId }).populate('productList');
 
     if (!store) {
       return res.status(404).json({ success: false, message: `Store not found for ID: ${storeId}` });
