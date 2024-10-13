@@ -14,7 +14,8 @@ const StallMenuContents = () => {
   const [price, setPrice] = useState<number | string>('');
   const [stock, setStock] = useState<number | string>('');
   const [cookTime, setCookTime] = useState<number | string>('');
-  
+  const [isSelecting, setIsSelecting] = useState(false); // 選択状態を管理
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]); // 複数選択された商品ID
 
   useEffect(() => {
     if (stallId) {
@@ -28,8 +29,6 @@ const StallMenuContents = () => {
             body: JSON.stringify({ _id: stallId }),
           });
           const result = await response.json();
-          console.log('Fetched stall data:', result);
-          console.log('Product list:', result.productList); // productList の内容を確認
           setStallData(result);
         } catch (error) {
           console.error('Error fetching stall data:', error);
@@ -38,10 +37,52 @@ const StallMenuContents = () => {
       fetchStallData();
     }
   }, [stallId]);
-  
 
   const handleButtonClick = () => {
     setShowForm(!showForm);
+  };
+
+  const handleSelectButtonClick = () => {
+    setIsSelecting(!isSelecting); // 選択状態を切り替える
+    setSelectedProductIds([]); // 状態をリセットする
+  };
+
+  const handleSelectProduct = (productId: string) => {
+    if (isSelecting) {
+      setSelectedProductIds((prev) =>
+        prev.includes(productId)
+          ? prev.filter((id) => id !== productId) // すでに選択されていたら外す
+          : [...prev, productId] // 選択されていなかったら追加
+      );
+    }
+  };
+
+  const handleDeleteSelectedProducts = async () => {
+    if (selectedProductIds.length === 0) return;
+
+    try {
+      await Promise.all(
+        selectedProductIds.map(async (productId) => {
+          const response = await fetch(`/api/ProductData/setter/deletePRODUCTS_DATA`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ _id: productId }),
+          });
+          if (!response.ok) {
+            throw new Error('Failed to delete product');
+          }
+        })
+      );
+      setStallData((prev: any) => ({
+        ...prev,
+        productList: prev.productList.filter((product: any) => !selectedProductIds.includes(product._id)),
+      }));
+      setSelectedProductIds([]); // 選択リセット
+    } catch (error) {
+      console.error('Error deleting products:', error);
+    }
   };
 
   const handleCloseForm = () => {
@@ -67,52 +108,48 @@ const StallMenuContents = () => {
   };
 
   const handleFormSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();  // デフォルトのフォーム送信動作を無効化
+    event.preventDefault(); // デフォルトのフォーム送信動作を無効化
     if (!stallId || typeof stallId !== 'string') {
-        console.error('Invalid stallId');
-        return;
+      console.error('Invalid stallId');
+      return;
     }
-  
+
     const formData = new FormData();
-    formData.append('storeName', stallData.storeName);  // storeName を追加
+    formData.append('storeName', stallData.storeName); // storeName を追加
     formData.append('productName', menuName);
     formData.append('price', price.toString());
     formData.append('stock', stock.toString());
     formData.append('cookTime', cookTime.toString());
     formData.append('storeId', stallId.toString());
-  
+
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput && fileInput.files && fileInput.files[0]) {
-      const imageFile = fileInput.files[0];  // ファイルオブジェクトを取得
+      const imageFile = fileInput.files[0]; // ファイルオブジェクトを取得
       formData.append('image', imageFile);
     } else {
-      console.error("No file selected or input element not found");
+      console.error('No file selected or input element not found');
     }
-  
+
     try {
       const response = await fetch('/api/ProductData/setter/postPRODUCTS_DATA', {
         method: 'POST',
-        body: formData,  // FormData を使用
+        body: formData, // FormData を使用
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to save store data');
       }
-  
+
       const result = await response.json();
       setStallData((prev: any) => ({
         ...prev,
-        productList: [...(prev?.productList || []), result],  // メニューをリストに追加
+        productList: [...(prev?.productList || []), result], // メニューをリストに追加
       }));
-      handleCloseForm();  // フォームを閉じる
+      handleCloseForm(); // フォームを閉じる
     } catch (error) {
       console.error('Error saving store data:', error);
     }
   };
-
-  if (!stallData) {
-    return <p>Loading...</p>;
-  }
 
   return (
     <div>
@@ -125,33 +162,43 @@ const StallMenuContents = () => {
             <div className={styles.backButton} onClick={() => router.back()}>
               &lt;
             </div>
-            {stallData.storeName}のメニュー一覧
-          </div>
-          <div className={styles.buttonContainer}>
-            <FontAwesomeIcon icon={faTrash} className={styles.trashIcon} />
-            <button className={styles.addButton} onClick={handleButtonClick}>
-              + メニュー追加
-            </button>
-          </div>
+            {stallData ? (
+                `${stallData.storeName}のメニュー一覧`
+            ) : (
+                <p>データを読み込み中です...</p>
+            )}
+            </div>
+            <div className={styles.buttonContainer}>
+                <FontAwesomeIcon icon={faTrash} className={styles.trashIcon} onClick={handleDeleteSelectedProducts} />
+                <button className={styles.selectButton} onClick={handleSelectButtonClick}>
+                    {isSelecting ? '選択キャンセル' : '選択'}
+                </button>
+                <button className={styles.addButton} onClick={handleButtonClick}>
+                    + メニュー追加
+                </button>
+            </div>
         </h1>
 
         {/* メニューのリストを表示 */}
         <div className={styles.stallList}>
-            {stallData?.productList && stallData.productList.length > 0 ? (
-                stallData.productList.map((product: any) => (
-                    <div key={product._id} className={styles.stallCard}>
-                        <img src={product.productImageUrl} alt={product.productName} className={styles.stallImage} />
-                        <h2>{product.productName}</h2>
-                        <p>値段: {product.price}円</p>
-                        <p>在庫: {product.stock}個</p>
-                        <p>調理時間: {product.cookTime}分</p>
-                    </div>
-                ))
-            ) : (
-                <p>メニューがありません。</p>
-            )}
+          {stallData?.productList && stallData.productList.length > 0 ? (
+            stallData.productList.map((product: any) => (
+                <div
+                    key={product._id}
+                    className={`${styles.stallCard} ${selectedProductIds.includes(product._id) ? styles.selectedCard : ''}`}
+                    onClick={() => handleSelectProduct(product._id)}
+                >
+                <img src={product.productImageUrl} alt={product.productName} className={styles.stallImage} />
+                <h2>{product.productName}</h2>
+                <p>値段: {product.price}円</p>
+                <p>在庫: {product.stock}個</p>
+                <p>調理時間: {product.cookTime}分</p>
+              </div>
+            ))
+          ) : (
+            <p>メニューがありません。</p>
+          )}
         </div>
-
 
         {/* メニュー追加フォーム */}
         {showForm && (

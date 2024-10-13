@@ -133,6 +133,12 @@
   cursor: pointer;
 }
 
+.selectedCard {
+  border: 2px solid blue; /* 枠線を青くする */
+  transition: border 0.2s ease;
+}
+
+
 .selectButton {
   background-color: #B8D5F4;
   color: white;
@@ -141,6 +147,7 @@
   font-size: 1rem;
   cursor: pointer;
   border-radius: 100vh;
+  margin-left: 10px;
   margin-right: 10px;
 }
 
