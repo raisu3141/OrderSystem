@@ -78,7 +78,7 @@ const StallForm = ({ onSubmit, onClose }: StallFormProps) => {
               className={styles.stallNameInput}
             />
           </label>
-          <button type="submit" className={styles.submitButton}>追加</button>
+          <button type="submit" className={styles.submitButton}>完了</button>
         </form>
       </div>
     </div>
