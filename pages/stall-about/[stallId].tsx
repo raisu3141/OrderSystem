@@ -9,34 +9,47 @@ const StallMenuContents = () => {
   const { stallId } = router.query;
   const [stallData, setStallData] = useState<any>(null);
   const [showForm, setShowForm] = useState(false);
+  const [showUpdateForm, setShowUpdateForm] = useState(false); // 更新フォームの表示管理
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [menuName, setMenuName] = useState('');
   const [price, setPrice] = useState<number | string>('');
-  const [stock, setStock] = useState<number | string>('');
+  const [stock, setStock] = useState<number | string>(''); // 在庫
   const [cookTime, setCookTime] = useState<number | string>('');
   const [isSelecting, setIsSelecting] = useState(false); // 選択状態を管理
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]); // 複数選択された商品ID
+  const [selectedProduct, setSelectedProduct] = useState<any>(null); // 編集するための商品データ
 
   useEffect(() => {
     if (stallId) {
-      const fetchStallData = async () => {
-        try {
-          const response = await fetch('/api/StoreData/getter/getOneSTORE_DATA', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ _id: stallId }),
-          });
-          const result = await response.json();
-          setStallData(result);
-        } catch (error) {
-          console.error('Error fetching stall data:', error);
-        }
-      };
       fetchStallData();
+      
+      // 1秒ごとに在庫情報を更新
+      const intervalId = setInterval(() => {
+        fetchStallData();
+      }, 3000);
+      
+      // コンポーネントがアンマウントされた時にインターバルをクリア
+      return () => clearInterval(intervalId);
     }
   }, [stallId]);
+
+  const fetchStallData = async () => {
+    if (stallId) {
+      try {
+        const response = await fetch('/api/StoreData/getter/getOneSTORE_DATA', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ _id: stallId }),
+        });
+        const result = await response.json();
+        setStallData(result);
+      } catch (error) {
+        console.error('Error fetching stall data:', error);
+      }
+    }
+  };
 
   const handleButtonClick = () => {
     setShowForm(!showForm);
@@ -82,6 +95,35 @@ const StallMenuContents = () => {
       setSelectedProductIds([]); // 選択リセット
     } catch (error) {
       console.error('Error deleting products:', error);
+    }
+  };
+
+  // ここにhandleStockUpdate関数を追加
+  const handleStockUpdate = async (productId: string, newStock: number) => {
+    try {
+      const response = await fetch(`/api/ProductData/setter/updataPRODUCTS_DATA`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ _id: productId, stock: newStock }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update stock');
+      }
+
+      const updatedProduct = await response.json();
+
+      // 商品データをリアルタイムで更新
+      setStallData((prev: any) => ({
+        ...prev,
+        productList: prev.productList.map((product: any) =>
+          product._id === updatedProduct._id ? updatedProduct : product
+        ),
+      }));
+    } catch (error) {
+      console.error('Error updating stock:', error);
     }
   };
 
@@ -151,6 +193,62 @@ const StallMenuContents = () => {
     }
   };
 
+  // 更新ボタンが押されたときに、選択された商品のデータを編集フォームにセットする関数
+  const handleUpdateButtonClick = (product: any) => {
+    setSelectedProduct(product); // 編集する商品のデータをセット
+    setMenuName(product.productName);
+    setPrice(product.price);
+    setStock(product.stock);
+    setCookTime(product.cookTime);
+    setShowUpdateForm(true); // 更新フォームを表示
+  };
+
+  // 更新フォームの送信を処理する関数
+  const handleUpdateFormSubmit = async (event: React.FormEvent) => {
+    event.preventDefault(); // デフォルトのフォーム送信動作を無効化
+
+    if (!selectedProduct) {
+      console.error('No product selected for update');
+      return;
+    }
+
+    const updatedProductData = {
+      _id: selectedProduct._id,
+      productName: menuName,
+      price: price,
+      stock: stock,
+      cookTime: cookTime,
+    };
+
+    try {
+      const response = await fetch(`/api/ProductData/setter/updataPRODUCTS_DATA`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedProductData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update product');
+      }
+
+      const updatedProduct = await response.json();
+
+      // 商品リストをリアルタイムで更新
+      setStallData((prev: any) => ({
+        ...prev,
+        productList: prev.productList.map((product: any) =>
+          product._id === updatedProduct._id ? updatedProduct : product
+        ),
+      }));
+
+      setShowUpdateForm(false); // 更新フォームを閉じる
+    } catch (error) {
+      console.error('Error updating product:', error);
+    }
+  };
+
   return (
     <div>
       <header className={styles.header}>
@@ -191,8 +289,16 @@ const StallMenuContents = () => {
                 <img src={product.productImageUrl} alt={product.productName} className={styles.stallImage} />
                 <h2>{product.productName}</h2>
                 <p>値段: {product.price}円</p>
-                <p>在庫: {product.stock}個</p>
+                <p>在庫: 
+                  <input
+                    type="number"
+                    value={product.stock}
+                    onChange={(e) => handleStockUpdate(product._id, Number(e.target.value))}
+                    className={styles.stockInputBox}
+                  />個
+                </p>
                 <p>調理時間: {product.cookTime}分</p>
+                <button onClick={() => handleUpdateButtonClick(product)}>更新</button> {/* 更新ボタンを追加 */}
               </div>
             ))
           ) : (
@@ -260,6 +366,63 @@ const StallMenuContents = () => {
                 </label>
                 <button type="submit" className={styles.submitButton}>
                   完了
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* 更新フォーム */}
+        {showUpdateForm && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modal}>
+              <button className={styles.closeButton} onClick={() => setShowUpdateForm(false)}>
+                &times;
+              </button>
+              <h2 className={styles.formTitle}>メニュー更新フォーム</h2>
+              <form className={styles.form} onSubmit={handleUpdateFormSubmit}>
+                <label className={styles.stallNameLabel}>
+                  商品名:
+                  <input
+                    type="text"
+                    name="menuName"
+                    className={styles.stallNameInput}
+                    value={menuName}
+                    onChange={(e) => setMenuName(e.target.value)}
+                  />
+                </label>
+                <label className={styles.priceLabel}>
+                  値段(円):
+                  <input
+                    type="number"
+                    name="price"
+                    className={styles.priceInput}
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                  />
+                </label>
+                <label className={styles.stockLabel}>
+                  在庫数(個):
+                  <input
+                    type="number"
+                    name="stock"
+                    className={styles.stockInput}
+                    value={stock}
+                    onChange={(e) => setStock(e.target.value)}
+                  />
+                </label>
+                <label className={styles.timeLabel}>
+                  調理時間(分):
+                  <input
+                    type="number"
+                    name="cookTime"
+                    className={styles.timeInput}
+                    value={cookTime}
+                    onChange={(e) => setCookTime(e.target.value)}
+                  />
+                </label>
+                <button type="submit" className={styles.submitButton}>
+                  更新完了
                 </button>
               </form>
             </div>
