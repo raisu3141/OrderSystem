@@ -56,6 +56,11 @@
   border-bottom: 2px solid #ccc;
 }
 
+.leftContainer {
+  display: flex;
+  align-items: center;
+}
+
 .addButton {
   background-color: #B8D5F4;
   color: white;
@@ -115,15 +120,23 @@
 
 .buttonContainer {
   display: flex;
+  justify-content: flex-end;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 0;
 }
 
+
 .trashIcon {
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   margin-right: 10px;
   cursor: pointer;
 }
+
+.selectedCard {
+  border: 2px solid blue; /* 枠線を青くする */
+  transition: border 0.2s ease;
+}
+
 
 .selectButton {
   background-color: #B8D5F4;
@@ -133,6 +146,7 @@
   font-size: 1rem;
   cursor: pointer;
   border-radius: 100vh;
+  margin-left: 10px;
   margin-right: 10px;
 }
 
@@ -321,6 +335,12 @@
   margin: 10px 0;
 }
 
+.stallCard p {
+  font-size: 1rem;
+  color: #333;
+  margin: 5px 0;
+}
+
 .backButton {
   display: inline-block;
   cursor: pointer;
@@ -338,9 +358,14 @@
 }
 
 .title {
-  font-size: 1.5rem;
+  font-size: 2rem;
   color: #333;
-  margin: 0;
+  margin: 0 5%;
+  padding: 20px 0; 
+  text-align: left;
+  font-family: sans-serif;
+  display: flex;
+  justify-content: space-between;
 }
 
 .menuItem {
@@ -357,4 +382,38 @@
   height: 100px;
   object-fit: cover;
   margin-bottom: 8px;
+}
+
+.stockInputBox {
+  width: 70px; /* 横幅を80pxに設定 */
+  padding: 1.5px; /* ボックス内の余白を設定 */
+  font-size: 16px; /* 文字サイズを調整 */
+  border: 0.5px solid #ccc; /* 枠線のスタイル */
+  border-radius: 4px; /* 角を少し丸める */
+}
+
+.adjustStockLabel {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.adjustStockInput {
+  width: 60px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.adjustButton {
+  background-color: #4CAF50;
+  color: white;
+  padding: 5px 10px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.adjustButton:hover {
+  background-color: #45a049;
 }
