@@ -23,30 +23,39 @@ const StallMenuContents = () => {
 
   useEffect(() => {
     if (stallId) {
-      // 初回データ取得
-      fetchStallData();
-  
-      // サーバーサイドイベント (SSE) のセットアップ
-      const eventSource = new EventSource(`/api/Utils/productDataChanges?storeId=${stallId}`);
-  
-      // サーバーからメッセージを受信したときの処理
-      eventSource.onmessage = (event) => {
-        console.log('SSE message received:', event.data);
-        fetchStallData();  // データを再取得
-      };
-  
-      // エラーハンドリング
-      eventSource.onerror = (error) => {
-        console.error('SSE connection error:', error);
-        eventSource.close();  // エラーが発生した場合は接続を閉じる
-      };
-  
-      // コンポーネントがアンマウントされた時にSSE接続を閉じる
-      return () => {
-        eventSource.close();
-      };
+        // 初回データ取得
+        console.log('Fetching stall data...');
+        fetchStallData();
+
+        // サーバーサイドイベント (SSE) のセットアップ
+        const eventSource = new EventSource(`/api/Utils/productDataChanges?storeId=${stallId}`);
+
+        // サーバーからメッセージを受信したときの処理
+        eventSource.onmessage = (event) => {
+            console.log('SSE message received:', event.data);
+            try {
+                const data = JSON.parse(event.data);
+                console.log('Parsed data:', data);
+                // 必要に応じてUIを更新
+                fetchStallData();  // データを再取得
+            } catch (error) {
+                console.error('Error parsing data:', error);
+            }
+        };
+
+        // エラーハンドリング
+        eventSource.onerror = (error) => {
+            console.error('SSE connection error:', error);
+            eventSource.close();  // エラーが発生した場合は接続を閉じる
+        };
+
+        // コンポーネントがアンマウントされた時にSSE接続を閉じる
+        return () => {
+            eventSource.close();
+        };
     }
-  }, [stallId]);
+}, [stallId]);
+
 
   const fetchStallData = async () => {
     if (stallId) {

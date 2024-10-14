@@ -18,6 +18,7 @@ export default async function handler(req, res) {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
+
   res.flushHeaders();
 
   // Connect to MongoDB
@@ -41,6 +42,8 @@ export default async function handler(req, res) {
 
   // Listen for changes in StoreData
   storeDataChangeStream.on('change', async (change) => {
+    const updatedStore = change.fullDocument; // 変更後の完全なドキュメント
+    sendData(updatedStore); // クライアントに送信
     console.log('Change detected in StoreData:', JSON.stringify(change, null, 2));
   });
 
@@ -48,7 +51,7 @@ export default async function handler(req, res) {
   productDataChangeStream.on('change', async (change) => {
     console.log('Change detected in ProductData:', change);
     try {
-        const updatedProduct = change; // 変更後の完全なドキュメント
+        const updatedProduct = change.fullDocument; // 変更後の完全なドキュメント
         sendData(updatedProduct); // クライアントに送信
     } catch (error) {
         console.error('Error handling product data change:', error);
