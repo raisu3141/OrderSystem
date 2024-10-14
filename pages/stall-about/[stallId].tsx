@@ -3,6 +3,8 @@ import { useRouter } from 'next/router';
 import styles from '../../styles/Stallabout.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { debug } from 'console';
+import { debugPort } from 'process';
 
 const StallMenuContents = () => {
   const router = useRouter();
@@ -21,15 +23,28 @@ const StallMenuContents = () => {
 
   useEffect(() => {
     if (stallId) {
+      // 初回データ取得
       fetchStallData();
-      
-      // 1秒ごとに在庫情報を更新
-      const intervalId = setInterval(() => {
-        fetchStallData();
-      }, 3000);
-      
-      // コンポーネントがアンマウントされた時にインターバルをクリア
-      return () => clearInterval(intervalId);
+  
+      // サーバーサイドイベント (SSE) のセットアップ
+      const eventSource = new EventSource(`/api/Utils/productDataChanges?storeId=${stallId}`);
+  
+      // サーバーからメッセージを受信したときの処理
+      eventSource.onmessage = (event) => {
+        console.log('SSE message received:', event.data);
+        fetchStallData();  // データを再取得
+      };
+  
+      // エラーハンドリング
+      eventSource.onerror = (error) => {
+        console.error('SSE connection error:', error);
+        eventSource.close();  // エラーが発生した場合は接続を閉じる
+      };
+  
+      // コンポーネントがアンマウントされた時にSSE接続を閉じる
+      return () => {
+        eventSource.close();
+      };
     }
   }, [stallId]);
 
