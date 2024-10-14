@@ -309,11 +309,11 @@ const StallMenuContents = () => {
                     type="number"
                     value={product.stock}
                     onChange={(e) => handleStockUpdate(product._id, Number(e.target.value))}
-                    className={styles.stockInputBox}
+                    className={styles.stockInputBox}    
                   />個
                 </p>
                 <p>調理時間: {product.cookTime}分</p>
-                <button onClick={() => handleUpdateButtonClick(product)}>更新</button> {/* 更新ボタンを追加 */}
+                <button onClick={() => handleUpdateButtonClick(product)}>編集</button> {/* 更新ボタンを追加 */}
               </div>
             ))
           ) : (
