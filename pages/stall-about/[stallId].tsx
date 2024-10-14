@@ -26,7 +26,7 @@ const StallMenuContents = () => {
       // 1秒ごとに在庫情報を更新
       const intervalId = setInterval(() => {
         fetchStallData();
-      }, 3000);
+      }, 1000);
       
       // コンポーネントがアンマウントされた時にインターバルをクリア
       return () => clearInterval(intervalId);
