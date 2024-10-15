@@ -6,6 +6,7 @@ export default async function handler(req, res) {
 
   let results = [];
   let storeIds = [];
+  let products = [];
 
   // データベースに接続
   await connectToDatabase();
@@ -60,6 +61,23 @@ export default async function handler(req, res) {
     }
   }
 
-  // 最終的に結果を返す
-  res.status(200).json(results);
+  await Promise.all(
+    results.map(async (id) => {
+      const product = await ProductData.find({ _id: id })
+        .select('productName price productImageUrl')
+        .populate('storeId', 'storeName');  // storeId から storeName だけを取得
+      
+      products.push(product);  // productを配列に追加
+    })
+  );
+
+  const formattedData = products.flat().map(item => ({
+    storeName: item.storeId.storeName,
+    productName: item.productName,
+    productImageUrl: item.productImageUrl,
+    price: item.price
+}));
+
+  res.status(200).json(formattedData);
 }
+
