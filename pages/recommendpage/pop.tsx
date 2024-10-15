@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import Header from '../components/header'
-import Styles from '../styles/Home.module.css'
+import Header from '../../components/header'
+import Styles from '../../styles/Home.module.css'
 import Image from 'next/image'
-import teststyle from '../styles/pop.module.css'
+import teststyle from '../../styles/recommend.module.css'
 
 interface items {
   id : number;
@@ -25,9 +25,10 @@ export function pop() {
     <div>
       <div className={Styles.container}>
         {/* 屋台一覧を表示 */}
-        <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 justify-items-center">
+        <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
           {testitems.map((src: items) => {
             return(
+              <div className='grid relative'>
               <div className={`${teststyle.card} ${
                 src.id == 1 ? teststyle.id1: 
                 src.id == 2 ? teststyle.id2:
@@ -39,6 +40,7 @@ export function pop() {
                   <div className='font-semibold text-4xl'>{src.name}</div>
                   <div className='font-semibold text-5xl'>&yen;{src.price}</div>
                 </div>
+              </div>
               </div>
             )
           })}

@@ -3,22 +3,27 @@
     border-radius: 0.5rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     display: flex;
+    background-color: white;
 }
 .id1 {
     z-index: 0;
     animation: scale1 40s ease 1s infinite;
+    justify-self: start;
 }
 .id2 {
     z-index: 0;
     animation: scale2 40s ease 11s infinite;
+    justify-self: end;
 }
 .id3 {
     z-index: 0;
     animation: scale3 40s ease 21s infinite;
+    justify-self: start;
 }
 .id4 {
     z-index: 0;
     animation: scale4 40s ease 31s infinite;
+    justify-self: end;
 }
 
 
@@ -36,13 +41,13 @@
     }
     5% {
         z-index: 1;
-        transform: scale(1.5) translate(200px, 100px);
-        background-color: aqua;
+        transform: scale(1.5) translate(280px, 100px);
+        background-color: white;
     }
     5%, 20% {
         z-index: 1;
-        transform: scale(1.5) translate(200px, 100px);
-        background-color: aqua;
+        transform: scale(1.5) translate(280px, 100px);
+        background-color: white;
     }
     25% {
         z-index: 1;
@@ -69,13 +74,13 @@
     }
     5% {
         z-index: 1;
-        transform: scale(1.5) translate(-200px, 100px);
-        background-color: aqua;
+        transform: scale(1.5) translate(-280px, 100px);
+        background-color: white;
     }
     5%, 20% {
         z-index: 1;
-        transform: scale(1.5) translate(-200px, 100px);
-        background-color: aqua;
+        transform: scale(1.5) translate(-280px, 100px);
+        background-color: white;
     }
     25% {
         z-index: 1;
@@ -102,13 +107,13 @@
     }
     5% {
         z-index: 1;
-        transform: scale(1.5) translate(200px, -100px);
-        background-color: aqua;
+        transform: scale(1.5) translate(280px, -100px);
+        background-color: white;
     }
     5%, 20% {
         z-index: 1;
-        transform: scale(1.5) translate(200px, -100px);
-        background-color: aqua;
+        transform: scale(1.5) translate(280px, -100px);
+        background-color: white;
     }
     25% {
         z-index: 1;
@@ -135,13 +140,13 @@
     }
     5% {
         z-index: 1;
-        transform: scale(1.5) translate(-200px, -100px);
-        background-color: aqua;
+        transform: scale(1.5) translate(-280px, -100px);
+        background-color: white;
     }
     5%, 20% {
         z-index: 1;
-        transform: scale(1.5) translate(-200px, -100px);
-        background-color: aqua;
+        transform: scale(1.5) translate(-280px, -100px);
+        background-color: white;
     }
     25% {
         z-index: 1;
