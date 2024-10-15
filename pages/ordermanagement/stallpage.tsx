@@ -1,23 +1,33 @@
-import Header from "@/components/header";
-import Head from "next/head";
-import Styles from "@/styles/Home.module.css";
-
-export default function StallPage1() {
-
+import { useSearchParams } from 'next/navigation'
+import { Metadata } from 'next'
+import Styles from "../../styles/Home.module.css";
+import OrderticketManager from "../../components/ordermanege/orderticketmanager";
 
 
+export const metadata: Metadata = {
+  title: 'Stall Page',
+}
+
+export default function StallPage() {
+  const searchParams = useSearchParams()
+  const storeName = searchParams.get('storeName')
+
+  if (!storeName) {
     return (
       <div>
-          <Head>
-              <title>
-                屋台１
-              </title>
-          </Head>
-          <div className={Styles.container}>
-            <div className="sticky top-0 bg-white border-b-2 border-gray-300 p-4 z-10 flex items-center justify-between mb-8">
-              <h1 className="text-4xl font-bold">屋台１</h1>
-            </div>
-          </div>
+        Error: Missing parameters
       </div>
     )
+  }
+
+  return (
+    <div>
+      <div className={Styles.container}>
+        <div className="sticky top-0 bg-white border-b-2 border-gray-300 p-4 z-10 flex items-center justify-between mb-8">
+          <h1 className="text-4xl font-bold">{storeName}</h1>
+        </div>
+        <OrderticketManager storeName={storeName} />
+      </div>
+    </div>
+  )
 }
