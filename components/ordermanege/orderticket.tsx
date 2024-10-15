@@ -125,17 +125,19 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
   const renderOrderCard = (order: Order) => (
     <Card key={order.orderId} className={`mb-4 ${!order.cookStatus ? 'bg-orange-100' : order.getStatus ? 'bg-gray-100' : 'bg-green-100'}`}>
       <CardContent className="p-4">
-        <div className="flex items-start">
-          <div className="flex-shrink-0 w-20 mr-4">
+        <div className="flex items-stretch h-full divide-x divide-gray-300">
+          {/* 整理券番号の表示 */}
+          <div className="flex-shrink-0 w-24 pr-4">
             <div className="text-sm text-gray-500">整理券番号</div>
             <div className="text-4xl font-bold">{order.ticketNumber}</div>
           </div>
-          <div className="flex-shrink-0 w-20 mr-4">
-            <div className="text-sm mb-4">{order.clientName}</div>
-            <div className="text-sm text-gray-500">{order.orderTime}</div>
+          {/* 顧客名と注文時間の表示 */}
+          <div className="flex-shrink-0 w-32 px-4 flex flex-col">
+            <div className="text-sm">{order.clientName}</div>
+            <div className="text-sm text-gray-500 mt-4">{order.orderTime}</div>
           </div>
           {/* 商品リストの表示 */}
-          <div className="flex-grow">
+          <div className="flex-grow px-4 flex flex-col">
             <ul className="space-y-1">
               {order.orderList.map((item, index) => (
                 <li key={index} className="flex justify-between text-sm font-bold">
@@ -144,8 +146,8 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
               ))}
             </ul>
           </div>
-          {/* 常体更新ボタン */}
-          <div className="flex-shrink-0 ml-4">
+          {/* 状態更新ボタン */}
+          <div className="flex-shrink-0 pl-4 flex">
             {!order.getStatus && (
               <Button 
                 onClick={() => updateOrderStatus(order, order.cookStatus ? 'completed' : 'ready')}
