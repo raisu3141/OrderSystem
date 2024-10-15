@@ -83,6 +83,7 @@ export default async function handler(req, res) {
     const StoreOrder = mongoose.model(storeName + "_Order", StoreOrderSchema);
 
     const tempDoc = new StoreOrder({
+      orderId: storeID,
       tiketNumber: 1,
       orderList: [],
       clientName: "仮データ",
@@ -102,7 +103,7 @@ export default async function handler(req, res) {
 
   // 屋台データにStoreOrderのコレクション名を格納
   try {
-    const updateFields = { storeOrder: storeName + "_Order" };
+    const updateFields = { storeOrder: storeName + "_order" };
     const updatedStore = await StoreData.findByIdAndUpdate(
       storeID, 
       updateFields, 
