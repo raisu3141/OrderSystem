@@ -30,6 +30,11 @@ const StallMenuContents = () => {
         // サーバーサイドイベント (SSE) のセットアップ
         const eventSource = new EventSource(`/api/Utils/productDataChanges?storeId=${stallId}`);
 
+        // SSEの通信が確立したかの確認
+        eventSource.onopen = () => {
+          console.log('SSE connection established.');
+        };
+
         // サーバーからメッセージを受信したときの処理
         eventSource.onmessage = (event) => {
             console.log('SSE message received:', event.data);

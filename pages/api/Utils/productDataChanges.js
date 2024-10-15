@@ -2,8 +2,29 @@ import connectToDatabase from '../../../lib/mongoose';
 import ProductData from '../../../models/ProductData';
 import StoreData from '../../../models/StoreData';
 import mongoose from 'mongoose';
+import Cors from 'cors';
+
+// Helper method to wait for a middleware to execute before continuing
+function runMiddleware(req, res, fn) {
+  return new Promise((resolve, reject) => {
+    fn(req, res, (result) => {
+      if (result instanceof Error) {
+        return reject(result);
+      }
+      return resolve(result);
+    });
+  });
+}
+
+// Initialize the cors middleware
+const cors = Cors({
+  methods: ['GET', 'HEAD'],
+  origin: '*', // 必要に応じて特定のオリジンを指定してください
+});
 
 export default async function handler(req, res) {
+  // Run the CORS middleware
+  await runMiddleware(req, res, cors);
 
   const storeId = req.query.storeId;
 
@@ -28,16 +49,19 @@ export default async function handler(req, res) {
   const storeDataChangeStream = StoreData.watch([
     { $match: { 'documentKey._id': new mongoose.Types.ObjectId(storeId) } }
   ]);
+  
   const productDataChangeStream = ProductData.watch(
     [
       { $match: { 'fullDocument.storeId': new mongoose.Types.ObjectId(storeId) } }
     ],
-    { fullDocument: 'updateLookup' } // これを追加
+    { fullDocument: 'updateLookup' } // 完全なドキュメントを取得するために追加
   );
 
   // Function to send data to client
   const sendData = (data) => {
     res.write(`data: ${JSON.stringify(data)}\n\n`);
+    // 即座にレスポンスを返す　デフォルトならバッファ処理があり、レスポンスが蓄積されるが、それはSSEの規格に沿わない
+    res.flush();
   };
 
   // Listen for changes in StoreData
@@ -51,13 +75,13 @@ export default async function handler(req, res) {
   productDataChangeStream.on('change', async (change) => {
     console.log('Change detected in ProductData:', change);
     try {
-        const updatedProduct = change.fullDocument; // 変更後の完全なドキュメント
-        sendData(updatedProduct); // クライアントに送信
+      const updatedProduct = change.fullDocument; // 変更後の完全なドキュメント
+      sendData(updatedProduct); // クライアントに送信
     } catch (error) {
-        console.error('Error handling product data change:', error);
-        sendData({ success: false, message: 'Error handling product data change' });
+      console.error('Error handling product data change:', error);
+      sendData({ success: false, message: 'Error handling product data change' });
     }
-});
+  });
 
   // Keep the connection alive by sending a comment every 30 seconds
   const keepAlive = setInterval(() => {
