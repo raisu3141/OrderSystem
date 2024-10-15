@@ -29,6 +29,7 @@ interface Order {
   orderId: string;
   orderList: OrderList[];
   ticketNumber: number;
+  orderTime: string;
 }
 
 async function fetchOrders(storeName: string, status: 'preparing' | 'ready' | 'all'): Promise<Order[]> {
@@ -37,7 +38,8 @@ async function fetchOrders(storeName: string, status: 'preparing' | 'ready' | 'a
     throw new Error('Failed to fetch orders');
   }
   const data: Order[] = await response.json();
-
+  // コンソールに出力
+  console.log(data);
   if (status === 'all') {
     return data
   } else {
@@ -129,17 +131,20 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
             <div className="text-4xl font-bold">{order.ticketNumber}</div>
           </div>
           <div className="flex-shrink-0 w-20 mr-4">
-            <div className="text-sm mb-2">{order.clientName}</div>
+            <div className="text-sm mb-4">{order.clientName}</div>
+            <div className="text-sm text-gray-500">{order.orderTime}</div>
           </div>
+          {/* 商品リストの表示 */}
           <div className="flex-grow">
             <ul className="space-y-1">
               {order.orderList.map((item, index) => (
-                <li key={index} className="flex justify-between text-sm">
+                <li key={index} className="flex justify-between text-sm font-bold">
                   <span>{item.productName} × {item.orderQuantity}</span>
                 </li>
               ))}
             </ul>
           </div>
+          {/* 常体更新ボタン */}
           <div className="flex-shrink-0 ml-4">
             {!order.getStatus && (
               <Button 
