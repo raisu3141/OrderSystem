@@ -1,4 +1,4 @@
-// pages/api/getSTORES_ORDER.js
+// pages/api/getOrders.js
 import mongoose from 'mongoose';  // mongooseのインポートを追加
 import connectToDatabase from '../../../../lib/mongoose';
 import StoreOrderSchema from '../../../../models/StoreOrder';
@@ -11,6 +11,7 @@ export default async function handler(req, res) {
     const collectionName = storeName + "_orders";
 
     await connectToDatabase();
+    const { storeId } = req.query;
     try {
       const collections = await mongoose.connection.db.listCollections({ name: collectionName }).toArray();
     
@@ -20,7 +21,13 @@ export default async function handler(req, res) {
       }
   
       // コレクションが存在する場合のみモデルを取得
-      const StoreOrder = mongoose.model(collectionName, StoreOrderSchema);
+      // すでにモデルが存在する場合は再定義しない
+      let StoreOrder;
+      if (mongoose.modelNames().includes(collectionName)) {
+          StoreOrder = mongoose.model(collectionName);
+      } else {
+          StoreOrder = mongoose.model(collectionName, StoreOrderSchema);
+      }
       const allStoreOrder = await StoreOrder.find({}, "orderId orderList.productId orderList.orderQuantity cookStatus getStatus orderTime")
         .populate([
           {path: 'orderId', select: 'clientName ticketNumber'}, 

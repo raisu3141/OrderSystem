@@ -45,13 +45,12 @@ const ProductDataSchema = new mongoose.Schema({
     min: 0,
   },
 
-  // 個数カウント
-  "soldCount" : {
+  "soldCount": {
     type: mongoose.Schema.Types.Number,
-    required: true,
+    required: false,
     default: 0,
     min: 0,
-  }
+  },
 
 }, {
   // 追加・更新日時を自動で保存
