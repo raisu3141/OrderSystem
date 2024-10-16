@@ -1,7 +1,4 @@
-const express = require('express');
 const { MongoClient } = require('mongodb');
-
-const app = express();
 
 async function monitorChanges(req, res) {
     const storeName = req.query; // フロントから送られたコレクション名を取得
@@ -72,12 +69,5 @@ async function monitorChanges(req, res) {
         res.status(500).json({ success: false, error: error.message });
     }
 }
-
-app.get('/api/StoreOrder/getter', monitorChanges);  // SSEエンドポイントを設定
-
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
 
 export default monitorChanges;

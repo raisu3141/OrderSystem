@@ -84,6 +84,7 @@ export default async function orderSorting(orderId, session){
     }
     catch(error){
         console.error(error); // エラーをコンソールに出力
+        res.status(500).json({ success: false, message: error.message });
     }
 }
 
