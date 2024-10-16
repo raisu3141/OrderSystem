@@ -204,7 +204,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
   }
   // エラーが発生した場合の表示
   if (errorAll) {
-    return <div className="text-red-500">エラーが発生しました。再度お試しください。</div>
+    return <div className="text-red-500 items-center">エラーが発生しました。再度お試しください。</div>
   }
 
   const handleShowAllOrders = () => {
