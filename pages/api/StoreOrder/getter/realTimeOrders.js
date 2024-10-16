@@ -39,18 +39,21 @@ async function monitorChanges(req, res) {
             if (change.operationType && change.operationType === 'insert') {
                 const updatedDocument = change.fullDocument;
                 console.log('Detected change:', updatedDocument);
+
                 res.write(`data: ${JSON.stringify(updatedDocument)}\n\n`);
+                res.flush();
                 
             }else if(change.operationType === 'update'){
                 const updatedFields = change.updateDescription.updatedFields;
 
-                if (updatedFields && updatedFields.hasOwnProperty('cancelStatus')) {
-                    const updatedName = updatedFields.cancelStatus;
+                if (updatedFields && updatedFields.hasOwnProperty('getStatus')) {
+                    const updatedName = updatedFields.getStatus;
                     console.log('Name field was updated:', updatedName);
                     console.log(change);
               
                     // クライアントに変更された特定のフィールドを送信
                     res.write(`data: ${JSON.stringify({ name: updatedName })}\n\n`);
+                    res.flush();
                 }
             } else {
                 console.log('No operationType or unsupported operation');

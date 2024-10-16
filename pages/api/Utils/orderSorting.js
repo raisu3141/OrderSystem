@@ -10,9 +10,9 @@ export default async function orderSorting(orderId, session){
     try{
         //全屋台名を取得・リストに分けるためのデータ作成
         let stores = [];
-        const storeData = await StoreData.find({}, "storeName storeWaitTime").session(session);
+        const storeData = await StoreData.find({}, "_id storeName storeWaitTime").session(session);
         storeData.forEach(data => {
-            stores.push({[data.storeName]: [], waitTime: data.storeWaitTime});
+            stores.push({[data.storeName]: [], storeId: data._id, waitTime: data.storeWaitTime});
         });
 
         //注文の受け取り
@@ -59,12 +59,28 @@ export default async function orderSorting(orderId, session){
             const allStoreOrder = new StoreOrder({
               orderId: orders._id, 
               orderList: data[storeName],  // リストのデータを渡す
-              waitTime: data.waitTime      // タイプミス修正: waiTime -> waitTime
             });
           
             // データベースに保存
             await allStoreOrder.save({ session });
           }
+
+          const waitTimes = {};
+            cleaneData.forEach(data =>{
+                waitTimes[data.storeId] = data.waitTime;
+            });
+
+            const updatedStatus = await orderData.findOneAndUpdate(
+                {_id: orderId}, 
+                { 
+                    waitTime: waitTimes
+                }, 
+                {new: true }
+            );
+            
+            if (!updatedStatus) {
+                return res.status(404).json({ success: false, message: 'Status not found' });
+            }
     }
     catch(error){
         console.error(error); // エラーをコンソールに出力
