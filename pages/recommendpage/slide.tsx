@@ -13,6 +13,13 @@ interface items {
   image: string;
 }
 
+interface itemsapi {
+  storeName: string;
+  productName: string;
+  productImageUrl: string;
+  price: number;
+}
+
 const testitems: items[] = [
   {id: 1, stall: '屋台1', name: '商品1', price: 300, image: '/images/yatai1.png'},
   {id: 2, stall: '屋台2', name: '商品2', price: 200, image: '/images/yatai1.png'},
@@ -20,7 +27,19 @@ const testitems: items[] = [
   {id: 4, stall: '屋台4', name: '商品4', price: 3100, image: '/images/yatai1.png'},
 ]
 
-const Slider = () => {
+async function fetchRecommend(): Promise<itemsapi[]> { 
+  const response = await fetch(`/api/Utils/getter/getStoreRecommend`); 
+  if (!response.ok) { 
+    throw new Error('Failed to fetch orders'); 
+  } 
+  const data: itemsapi[] = await response.json();
+
+  return data;
+}
+
+
+async function Slider(){
+  const data = await fetchRecommend();
   return (
     <div>
       <h1 className='font-semibold text-5xl text-center mt-10'>recommendation</h1>
@@ -36,7 +55,7 @@ const Slider = () => {
           disableOnInteraction: false,
         }}
         >
-        {testitems.map((src: items, index: number) => {
+        {data.map((src: itemsapi, index: number) => {
           return (
             <SwiperSlide key={`${index}`} className="mt-10">
               <div className='grid justify-items-center'>
@@ -50,7 +69,7 @@ const Slider = () => {
                   relative
                   grid"
                   >
-                  <Image src={src.image} width={540} height={400} alt="test_image" />
+                  <Image src={src.productImageUrl} width={540} height={400} alt="test_image" />
                   <div>
                     <div className='
                       absolute
@@ -60,7 +79,7 @@ const Slider = () => {
                       bg-gray-100 
                       bg-opacity-100'
                       >
-                      {src.stall}
+                      {src.storeName}
                     </div>
                     <div className='
                       absolute
@@ -71,7 +90,7 @@ const Slider = () => {
                       bg-gray-100 
                       bg-opacity-100'
                       >
-                      {src.name} &yen;{src.price}
+                      {src.productName} &yen;{src.price}
                     </div>
                   </div>
                 </div>
