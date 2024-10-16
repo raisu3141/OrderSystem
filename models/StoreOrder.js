@@ -10,7 +10,7 @@ const StoreOrderSchema = new mongoose.Schema({
     ref: 'OrderData',
   },
 
-// 注文リスト
+  // 注文リスト
   "orderList": [{
     // 商品ID
     "productId": {
