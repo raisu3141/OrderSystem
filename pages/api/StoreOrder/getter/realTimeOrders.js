@@ -44,8 +44,8 @@ async function monitorChanges(req, res) {
             }else if(change.operationType === 'update'){
                 const updatedFields = change.updateDescription.updatedFields;
 
-                if (updatedFields && updatedFields.hasOwnProperty('isCanceled')) {
-                    const updatedName = updatedFields.isCanceled;
+                if (updatedFields && updatedFields.hasOwnProperty('cancelStatus')) {
+                    const updatedName = updatedFields.cancelStatus;
                     console.log('Name field was updated:', updatedName);
                     console.log(change);
               
