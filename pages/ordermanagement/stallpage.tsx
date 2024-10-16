@@ -11,9 +11,8 @@ export const metadata: Metadata = {
 export default function StallPage() {
   const searchParams = useSearchParams()
   const storeName = searchParams.get('storeName')
-  const name = searchParams.get('name')
 
-  if (!storeName || !name) {
+  if (!storeName) {
     return (
       <div>
         Error: Missing parameters
@@ -25,9 +24,9 @@ export default function StallPage() {
     <div>
       <div className={Styles.container}>
         <div className="sticky top-0 bg-white border-b-2 border-gray-300 p-4 z-10 flex items-center justify-between mb-8">
-          <h1 className="text-4xl font-bold">{name}</h1>
+          <h1 className="text-4xl font-bold">{storeName}</h1>
         </div>
-        <OrderticketManager storeName={storeName} name={name} />
+        <OrderticketManager storeName={storeName} />
       </div>
     </div>
   )

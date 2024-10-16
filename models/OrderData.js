@@ -12,10 +12,10 @@ const OrderDataSchema = new mongoose.Schema({
   },
 
   //LINEのユーザーID
-  "LineUserId":{
+  "lineUserId":{
     type: mongoose.Schema.Types.String,
     required: false,
-    unique: true,
+    unique: false,
   },
 
   // 注文リスト
@@ -42,6 +42,13 @@ const OrderDataSchema = new mongoose.Schema({
       min: 0,
     },
   }],
+
+  "waitTime": [
+    {
+      type: Map,
+      of: Number // 各オブジェクトの値の型はNumber
+    }
+  ],
 
   // 注文者名
   "clientName": {

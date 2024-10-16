@@ -1,13 +1,20 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useQuery } from 'react-query'
+import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { Button } from '../../components/ui/button'
 import { Card, CardContent } from '../../components/ui/ticketcard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
-import { Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
+import { Toaster, toast } from 'react-hot-toast';
 
+import styles from '../../components/ordermanege/orderticket.module.css'
 
+const LoadingOverlay = () => (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <Loader2 className="animate-spin text-white w-16 h-16" />
+  </div>
+)
 
 interface OrderList {
   productId: string;
@@ -22,29 +29,31 @@ interface Order {
   orderId: string;
   orderList: OrderList[];
   ticketNumber: number;
+  orderTime: string;
 }
 
-// 屋台Id, 調理状況, 受け渡し状況を指定してあてはまる注文を取得
-async function fetchOrders(storeName: string, status: 'preparing' | 'ready' | 'completed'): Promise<Order[]> { 
-  const response = await fetch(`/api/StoreOrder/getter/getOrders?storeName=${storeName}`); 
-  if (!response.ok) { 
-    throw new Error('Failed to fetch orders'); 
-  } 
+async function fetchOrders(storeName: string, status: 'preparing' | 'ready' | 'all'): Promise<Order[]> {
+  const response = await fetch(`/api/StoreOrder/getter/getOrders?storeName=${storeName}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch orders');
+  }
   const data: Order[] = await response.json();
-
-  // statusの値によってフィルタリング
-  return data.filter(order => {
-    switch (status) {
-      case 'preparing':
-        return order.cookStatus === false && order.getStatus === false;
-      case 'ready':
-        return order.cookStatus === true && order.getStatus === false;
-      case 'completed':
-        return order.cookStatus === true && order.getStatus === true;
-      default:
-        return false;
-    }
-  });
+  // コンソールに出力
+  console.log(data);
+  if (status === 'all') {
+    return data
+  } else {
+    return data.filter(order => {
+      switch (status) {
+        case 'preparing':
+          return order.cookStatus === false && order.getStatus === false;
+        case 'ready':
+          return order.cookStatus === true && order.getStatus === false;
+        default:
+          return false;
+      }
+    });
+  }
 }
 
 interface OrderticketProps {
@@ -52,107 +61,185 @@ interface OrderticketProps {
 }
 
 export default function OrderTicket({ storeName }: OrderticketProps) {
-  const [activeTab, setActiveTab] = useState<'preparing' | 'ready'>('preparing')
+  const [activeTab, setActiveTab] = useState<'preparing' | 'ready' | 'all'>('preparing')
+  const [showAllOrders, setShowAllOrders] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
+  const queryClient = useQueryClient()
 
-  // 調理待ちの注文を取得
-  const { data: preparingOrders, isLoading: isLoadingPreparing, error: errorPreparing } = useQuery(
-    ['orders', storeName, 'perparing'],
-    () => fetchOrders(storeName, 'preparing'),
-    { refetchInterval: 5000 } // 5秒ごとに再取得
+  const { data: allOrders, isLoading: isLoadingAll, error: errorAll } = useQuery(
+    ['orders', storeName, 'all'],
+    () => fetchOrders(storeName, 'all'),
+    { refetchInterval: 5000 }
   )
 
-  // 受け渡し待ちの注文を取得
-  const { data: readyOrders, isLoading: isLoadingReady, error: errorReady } = useQuery(
-    ['orders', storeName, 'ready'],
-    () => fetchOrders(storeName, 'ready'),
-    { refetchInterval: 5000 } // 5秒ごとに再取得
+  const preparingOrders = allOrders?.filter(order => !order.cookStatus && !order.getStatus)
+  const readyOrders = allOrders?.filter(order => order.cookStatus && !order.getStatus)
+
+  const updateOrderStatusMutation = useMutation(
+    async ({ order, newStatus }: { order: Order; newStatus: 'ready' | 'completed' }) => {
+      const cookStatus = newStatus === 'ready' || 'completed' ? true : false
+      const getStatus = newStatus === 'completed' ? true : false
+      
+      // 状態の更新
+      await fetch(`/api/StoreOrder/update/PatchOrderStatus?storeName=${storeName}&orderId=${order.orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cookStatus, getStatus }),
+      })
+      
+      // waittimeの更新
+      await fetch(`/api/Utils/storeWaitTimeSuber`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderList: [{
+            productId: order.orderList[0].productId,
+            storeName: storeName,
+            orderQuantity: order.orderList[0].orderQuantity
+          }]
+        }),
+      })
+    },
+    {
+      onSuccess: () => {
+        // 再取得
+        queryClient.invalidateQueries(['orders', storeName, 'all'])
+        toast.success('送信完了', {
+          position: 'top-right',
+          duration: 3000,
+        });
+      },
+    }
   )
 
-  // 注文のステータスを更新
-  const updateOrderStatus = async (storeName: string, orderId: string, newStatus: 'ready' | 'completed') => {
-
-    const cookStatus = newStatus === 'ready' ? true : false
-    const getStatus = newStatus === 'completed' ? true : false
-    await fetch(`/api/StoreOrder/update/PatchOrderStatus?storeName=${storeName}&orderId=${orderId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cookStatus, getStatus }),
-    })
-    await Promise.all([
-      fetchOrders(storeName, 'preparing'),
-      fetchOrders(storeName, 'ready'),
-    ])
+  const updateOrderStatus = (order: Order, newStatus: 'ready' | 'completed') => {
+    setIsUpdating(true)
+    updateOrderStatusMutation.mutate(
+      { order, newStatus },
+      {
+        onSettled: () => setIsUpdating(false)
+      }
+    )
   }
 
-  const renderOrderCard = (order: Order, status: 'preparing' | 'ready') => (
-    <Card key={order.orderId} className="mb-4 bg-gray-100">
+  const renderOrderCard = (order: Order) => (
+    <Card key={order.orderId} className={`mb-4 ${!order.cookStatus ? 'bg-orange-100' : order.getStatus ? 'bg-gray-50' : 'bg-green-100'}`}>
       <CardContent className="p-4">
-        <div className="flex items-start">
-          <div className="flex-shrink-0 w-20 mr-4">
+        <div className="flex items-stretch h-full divide-x divide-gray-300">
+          {/* 整理券番号の表示 */}
+          <div className="flex-shrink-0 w-24 pr-4">
             <div className="text-sm text-gray-500">整理券番号</div>
             <div className="text-4xl font-bold">{order.ticketNumber}</div>
           </div>
-          <div className="flex-shrink-0 w-20 mr-4">
-            <div className="text-sm mb-2">{order.clientName}</div>
+          {/* 顧客名と注文時間の表示 */}
+          <div className="flex-shrink-0 w-32 px-4 flex flex-col">
+            <div className="text-sm">{order.clientName}</div>
+            <div className="text-sm text-gray-500 mt-4">{order.orderTime}</div>
           </div>
-          <div className="flex-grow">
+          {/* 商品リストの表示 */}
+          <div className="flex-grow px-4 flex flex-col">
             <ul className="space-y-1">
               {order.orderList.map((item, index) => (
-                <li key={index} className="flex justify-between text-sm">
-                  <span>{item.productName}</span>
-                  <span>× {item.orderQuantity}</span>
+                <li key={index} className="flex justify-between text-sm font-bold">
+                  <span>{item.productName} × {item.orderQuantity}</span>
                 </li>
               ))}
             </ul>
           </div>
-          <div className="flex-shrink-0 ml-4">
-            <Button 
-              onClick={() => updateOrderStatus(storeName, order.orderId, status === 'preparing' ? 'ready' : 'completed')}
-              className="w-24 bg-gray-200 text-black hover:bg-gray-300"
-            >
-              {status === 'preparing' ? '調理完了' : '受け渡し完了'}
-            </Button>
+          {/* 状態更新ボタン */}
+          <div className="flex-shrink-0 pl-4 flex">
+            {!order.getStatus ? (
+              <Button 
+                onClick={() => updateOrderStatus(order, order.cookStatus ? 'completed' : 'ready')}
+                className="mt-2 w-24 bg-gray-200 text-black hover:bg-gray-300"
+              >
+                {order.cookStatus ? '受け渡し完了' : '調理完了'}
+              </Button>
+            ) : (
+              <div className="w-24 text-black flex items-center justify-center">
+                completed
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
     </Card>
   )
-
-  if (isLoadingPreparing || isLoadingReady) {
+  // ローディング中の表示
+  if (isLoadingAll) {
     return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin" /></div>
   }
-
-  if (errorPreparing || errorReady) {
+  // エラーが発生した場合の表示
+  if (errorAll) {
     return <div className="text-red-500">エラーが発生しました。再度お試しください。</div>
   }
 
-  return (
-    <div className="container mx-auto p-4">
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'preparing' | 'ready')}> 
-        <TabsList className="grid w-full grid-cols-2 mb-4"> 
-          <TabsTrigger  
-            value="preparing"  
-            className={`text-lg px-4 py-2 ${activeTab === 'preparing' ? 'border-b-2 border-orange-500' : ''}`}>
-            調理待ち
-          </TabsTrigger>  
-          <TabsTrigger  
-            value="ready"  
-            className={`text-lg px-4 py-2 ${activeTab === 'ready' ? 'border-b-2 border-green-500' : ''}`}>
-            受け渡し待ち
-          </TabsTrigger>  
-        </TabsList> 
-        <TabsContent value="preparing"> 
-          <div> 
-            {preparingOrders?.map(order => renderOrderCard(order, 'preparing'))} 
-          </div> 
-        </TabsContent> 
-        <TabsContent value="ready"> 
-          <div> 
-            {readyOrders?.map(order => renderOrderCard(order, 'ready'))} 
-          </div> 
-        </TabsContent> 
-      </Tabs>
+  const handleShowAllOrders = () => {
+    setShowAllOrders(true)
+    setActiveTab('all')
+  }
 
+  const handleHideAllOrders = () => {
+    setShowAllOrders(false)
+    setActiveTab('preparing')
+  }
+
+  return (
+    <div className="container mx-auto p-4 pb-20"> 
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'preparing' | 'ready' | 'all')}>  
+        <TabsList className={`grid w-full mb-4 ${showAllOrders ? 'grid-cols-1' : 'grid-cols-2'}`}>  
+          {showAllOrders ? ( 
+            <TabsTrigger  
+              value="all" 
+              className="text-lg px-4 py-2 border-b-2 border-blue-500 text-center"> 
+              全ての注文 
+            </TabsTrigger> 
+          ) : ( 
+            <> 
+              <TabsTrigger   
+                value="preparing"   
+                className={`text-lg px-4 py-2 ${activeTab === 'preparing' ? 'border-b-2 border-orange-500' : ''} text-center`}> 
+                調理待ち 
+              </TabsTrigger>   
+              <TabsTrigger   
+                value="ready"   
+                className={`text-lg px-4 py-2 ${activeTab === 'ready' ? 'border-b-2 border-green-500' : ''} text-center`}> 
+                受け渡し待ち 
+              </TabsTrigger> 
+            </> 
+          )} 
+        </TabsList>  
+        {!showAllOrders && ( 
+          <div> 
+            <TabsContent value="preparing">  
+              <div>  
+                {preparingOrders?.map(order => renderOrderCard(order))}  
+              </div>  
+            </TabsContent>  
+            <TabsContent value="ready">  
+              <div>  
+                {readyOrders?.map(order => renderOrderCard(order))}  
+              </div>  
+            </TabsContent>  
+          </div> 
+        )} 
+        {showAllOrders && ( 
+          <TabsContent value="all">  
+            <div>  
+              {allOrders?.map(order => renderOrderCard(order))}  
+            </div>  
+          </TabsContent>  
+        )} 
+      </Tabs> 
+
+      <button 
+        className={`${styles.button} ${showAllOrders ? styles.buttonSecondary : styles.buttonPrimary}`}
+        onClick={showAllOrders ? handleHideAllOrders : handleShowAllOrders} 
+      > 
+        {showAllOrders ? '分けて表示' : '全て表示'} 
+      </button>
+      {isUpdating && <LoadingOverlay />}
+      <Toaster />
     </div>
   )
 }
