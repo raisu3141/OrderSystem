@@ -57,6 +57,13 @@ const StoreOrderSchema = new mongoose.Schema({
     default: false,
   },
 
+  // 注文キャンセルステータス
+  "cancelStatus": {
+    type: mongoose.Schema.Types.Boolean,
+    required: true,
+    default: false,
+  },
+
   // 注文時間
   "orderTime": {
     type: mongoose.Schema.Types.Date,
