@@ -44,7 +44,8 @@ export default async function handler(req, res) {
           orderQuantity: item.orderQuantity,
         })),
         cookStatus: order.cookStatus,            
-        getStatus: order.getStatus,              
+        getStatus: order.getStatus,  
+        orderTime: formatOrderTime(order.orderTime),            
       }));
 
       return res.status(200).json(formattedOrders);
@@ -53,5 +54,12 @@ export default async function handler(req, res) {
       res.status(400).json({ success: false, error: error.message });
     }
     
-  }
+}
+
+function formatOrderTime(orderTime) {
+  const date = new Date(orderTime);
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
 
