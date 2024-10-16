@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { Button } from '../../components/ui/button'
 import { Card, CardContent } from '../../components/ui/ticketcard'
@@ -66,11 +66,44 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
   const [isUpdating, setIsUpdating] = useState(false)
   const queryClient = useQueryClient()
 
-  const { data: allOrders, isLoading: isLoadingAll, error: errorAll } = useQuery(
+  const { data: allOrders, isLoading: isLoadingAll, error: errorAll, refetch } = useQuery(
     ['orders', storeName, 'all'],
     () => fetchOrders(storeName, 'all'),
-    { refetchInterval: 5000 }
+    { 
+      staleTime: Infinity, // 自動リフェッチを防ぐ
+      cacheTime: Infinity, // データを無期限にキャッシュし続ける
+    }
   )
+
+  useEffect(() => {
+    const eventSource = new EventSource(`/api/StoreOrder/getter/realTimeOrders?storeName=${storeName}`);
+
+    eventSource.onmessage = async (event) => {
+      console.log('Received SSE update');
+      try {
+        await refetch(); // 既存のgetOrders関数を使用してデータを再取得
+        toast.success('注文が更新されました', {
+          position: 'top-right',
+          duration: 3000,
+        });
+      } catch (error) {
+        console.error('Failed to refetch orders:', error);
+        toast.error('注文の更新に失敗しました', {
+          position: 'top-right',
+          duration: 3000,
+        });
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error('EventSource failed:', error);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [storeName, refetch]);
 
   const preparingOrders = allOrders?.filter(order => !order.cookStatus && !order.getStatus)
   const readyOrders = allOrders?.filter(order => order.cookStatus && !order.getStatus)
