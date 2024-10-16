@@ -77,17 +77,17 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
 
   const updateOrderStatusMutation = useMutation(
     async ({ order, newStatus }: { order: Order; newStatus: 'ready' | 'completed' }) => {
-      const cookStatus = newStatus === 'ready' ? true : false
+      const cookStatus = newStatus === 'ready' || 'completed' ? true : false
       const getStatus = newStatus === 'completed' ? true : false
       
-      // Update order status
+      // 状態の更新
       await fetch(`/api/StoreOrder/update/PatchOrderStatus?storeName=${storeName}&orderId=${order.orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cookStatus, getStatus }),
       })
       
-      // Update order wait time
+      // waittimeの更新
       await fetch(`/api/Utils/storeWaitTimeSuber`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -102,7 +102,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
     },
     {
       onSuccess: () => {
-        // Invalidate and refetch
+        // 再取得
         queryClient.invalidateQueries(['orders', storeName, 'all'])
         toast.success('送信完了', {
           position: 'top-right',
@@ -123,7 +123,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
   }
 
   const renderOrderCard = (order: Order) => (
-    <Card key={order.orderId} className={`mb-4 ${!order.cookStatus ? 'bg-orange-100' : order.getStatus ? 'bg-gray-100' : 'bg-green-100'}`}>
+    <Card key={order.orderId} className={`mb-4 ${!order.cookStatus ? 'bg-orange-100' : order.getStatus ? 'bg-gray-50' : 'bg-green-100'}`}>
       <CardContent className="p-4">
         <div className="flex items-stretch h-full divide-x divide-gray-300">
           {/* 整理券番号の表示 */}
@@ -148,24 +148,28 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
           </div>
           {/* 状態更新ボタン */}
           <div className="flex-shrink-0 pl-4 flex">
-            {!order.getStatus && (
+            {!order.getStatus ? (
               <Button 
                 onClick={() => updateOrderStatus(order, order.cookStatus ? 'completed' : 'ready')}
-                className="w-24 bg-gray-200 text-black hover:bg-gray-300"
+                className="mt-2 w-24 bg-gray-200 text-black hover:bg-gray-300"
               >
                 {order.cookStatus ? '受け渡し完了' : '調理完了'}
               </Button>
+            ) : (
+              <div className="w-24 text-black flex items-center justify-center">
+                completed
+              </div>
             )}
           </div>
         </div>
       </CardContent>
     </Card>
   )
-
+  // ローディング中の表示
   if (isLoadingAll) {
     return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin" /></div>
   }
-
+  // エラーが発生した場合の表示
   if (errorAll) {
     return <div className="text-red-500">エラーが発生しました。再度お試しください。</div>
   }
