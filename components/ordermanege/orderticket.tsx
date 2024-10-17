@@ -25,6 +25,7 @@ interface OrderList {
 interface Order {
   clientName: string;
   cookStatus: boolean;
+  cancelStatus: boolean;
   getStatus: boolean;
   orderId: string;
   orderList: OrderList[];
