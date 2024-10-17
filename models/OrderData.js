@@ -43,12 +43,11 @@ const OrderDataSchema = new mongoose.Schema({
     },
   }],
 
-  "waitTime": [
-    {
+  "waitTime": {
       type: Map,
-      of: Number // 各オブジェクトの値の型はNumber
-    }
-  ],
+      required: false,
+  },
+
 
   // 注文者名
   "clientName": {
