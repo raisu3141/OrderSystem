@@ -77,14 +77,16 @@ export default async function orderSorting(orderId, session){
                 }, 
                 {new: true }
             );
+
+            console.log(updatedStatus);
             
             if (!updatedStatus) {
-                return res.status(404).json({ success: false, message: 'Status not found' });
+                return { success: false, message: 'Status not found' };
             }
     }
     catch(error){
         console.error(error); // エラーをコンソールに出力
-        res.status(500).json({ success: false, message: error.message });
+        return { success: false, message: error.message };
     }
 }
 

@@ -153,13 +153,12 @@ const processOrder = async (orderList, clientName, session) => {
   const orderId = newOrderData._id;
 
   // 屋台ごとに注文商品をソート (もとき実装中)
-  await orderSorting(orderId, session);
-
+  const orderResult = await orderSorting(orderId, session);
+  console.log(orderResult);
 
   console.log("return processOrder");
   return {
     ticketNumber: newTicketNumber,
-    orderId,
   };
 };
 
