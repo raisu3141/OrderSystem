@@ -7,12 +7,14 @@ import StoreData from '../../../models/StoreData'; // StoreData モデルをイ�
 export default async function handler(req, res){
     await connectToDatabase();
     const {orderId} = req.query;
+    console.log(orderId);
+    
     try{
         //全屋台名を取得・リストに分けるためのデータ作成
         let stores = [];
-        const storeData = await StoreData.find({}, "storeName storeWaitTime");
+        const storeData = await StoreData.find({}, "_id storeName storeWaitTime");
         storeData.forEach(data => {
-            stores.push({[data.storeName]: [], waitTime: data.storeWaitTime});
+            stores.push({[data.storeName]: [], storeId: data._id, waitTime: data.storeWaitTime});
         });
 
         //注文の受け取り
@@ -47,25 +49,42 @@ export default async function handler(req, res){
         const cleaneData = stores.filter(item => {
             // 各オブジェクトのプロパティをチェックし、リストが空でないものを保持
             return Object.values(item).some(value => Array.isArray(value) && value.length > 0);
-          });
+        });
 
-          for (const data of cleaneData) {
+        for (const data of cleaneData) {
             const storeName = Object.keys(data)[0];
             
             // 既存のモデルがあるかどうか確認し、なければ新しいモデルを定義
             const StoreOrder = mongoose.models[storeName + "_orders"] || mongoose.model(storeName + "_orders", StoreOrderSchema);
-          
+            
             // new キーワードを使ってインスタンスを作成
             const allStoreOrder = new StoreOrder({
-              orderId: orders._id, 
-              orderList: data[storeName],  // リストのデータを渡す
-              waitTime: data.waitTime      // タイプミス修正: waiTime -> waitTime
+                orderId: orders._id, 
+                orderList: data[storeName],  // リストのデータを渡す
             });
-          
+            
             // データベースに保存
             await allStoreOrder.save();
-          }
-          res.status(200).json(stores);
+        }
+
+        const waitTimes = {};
+        cleaneData.forEach(data =>{
+            waitTimes[data.storeId] = data.waitTime;
+        });
+
+        const updatedStatus = await orderData.findOneAndUpdate(
+            {_id: orderId}, 
+            { 
+              waitTime: waitTimes
+            }, 
+            {new: true }
+        );
+        
+        if (!updatedStatus) {
+            return res.status(404).json({ success: false, message: 'Status not found' });
+        }
+
+        res.status(200).json(updatedStatus);
     }
     catch(error){
         console.error(error); // エラーをコンソールに出力

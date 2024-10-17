@@ -20,11 +20,11 @@ export const storeWaitTimeSuber = async (req, res) => {
 
         for (const order of orderList) {
             // 注文リストの取得
-            const { productId, storeId, orderQuantity } = order;
+            const { productId, storeName, orderQuantity } = order;
 
             // メニューと屋台を取得
             const product = await ProductData.findById(productId);
-            const store = await StoreData.findById(storeId);
+            const store = await StoreData.findOne({ storeName: storeName });
 
             // メニューと屋台が取れたかエラー処理
             if (!product || !store) {
@@ -36,7 +36,7 @@ export const storeWaitTimeSuber = async (req, res) => {
         }
 
         // 屋台の待ち時間更新
-        const store = await StoreData.findById(orderList[0].storeId); // 最後の注文のstoreIdで取得
+        const store = await StoreData.findOne({ storeName: orderList[0].storeName }); // 最後の注文のstoreNameで取得
         store.storeWaitTime -= subtime;
 
         await store.save();
