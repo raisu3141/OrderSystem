@@ -4,6 +4,7 @@ import OrderData from "../../../models/OrderData";
 import ProductData from "../../../models/ProductData";
 import TicketManagement from "../../../models/TicketManagement";
 import orderSorting from "./orderSorting";
+import storeWaitTimeAdder from "./storeWaitTimeAdder";
 
 export default async function handler(req, res) {
   const client = await connectToDatabase(); // データベースに接続
@@ -158,13 +159,15 @@ const processOrder = async (orderList, clientName, session) => {
   const orderId = newOrderData._id;
   console.log("orderId", orderId);
 
-  // 屋台ごとに注文商品をソート (もとき実装中)
+  // 屋台ごとに注文商品をソート
   const orderResult = await orderSorting(orderId, session);
   console.log("orderResult", orderResult);
-
   if (!orderResult.success) {
     throw new Error(orderResult.message);
   }
+
+  // 各屋台の待ち時間の更新（たけと変更待ち）
+  // storeWaitTimeAdder(orderList, session);
 
   console.log("return processOrder");
   return {
