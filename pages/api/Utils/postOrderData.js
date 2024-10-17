@@ -74,6 +74,11 @@ export default async function handler(req, res) {
         message: "注文に失敗しました",
         error: `{ ${Object.keys(error.keyValue)[0]}: ${Object.values(error.keyValue)[0]} } が重複しています`,
       });
+    } else if (error.message === "Status not found") {
+      return res.status(404).json({
+        message: "注文の仕分けに失敗しました",
+        error: error.message,
+      });
     } else {
       return res.status(500).json({
         message: "注文に失敗しました",
@@ -151,10 +156,15 @@ const processOrder = async (orderList, clientName, session) => {
 
   // 注文IDの取得
   const orderId = newOrderData._id;
+  console.log("orderId", orderId);
 
   // 屋台ごとに注文商品をソート (もとき実装中)
   const orderResult = await orderSorting(orderId, session);
-  console.log(orderResult);
+  console.log("orderResult", orderResult);
+
+  if (!orderResult.success) {
+    throw new Error(orderResult.message);
+  }
 
   console.log("return processOrder");
   return {
