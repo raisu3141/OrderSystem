@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       storeName: storeProduct.storeName,
       productList: storeProduct.productList.map((product) => ({
         productId: product._id,
-        productName: product.ProductName,
+        productName: product.productName,
         productImageUrl: product.productImageUrl,
         price: product.price,
         stock: product.stock,

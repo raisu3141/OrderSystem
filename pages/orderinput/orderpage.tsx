@@ -1,58 +1,53 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import Head from 'next/head';
 import Header from '../../components/header';
 import Styles from '../../styles/orderInput.module.css';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
-import { CartItem, Product } from '../../lib/types';
+import { StoreList, CartItem, Product } from '../../lib/types';
 import Cart from '../../components/orderinput/ProductCart';
 import { ProductList } from '../../components/orderinput/ProductList';
 import { set } from 'mongoose';
+import { useProducts } from '../../hooks/useProducts';
 
-interface StoreProduct {
-  _id: string,
-  storeName: string,
-  productList: Product[],
-  openDay: number,
-}
-
-
-async function fetchProductList(): Promise<Product[]> {
-  try {
-    const response = await fetch(`/api/Utils/getStoreProductData`);
-    if (!response.ok) {
-      throw new Error('Faided to fetch product list');
-    }
-    const data: StoreProduct[] = await response.json();
-    console.log('Fetched product list:', data); // データを出力して確認
+// async function fetchProductList(): Promise<Product[]> {
+//   try {
+//     const response = await fetch(`/api/Utils/getStoreProductData`);
+//     if (!response.ok) {
+//       throw new Error('Failed to fetch product list');
+//     }
     
-    //const allProducts: Product[] = data.flatMap(store => store.productList);
-    const allProducts: Product[] = data.flatMap(store => 
-      store.productList.map(product => ({
-        ...product,
-        storeId: store._id // storeId を各商品に追加
-      }))
-    );
+//     const data: StoreList[] = await response.json();
+//     console.log('Fetched product list:', data); // データを出力して確認
 
-    console.log('All products:', allProducts); // データを出力して確認
+//     // 各商品の productList に storeId を追加
+//     const allProducts: Product[] = data.flatMap(store => 
+//       store.productList.map(product => ({
+//         ...product,
+//         storeId: store.storeId // storeId を各商品に追加 (正しいフィールドを参照)
+//       }))
+//     );
 
-    return allProducts;
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
-}
+//     console.log('All products:', allProducts); // データを出力して確認
+
+//     return allProducts;
+//   } catch (error) {
+//     console.error(error);
+//     return [];
+//   }
+// }
 
 export function OrderPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [productList, setProductList] = useState<Product[]>([]);
+  // const [productList, setProductList] = useState<Product[]>([]);
+  const productList = useProducts();
 
-  useEffect(() => {
-    const loadProducts = async () => {
-      const products = await fetchProductList();
-      setProductList(products);
-    }
-    loadProducts();
-  }, []);
+  // useEffect(() => {
+  //   const loadProducts = async () => {
+  //     const products = await fetchProductList();
+  //     setProductList(products);
+  //   }
+  //   loadProducts();
+  // }, []);
 
   const addToCart = (product: Product, quantity: number) => {
     setCart(prevCart => {

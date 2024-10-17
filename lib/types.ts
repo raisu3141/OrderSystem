@@ -1,3 +1,10 @@
+export interface StoreList {
+  storeId: string,
+  storeName: string,
+  productList: Product[],
+  openDay: number,
+}
+
 export interface Product {
     productId: string,          // 商品ID
     storeId: string,            // 屋台ID

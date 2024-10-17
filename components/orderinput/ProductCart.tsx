@@ -61,7 +61,7 @@ export default function Cart({ cart, onRemove, onQuantityChange }: CartProps) {
                       onChange={(e) => handleQuantityChange(item.productId, Number(e.target.value))}
                       className="w-16 h-9 border-b-2 rounded-md"
                     >
-                      {Array.from({ length: Math.min(item.stock, 10) }, (_, index) => ( // 最大数量を制限
+                      {Array.from({ length: Math.min(item.stock) }, (_, index) => ( // 最大数量を制限
                         <option key={index + 1} value={index + 1}>
                           {index + 1}
                         </option>
