@@ -3,7 +3,7 @@ import connectToDatabase from "../../../lib/mongoose";
 import OrderData from "../../../models/OrderData";
 import ProductData from "../../../models/ProductData";
 import TicketManagement from "../../../models/TicketManagement";
-// import "./orderSorting"; (もとき実装中)
+import orderSorting from "./orderSorting";
 
 export default async function handler(req, res) {
   const client = await connectToDatabase(); // データベースに接続
@@ -153,7 +153,7 @@ const processOrder = async (orderList, clientName, session) => {
   const orderId = newOrderData._id;
 
   // 屋台ごとに注文商品をソート (もとき実装中)
-  // await orderSorting(result.orderId, session);
+  await orderSorting(orderId, session);
 
 
   console.log("return processOrder");
