@@ -35,14 +35,6 @@ const StoreOrderSchema = new mongoose.Schema({
     },
   }],
 
-  // 待ち時間
-  "waitTime": {
-    type: mongoose.Schema.Types.Number,
-    required: true,
-    default: 0,
-    min: 0,
-  },
-
   // 調理ステータス
   "cookStatus": {
     type: mongoose.Schema.Types.Boolean,
@@ -52,6 +44,12 @@ const StoreOrderSchema = new mongoose.Schema({
 
   // 受け取りステータス
   "getStatus": {
+    type: mongoose.Schema.Types.Boolean,
+    required: true,
+    default: false,
+  },
+
+  "cancelStatus":{
     type: mongoose.Schema.Types.Boolean,
     required: true,
     default: false,

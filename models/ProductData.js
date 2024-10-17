@@ -47,7 +47,7 @@ const ProductDataSchema = new mongoose.Schema({
 
   "soldCount": {
     type: mongoose.Schema.Types.Number,
-    required: true,
+    required: false,
     default: 0,
     min: 0,
   },
