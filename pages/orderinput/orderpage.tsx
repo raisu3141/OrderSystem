@@ -6,7 +6,6 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { StoreList, CartItem, Product } from '../../lib/types';
 import Cart from '../../components/orderinput/ProductCart';
 import { ProductList } from '../../components/orderinput/ProductList';
-// import { ProductList } from '../../components/orderinput/tabtest';
 import { set } from 'mongoose';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
 
