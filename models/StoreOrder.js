@@ -49,7 +49,8 @@ const StoreOrderSchema = new mongoose.Schema({
     default: false,
   },
 
-  "cancelStatus":{
+  // 注文キャンセルステータス
+  "cancelStatus": {
     type: mongoose.Schema.Types.Boolean,
     required: true,
     default: false,
