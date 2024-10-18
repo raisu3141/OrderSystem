@@ -3,6 +3,7 @@ import Head from 'next/head'
 import StallsCard from '../../components/StallsCard'
 import Header from '../../components/header'
 import Styles from '../../styles/Home.module.css'
+import { Loader2 } from 'lucide-react'
 
 interface Stall {
   storeName: string
@@ -35,7 +36,11 @@ export function ListStalls() {
   }, [])
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <Loader2 className="animate-spin text-white w-16 h-16" />
+    </div>
+    )
   }
 
   if (error) {

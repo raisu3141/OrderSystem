@@ -1,7 +1,4 @@
-const express = require('express');
 const { MongoClient } = require('mongodb');
-
-const app = express();
 
 async function monitorChanges(req, res) {
     const storeName = req.query; // フロントから送られたコレクション名を取得
@@ -39,7 +36,9 @@ async function monitorChanges(req, res) {
             if (change.operationType && change.operationType === 'insert') {
                 const updatedDocument = change.fullDocument;
                 console.log('Detected change:', updatedDocument);
+
                 res.write(`data: ${JSON.stringify(updatedDocument)}\n\n`);
+                res.flush();
                 
             }else if(change.operationType === 'update'){
                 const updatedFields = change.updateDescription.updatedFields;
@@ -51,6 +50,7 @@ async function monitorChanges(req, res) {
               
                     // クライアントに変更された特定のフィールドを送信
                     res.write(`data: ${JSON.stringify({ name: updatedName })}\n\n`);
+                    res.flush();
                 }
             } else {
                 console.log('No operationType or unsupported operation');
@@ -69,12 +69,5 @@ async function monitorChanges(req, res) {
         res.status(500).json({ success: false, error: error.message });
     }
 }
-
-app.get('/api/StoreOrder/getter', monitorChanges);  // SSEエンドポイントを設定
-
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
 
 export default monitorChanges;
