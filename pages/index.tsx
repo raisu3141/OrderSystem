@@ -62,6 +62,12 @@ export default function Home({ items }: HomeProps) {
         >
           注文入力ページ！！
         </Link>
+        <Link
+          href="/ordercancel/cancelpage"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+        >
+          cancelページ！！
+        </Link>
       </div>
     </div>
   );
