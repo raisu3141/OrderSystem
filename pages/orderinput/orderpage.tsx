@@ -6,48 +6,50 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { StoreList, CartItem, Product } from '../../lib/types';
 import Cart from '../../components/orderinput/ProductCart';
 import { ProductList } from '../../components/orderinput/ProductList';
+// import { ProductList } from '../../components/orderinput/tabtest';
 import { set } from 'mongoose';
-import { useProducts } from '../../hooks/useProducts';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
 
-// async function fetchProductList(): Promise<Product[]> {
-//   try {
-//     const response = await fetch(`/api/Utils/getStoreProductData`);
-//     if (!response.ok) {
-//       throw new Error('Failed to fetch product list');
-//     }
-    
-//     const data: StoreList[] = await response.json();
-//     console.log('Fetched product list:', data); // データを出力して確認
 
-//     // 各商品の productList に storeId を追加
-//     const allProducts: Product[] = data.flatMap(store => 
-//       store.productList.map(product => ({
-//         ...product,
-//         storeId: store.storeId // storeId を各商品に追加 (正しいフィールドを参照)
-//       }))
-//     );
+async function fetchProductList(): Promise<Product[]> {
+  try {
+    const response = await fetch(`/api/Utils/getStoreProductData`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch product list');
+    }
 
-//     console.log('All products:', allProducts); // データを出力して確認
+    const data: StoreList[] = await response.json();
+    console.log('Fetched product list:', data); // データを出力して確認
 
-//     return allProducts;
-//   } catch (error) {
-//     console.error(error);
-//     return [];
-//   }
-// }
+    // 各商品の productList に storeId を追加
+    const allProducts: Product[] = data.flatMap(store =>
+      store.productList.map(product => ({
+        ...product,
+        storeId: store.storeId, // storeId を各商品に追加 
+        openDay: store.openDay // storeDay を各商品に追加
+      }))
+    );
+
+    console.log('All products:', allProducts); // データを出力して確認
+
+    return allProducts;
+  } catch (error) {
+    console.error(error);
+    return [];
+  }
+}
 
 export function OrderPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
-  // const [productList, setProductList] = useState<Product[]>([]);
-  const productList = useProducts();
+  const [productList, setProductList] = useState<Product[]>([]);
 
-  // useEffect(() => {
-  //   const loadProducts = async () => {
-  //     const products = await fetchProductList();
-  //     setProductList(products);
-  //   }
-  //   loadProducts();
-  // }, []);
+  useEffect(() => {
+    const loadProducts = async () => {
+      const products = await fetchProductList();
+      setProductList(products);
+    }
+    loadProducts();
+  }, []);
 
   const addToCart = (product: Product, quantity: number) => {
     setCart(prevCart => {
@@ -73,6 +75,10 @@ export function OrderPage() {
     );
   };
 
+  const filterProductDay = (day: number) => {
+    return productList.filter(product => product.openDay === day);
+  };
+
   return (
     <div>
       <Head>
@@ -80,13 +86,36 @@ export function OrderPage() {
       </Head>
       <Header />
       <div className={`${Styles.maincontainer} flex`}>
-        <ScrollArea className="flex-1 overflow-auto p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {productList.map((product) => (
-              <ProductList key={product.productId} {...product} addToCart={addToCart} />
-            ))}
-          </div>
-        </ScrollArea>
+        <Tabs className="flex-1 overflow-auto p-4" defaultValue='0'>
+          <TabsList>
+            <TabsTrigger value="0">すべて</TabsTrigger>
+            <TabsTrigger value="1">1日目</TabsTrigger>
+            <TabsTrigger value="2">2日目</TabsTrigger>
+          </TabsList>
+          <ScrollArea className="flex-1 overflow-auto p-4">
+            <TabsContent value="0">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {productList.map((product) => (
+                  <ProductList key={product.productId} {...product} addToCart={addToCart} />
+                ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {filterProductDay(1).map((product) => (
+                  <ProductList key={product.productId} {...product} addToCart={addToCart} />
+                ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {filterProductDay(2).map((product) => (
+                  <ProductList key={product.productId} {...product} addToCart={addToCart} />
+                ))}
+              </div>
+            </TabsContent>
+          </ScrollArea>
+        </Tabs>
         <Cart cart={cart} onRemove={removeFromCart} onQuantityChange={quantityChange} /> {/* onRemoveを渡す */}
       </div>
     </div>

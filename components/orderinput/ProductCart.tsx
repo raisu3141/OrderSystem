@@ -7,7 +7,7 @@ import OrderConfirmation from "./OrderConfirmation";
 import { Dialog } from "@radix-ui/react-dialog";
 
 interface CartProps {
-  cart: CartItem[]; // initialCartをcartに変更
+  cart: CartItem[];
   onRemove: (id: string) => void; // 削除関数を追加
   onQuantityChange: (id: string, quantity: number) => void; // 数量変更関数を追加
 }

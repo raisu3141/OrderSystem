@@ -12,6 +12,7 @@ export interface Product {
     productImageUrl: string,    // 商品画像
     price: number,             // 値段
     stock: number,             // 在庫数
+    openDay: number,            // 開催日
 }
 
 export interface CartItem extends Product {
