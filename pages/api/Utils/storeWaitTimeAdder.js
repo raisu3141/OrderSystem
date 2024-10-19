@@ -1,51 +1,77 @@
-// pages/api/Utils/storeWaitTimeSuber.js
+// pages/api/Utils/storeWaitTimeAdder.js
 import connectToDatabase from '../../../lib/mongoose';
 import ProductData from '../../../models/ProductData';
 import StoreData from '../../../models/StoreData';
+import StoreOrder from '../../../models/StoreOrder';
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
-        await storeWaitTimeSuber(req, res);
+      await storeWaitTimeAdder(req, res);
     } else {
-        res.status(405).json({ message: 'Method Not Allowed' });
+      res.status(405).json({ message: 'Method Not Allowed' });
     }
 }
 
-export const storeWaitTimeSuber = async (req, res) => {
-    const { orderList } = req.body;
 
+export const storeWaitTimeAdder = async (req, res) => {
+    const { orderList } = req.body;
+  
     await connectToDatabase();
     try {
-        let subtime = 0; // 初期化
-
-        for (const order of orderList) {
-            // 注文リストの取得
-            const { productId, storeName, orderQuantity } = order;
-
-            // メニューと屋台を取得
-            const product = await ProductData.findById(productId);
-            const store = await StoreData.findOne({ storeName: storeName });
-
-            // メニューと屋台が取れたかエラー処理
-            if (!product || !store) {
-                return res.status(404).json({ message: '商品または屋台が見つかりませんでした。' });
-            }
-
-            const cookTime = product.cookTime * orderQuantity;
-            subtime += cookTime;
+      const storeWaitTimes = {};
+  
+      // 注文リストを処理する
+      for (const order of orderList) {
+        const { productId, storeId, orderQuantity } = order;
+  
+        const product = await ProductData.findById(productId);
+        const store = await StoreData.findById(storeId);
+  
+        if (!product || !store) {
+          return res.status(404).json({ message: '商品または屋台が見つかりませんでした。' });
         }
+  
+        // 調理時間を個数に応じて計算
+        const addTime = product.cookTime * orderQuantity;
+        storeWaitTimes[storeId] = (storeWaitTimes[storeId] || store.storeWaitTime) + addTime;
+      }
+  
+      // 各屋台の待ち時間をデータベースに一括更新
+      await Promise.all(
+        Object.keys(storeWaitTimes).map(async (storeId) => {
+          const store = await StoreData.findById(storeId);
+          if (store) {
+            store.storeWaitTime = storeWaitTimes[storeId];
+            try {
+              await store.save();
+            } catch (saveError) {
+              console.error(`Error saving store ${storeId}:`, saveError);
+              return res.status(500).json({ message: '待ち時間の保存中にエラーが発生しました。', error: saveError.message });
+            }
+          }
+        })
+      );
 
-        // 屋台の待ち時間更新
-        const store = await StoreData.findOne({ storeName: orderList[0].storeName }); // 最後の注文のstoreNameで取得
-        store.storeWaitTime -= subtime;
+			for (const storeId in storeWaitTimes) {
+				const waitTime = storeWaitTimes[storeId];
+				
+				// 対応するStoreOrderを取得
+				const storeOrder = await StoreOrder.findOne({ "orderList.storeId": storeId });
 
-        await store.save();
+				if (!storeOrder) {
+						return res.status(404).json({ message: `StoreOrder for storeId ${storeId} not found` });
+				}
 
-        // データを返す必要はないが、処理が成功したことを返す
-        return res.status(200).json({ status: true });
-
+				// StoreOrderのwaitTimeを更新
+				storeOrder.waitTime = waitTime;
+				await storeOrder.save();
+			}
+  
+      return res.status(200).json({ storeWaitTimes });
+  
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'エラーが発生しました' });
+      console.error(error);
+      return res.status(500).json({ message: 'エラーが発生しました。', error: error.message });
     }
-}
+  };
+  
