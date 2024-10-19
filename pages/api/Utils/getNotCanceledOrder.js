@@ -1,6 +1,5 @@
-// pages/api/OrderData/getter/getNotCanceledOrder.js
+// pages/api/Utils/getNotCanceledOrder.js
 import { MongoClient } from 'mongodb';
-import OrderData from '../../../../models/OrderData';
 
 export default async function monitorChanges(req, res) {
   const collectionName = 'orderdatas';
@@ -32,6 +31,7 @@ export default async function monitorChanges(req, res) {
       if (change.operationType && change.operationType === 'insert') {
         const updatedDocument = change.fullDocument;
         console.log('Detected change:', updatedDocument);
+        console.log("change", change);
 
         res.write(`data: ${JSON.stringify(updatedDocument)}\n\n`);
         res.flush();
