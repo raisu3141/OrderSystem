@@ -5,6 +5,7 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import Styles from '../../styles/orderInput.module.css';
 import { CartItem } from '../../lib/types';
 import OrderCompleted from "./OrderCompleted";
+import { set } from "mongoose";
 
 interface OrderConfirmationProps {
   cart: CartItem[];
@@ -22,8 +23,6 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
   const [ticketNumber, setTicketNumber] = useState<number | undefined>();
   const [stockStatusList, setStockStatusList] = useState<{ productId: string, stock: number }[]>([]);
   const [stock, setStock] = useState<{ [productId: string]: number }>({});
-
-
 
   const resetForm = () => {
     setClientName('');
@@ -90,6 +89,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         setStockStatusList(responseData.stockStatusList);
         setIsOpen(true);
         onClose();
+        // resetForm();
 
       } else {
         console.error('Failed to post order');
@@ -188,13 +188,35 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         <OrderCompleted clientName={clientName} ticketNumber={ticketNumber} onClose={() => { setIsOpen(false); resetForm(); }} />
       </Dialog>
 
+      {/* <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[80vh] max-h-[80vh]">
+          <DialogTitle className="text-5xl font-semibold">注文完了</DialogTitle>
+          <div className="w-full h-full flex flex-col items-center text-2xl mt-12">
+            <p>整理券番号</p>
+            <p className="text-9xl font-semibold mt-5">{ticketNumber}</p>
+            <p className="mt-8">{clientName}様</p>
+            <p className="mt-14">LINE BOTで整理番号を</p>
+            <p>入力してください</p>
+          </div> */}
+          {/* 閉じる */}
+          {/* <Button
+            className="w-[50%] mt-4"
+            onClick={() => {
+              setIsOpen(false);
+            }}
+          >
+            閉じる
+          </Button>
+        </DialogContent>
+      </Dialog> */}
+
       <Dialog open={isErrorOpen} onOpenChange={setIsErrorOpen}>
         <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[80vh] max-h-[80vh]">
           <DialogTitle className="text-5xl font-semibold">注文エラー</DialogTitle>
           <div className="w-full h-full flex flex-col items-center text-2xl mt-12">
             <p>再度注文お願いします</p>
           </div>
-          <Button className="w-[50%] mt-4" onClick={() => setIsErrorOpen(false)}>閉じる</Button>
+          <Button className="w-[50%] mt-4" onClick={() => {setIsErrorOpen(false); resetForm()}}>閉じる</Button>
         </DialogContent>
       </Dialog>
     </>
