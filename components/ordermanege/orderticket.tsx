@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { Button } from '../../components/ui/button'
 import { Card, CardContent } from '../../components/ui/ticketcard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
 import { AlertCircle, Loader2 } from 'lucide-react'
-import { Toaster, toast } from 'react-hot-toast';
+import { Toaster, toast } from 'react-hot-toast'
 
 import styles from '../../components/ordermanege/orderticket.module.css'
 
@@ -33,46 +33,77 @@ interface Order {
   orderTime: string;
 }
 
-async function fetchOrders(storeName: string, status: 'preparing' | 'ready' | 'all'): Promise<Order[]> {
+async function fetchOrders(storeName: string, status: 'preparing' | 'ready' | 'all', isSSE: boolean, isCancelUpdate: boolean): Promise<Order[]> {
   const response = await fetch(`/api/StoreOrder/getter/getOrders?storeName=${storeName}`);
   if (!response.ok) {
     throw new Error('Failed to fetch orders');
   }
   const data: Order[] = await response.json();
-  // コンソールに出力
-  console.log(data);
-  if (status === 'all') {
-    return data
+  
+  if (isSSE) {
+    console.log('SSEによる更新:', data);
+  } else if (isCancelUpdate) {
+    console.log('キャンセルによる更新:', data);
   } else {
-    return data.filter(order => {
-      switch (status) {
-        case 'preparing':
-          return order.cookStatus === false && order.getStatus === false;
-        case 'ready':
-          return order.cookStatus === true && order.getStatus === false;
-        default:
-          return false;
-      }
-    });
+    console.log('通常の取得:', data);
   }
+
+  return data;
 }
 
 interface OrderticketProps {
   storeName: string;
 }
 
-export default function OrderTicket({ storeName }: OrderticketProps) {
+export default function Component({ storeName }: OrderticketProps) {
   const [activeTab, setActiveTab] = useState<'preparing' | 'ready' | 'all'>('preparing')
   const [showAllOrders, setShowAllOrders] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [acknowledgedCancelOrders, setAcknowledgedCancelOrders] = useState<string[]>([])
   const queryClient = useQueryClient()
+  const isSSERef = useRef(false)
+  const isCancelUpdateRef = useRef(false)
+  const previousOrdersRef = useRef<Order[]>([])
+
+  const showCancelNotification = (order: Order) => {
+    toast((t) => (
+      <div className="flex flex-col items-start">
+        <p className="font-bold mb-2">注文がキャンセルされました</p>
+        <p>注文番号: {order.ticketNumber}</p>
+        <Button 
+          onClick={() => {
+            handleCancelAcknowledgment(order.orderId);
+            toast.dismiss(t.id);
+          }}
+          className="mt-2 bg-red-500 text-white hover:bg-red-600"
+        >
+          確認
+        </Button>
+      </div>
+    ), {
+      duration: Infinity,
+      position: 'top-right',
+    });
+  };
 
   const { data: allOrders, isLoading: isLoadingAll, error: errorAll, refetch } = useQuery(
     ['orders', storeName, 'all'],
-    () => fetchOrders(storeName, 'all'),
+    () => fetchOrders(storeName, 'all', isSSERef.current, isCancelUpdateRef.current),
     { 
-      staleTime: Infinity, // 自動リフェッチを防ぐ
-      cacheTime: Infinity, // データを無期限にキャッシュし続ける
+      staleTime: Infinity,
+      cacheTime: Infinity,
+      onSuccess: (newOrders) => {
+        const updatedOrders = newOrders.map(newOrder => {
+          const previousOrder = previousOrdersRef.current.find(order => order.orderId === newOrder.orderId);
+          if (previousOrder && !previousOrder.cancelStatus && newOrder.cancelStatus) {
+            showCancelNotification(newOrder);
+          }
+          return newOrder;
+        });
+        queryClient.setQueryData(['orders', storeName, 'all'], updatedOrders);
+        previousOrdersRef.current = newOrders;
+        isCancelUpdateRef.current = false;
+      }
     }
   )
 
@@ -80,9 +111,18 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
     const eventSource = new EventSource(`/api/StoreOrder/getter/realTimeOrders?storeName=${storeName}`);
 
     eventSource.onmessage = async (event) => {
-      console.log('Received SSE update');
+      const data = JSON.parse(event.data);
+      if (data.type === 'cancel') {
+        console.log('Received cancel update');
+        isCancelUpdateRef.current = true;
+      } else {
+        console.log('Received SSE update');
+        isSSERef.current = true;
+      }
+
       try {
-        await refetch(); // 既存のgetOrders関数を使用してデータを再取得
+        await refetch();
+        isSSERef.current = false;
         toast.success('注文が更新されました', {
           position: 'top-right',
           duration: 3000,
@@ -106,22 +146,20 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
     };
   }, [storeName, refetch]);
 
-  const preparingOrders = allOrders?.filter(order => !order.cookStatus && !order.getStatus)
-  const readyOrders = allOrders?.filter(order => order.cookStatus && !order.getStatus)
+  const preparingOrders = allOrders?.filter(order => !order.cookStatus && !order.getStatus && !order.cancelStatus)
+  const readyOrders = allOrders?.filter(order => order.cookStatus && !order.getStatus && !order.cancelStatus)
 
   const updateOrderStatusMutation = useMutation(
     async ({ order, newStatus }: { order: Order; newStatus: 'ready' | 'completed' }) => {
-      const cookStatus = newStatus === 'ready' || 'completed' ? true : false
-      const getStatus = newStatus === 'completed' ? true : false
+      const cookStatus = newStatus === 'ready' || newStatus === 'completed'
+      const getStatus = newStatus === 'completed'
       
-      // 状態の更新
       await fetch(`/api/StoreOrder/update/PatchOrderStatus?storeName=${storeName}&orderId=${order.orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cookStatus, getStatus }),
       })
       
-      // waittimeの更新
       await fetch(`/api/Utils/storeWaitTimeSuber`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -136,7 +174,6 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
     },
     {
       onSuccess: () => {
-        // 再取得
         queryClient.invalidateQueries(['orders', storeName, 'all'])
         toast.success('送信完了', {
           position: 'top-right',
@@ -156,54 +193,65 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
     )
   }
 
-  const renderOrderCard = (order: Order) => (
-    <Card key={order.orderId} className={`mb-4 ${!order.cookStatus ? 'bg-orange-100' : order.getStatus ? 'bg-gray-50' : 'bg-green-100'}`}>
-      <CardContent className="p-4">
-        <div className="flex items-stretch h-full divide-x divide-gray-300">
-          {/* 整理券番号の表示 */}
-          <div className="flex-shrink-0 w-24 pr-4">
-            <div className="text-sm text-gray-500">整理券番号</div>
-            <div className="text-4xl font-bold">{order.ticketNumber}</div>
+  const handleCancelAcknowledgment = (orderId: string) => {
+    setAcknowledgedCancelOrders(prev => [...prev, orderId]);
+  };
+
+  const renderOrderCard = (order: Order) => {
+    if (order.cancelStatus && acknowledgedCancelOrders.includes(order.orderId)) {
+      return null; // キャンセルされ、確認済みの注文は表示しない
+    }
+
+    const cardClassName = `mb-4 ${
+      order.cancelStatus ? 'bg-red-100 border-2 border-red-500' :
+      !order.cookStatus ? 'bg-orange-100' :
+      order.getStatus ? 'bg-gray-50' : 'bg-green-100'
+    }`;
+
+    return (
+      <Card key={order.orderId} className={cardClassName}>
+        <CardContent className="p-4">
+          <div className="flex items-stretch h-full divide-x divide-gray-300">
+            <div className="flex-shrink-0 w-24 pr-4">
+              <div className="text-sm text-gray-500">整理券番号</div>
+              <div className="text-4xl font-bold">{order.ticketNumber}</div>
+            </div>
+            <div className="flex-shrink-0 w-32 px-4 flex flex-col">
+              <div className="text-sm">{order.clientName}</div>
+              <div className="text-sm text-gray-500 mt-4">{order.orderTime}</div>
+            </div>
+            <div className="flex-grow px-4 flex flex-col">
+              <ul className="space-y-1">
+                {order.orderList.map((item, index) => (
+                  <li key={index} className="flex justify-between text-sm font-bold">
+                    <span>{item.productName} × {item.orderQuantity}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex-shrink-0 pl-4 flex">
+              {!order.getStatus && !order.cancelStatus ? (
+                <Button 
+                  onClick={() => updateOrderStatus(order, order.cookStatus ? 'completed' : 'ready')}
+                  className="mt-2 w-24 bg-gray-200 text-black hover:bg-gray-300"
+                >
+                  {order.cookStatus ? '受け渡し完了' : '調理完了'}
+                </Button>
+              ) : (
+                <div className="w-24 text-black flex items-center justify-center">
+                  {order.cancelStatus ? 'キャンセル' : 'completed'}
+                </div>
+              )}
+            </div>
           </div>
-          {/* 顧客名と注文時間の表示 */}
-          <div className="flex-shrink-0 w-32 px-4 flex flex-col">
-            <div className="text-sm">{order.clientName}</div>
-            <div className="text-sm text-gray-500 mt-4">{order.orderTime}</div>
-          </div>
-          {/* 商品リストの表示 */}
-          <div className="flex-grow px-4 flex flex-col">
-            <ul className="space-y-1">
-              {order.orderList.map((item, index) => (
-                <li key={index} className="flex justify-between text-sm font-bold">
-                  <span>{item.productName} × {item.orderQuantity}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          {/* 状態更新ボタン */}
-          <div className="flex-shrink-0 pl-4 flex">
-            {!order.getStatus ? (
-              <Button 
-                onClick={() => updateOrderStatus(order, order.cookStatus ? 'completed' : 'ready')}
-                className="mt-2 w-24 bg-gray-200 text-black hover:bg-gray-300"
-              >
-                {order.cookStatus ? '受け渡し完了' : '調理完了'}
-              </Button>
-            ) : (
-              <div className="w-24 text-black flex items-center justify-center">
-                completed
-              </div>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-  // ローディング中の表示
+        </CardContent>
+      </Card>
+    );
+  };
+
   if (isLoadingAll) {
     return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin" /></div>
   }
-  // エラーが発生した場合の表示
   if (errorAll) {
     return <div className="text-red-500 items-center">エラーが発生しました。再度お試しください。</div>
   }
