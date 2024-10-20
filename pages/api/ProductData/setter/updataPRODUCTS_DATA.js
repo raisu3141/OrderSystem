@@ -7,6 +7,13 @@ export default async function handler(req, res) {
   await connectToDatabase();
 
   // Destructure _id and the fields to update from the request body
+  if (req.body.cookTime) {
+    req.body.cookTime = req.body.cookTime * 1000;
+  }
+  else{
+    return res.status(401).json({ success: false, message: 'Error cookTime edit'});
+  }
+  
   const { _id, ...updateFields } = req.body;
 
   try {
