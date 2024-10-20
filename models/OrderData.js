@@ -42,12 +42,26 @@ const OrderDataSchema = new mongoose.Schema({
       min: 0,
     },
   }],
+  
+  // キャンセルできるかどうか
+  "cancellableStatus": {
+    type: mongoose.Schema.Types.Boolean,
+    required: true,
+    default: false,
+  },
 
+  // キャンセル状況
+  "cancelStatus": {
+    type: mongoose.Schema.Types.Boolean,
+    required: true,
+    default: false,
+  },
+
+  // 待ち時間
   "waitTime": {
       type: Map,
       required: false,
   },
-
 
   // 注文者名
   "clientName": {
