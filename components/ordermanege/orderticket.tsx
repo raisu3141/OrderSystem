@@ -67,20 +67,22 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
 
   const showCancelNotification = (order: Order) => {
     toast((t) => (
-      <div className="flex flex-col items-start">
-        <p className="font-bold mb-2">注文がキャンセルされました</p>
-          <p>注文番号: {order.ticketNumber}</p>
-          <p>注文者名: {order.clientName}</p>
+      <div className="flex flex-col items-start p-4 bg-white border-2 border-red-500 rounded-lg shadow-lg">
+        <p className="font-bold mb-2 text-red-500">注文がキャンセルされました</p>
+        <p>注文番号: {order.ticketNumber}</p>
+        <p>注文者名: {order.clientName}</p>
+        <ul className="w-full mt-2">
           {order.orderList.map((item, index) => (
             <li key={index} className="flex justify-between text-sm font-bold">
               <span>{item.productName} × {item.orderQuantity}</span>
             </li>
           ))}
+        </ul>
         <Button 
           onClick={() => {
             toast.dismiss(t.id);
           }}
-          className="mt-2 bg-red-500 text-white hover:bg-red-600"
+          className="mt-4 bg-red-500 text-white hover:bg-red-600"
         >
           確認
         </Button>
