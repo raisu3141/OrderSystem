@@ -59,7 +59,6 @@ export default function Component({ storeName }: OrderticketProps) {
   const [activeTab, setActiveTab] = useState<'preparing' | 'ready' | 'all'>('preparing')
   const [showAllOrders, setShowAllOrders] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
-  const [acknowledgedCancelOrders, setAcknowledgedCancelOrders] = useState<string[]>([])
   const queryClient = useQueryClient()
   const isSSERef = useRef(false)
   const isCancelUpdateRef = useRef(false)
@@ -69,10 +68,15 @@ export default function Component({ storeName }: OrderticketProps) {
     toast((t) => (
       <div className="flex flex-col items-start">
         <p className="font-bold mb-2">注文がキャンセルされました</p>
-        <p>注文番号: {order.ticketNumber}</p>
+          <p>注文番号: {order.ticketNumber}</p>
+          <p>注文者名: {order.clientName}</p>
+          {order.orderList.map((item, index) => (
+            <li key={index} className="flex justify-between text-sm font-bold">
+              <span>{item.productName} × {item.orderQuantity}</span>
+            </li>
+          ))}
         <Button 
           onClick={() => {
-            handleCancelAcknowledgment(order.orderId);
             toast.dismiss(t.id);
           }}
           className="mt-2 bg-red-500 text-white hover:bg-red-600"
@@ -193,16 +197,7 @@ export default function Component({ storeName }: OrderticketProps) {
     )
   }
 
-  const handleCancelAcknowledgment = (orderId: string) => {
-    setAcknowledgedCancelOrders(prev => [...prev, orderId]);
-  };
-
   const renderOrderCard = (order: Order) => {
-    if (order.cancelStatus && acknowledgedCancelOrders.includes(order.orderId)) {
-      console.log('キャンセルされた注文:' , order.ticketNumber);
-      return null; // キャンセルされ、確認済みの注文は表示しない
-    }
-
     const cardClassName = `mb-4 ${
       order.cancelStatus ? 'bg-red-100 border-2 border-red-500' :
       !order.cookStatus ? 'bg-orange-100' :
