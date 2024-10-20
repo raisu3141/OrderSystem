@@ -199,6 +199,7 @@ export default function Component({ storeName }: OrderticketProps) {
 
   const renderOrderCard = (order: Order) => {
     if (order.cancelStatus && acknowledgedCancelOrders.includes(order.orderId)) {
+      console.log('キャンセルされた注文:' , order.ticketNumber);
       return null; // キャンセルされ、確認済みの注文は表示しない
     }
 
