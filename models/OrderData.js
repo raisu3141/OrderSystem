@@ -43,20 +43,6 @@ const OrderDataSchema = new mongoose.Schema({
     },
   }],
   
-  // キャンセルできるかどうか
-  "cancellableStatus": {
-    type: mongoose.Schema.Types.Boolean,
-    required: true,
-    default: false,
-  },
-
-  // キャンセル状況
-  "cancelStatus": {
-    type: mongoose.Schema.Types.Boolean,
-    required: true,
-    default: false,
-  },
-
   // 待ち時間
   "waitTime": {
       type: Map,
