@@ -8,9 +8,7 @@ export default async function handler(req, res) {
   try {
     // StoreDataモデルを使用してクエリを実行し、productList を populate
     const storeProducts = await StoreData.find({}, 'storeName productList openDay')
-      .populate('productList', 'productName productImageUrl price stock')
-      .then((storeProduct) => { return storeProduct })
-      .catch((error) => { return error });
+      .populate('productList', 'productName productImageUrl price stock');
 
     // フロントに渡せるようにフォーマット
     const formattedStoreProducts = storeProducts.map((storeProduct) => ({
