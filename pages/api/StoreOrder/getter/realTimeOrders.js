@@ -33,7 +33,7 @@ async function monitorChanges(req, res) {
 
         changeStream.on('change', (change) => {
             // change.operationTypeが存在するかを確認
-            if (change.operationType && change.operationType === 'insert') {
+            if (change.operationType === 'insert') {
                 const updatedDocument = change.fullDocument;
                 console.log('Detected change:', updatedDocument);
 
@@ -43,8 +43,8 @@ async function monitorChanges(req, res) {
             }else if(change.operationType === 'update'){
                 const updatedFields = change.updateDescription.updatedFields;
 
-                if (updatedFields && updatedFields.hasOwnProperty('getStatus')) {
-                    const updatedName = updatedFields.getStatus;
+                if (updatedFields && updatedFields.hasOwnProperty('cancelStatus')) {
+                    const updatedName = updatedFields.cancelStatus;
                     console.log('Name field was updated:', updatedName);
                     console.log(change);
               
