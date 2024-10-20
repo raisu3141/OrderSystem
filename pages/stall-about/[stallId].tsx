@@ -99,12 +99,7 @@ const StallMenuContents = () => {
       // 選択状態でない時は更新フォームを表示
       const selected = stallData?.productList.find((product: any) => product._id === productId);
       if (selected) {
-        setSelectedProduct(selected); // 編集する商品のデータをセット
-        setMenuName(selected.productName);
-        setPrice(selected.price);
-        setStock(selected.stock);
-        setCookTime(selected.cookTime);
-        setShowUpdateForm(true); // 更新フォームを表示
+        handleUpdateButtonClick(selected);
       }
     }
   };
@@ -248,6 +243,7 @@ const StallMenuContents = () => {
     setPrice(product.price);
     setStock(product.stock);
     setCookTime(product.cookTime);
+    setStock(0);
     setShowUpdateForm(true); // 更新フォームを表示
   };
 
@@ -264,36 +260,58 @@ const StallMenuContents = () => {
     // ここで在庫の増減の値を取得
     const updateStockAmount = parseInt(stock.toString(), 10); // 何個増やす/減らすか
     const isIncrease = true; // ここで増減を選ぶ（増やす例）
+    const updatedProductData = {
+      _id: selectedProduct._id,
+      productName: menuName,   // 商品名
+      price: parseFloat(price.toString()),  // 値段
+      stock: parseInt(stock.toString(), 10),  // 在庫
+      cookTime: parseInt(cookTime.toString(), 10),  // 調理時間
+    };
 
     // 在庫を増やすならそのまま、減らすならマイナスに変換
     const updateStook = isIncrease ? updateStockAmount : -updateStockAmount;
 
     try {
+      // 商品名、値段、調理時間の更新APIエンドポイントへリクエストを送信
+      const response = await fetch(`/api/ProductData/setter/updataPRODUCTS_DATA`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedProductData),  // 更新データを送信
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update product data');
+      }
+
+      const updatedProduct = await response.json();
+
       // 在庫更新のAPIエンドポイントへリクエストを送信
-      const response = await fetch(`/api/ProductData/setter/updataStock?_id=${selectedProduct._id}&updateStook=${updateStook}`, {
+      const stockResponse = await fetch(`/api/ProductData/setter/updataStock?_id=${selectedProduct._id}&updateStook=${updateStook}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
       });
 
-      if (!response.ok) {
+      if (!stockResponse.ok) {
         throw new Error('Failed to update product stock');
       }
 
-      const updatedProduct = await response.json();
+      const updatedStockProduct = await stockResponse.json();
 
       // 商品リストをリアルタイムで更新
       setStallData((prev: any) => ({
         ...prev,
         productList: prev.productList.map((product: any) =>
-          product._id === updatedProduct._id ? updatedProduct : product
+          product._id === updatedStockProduct._id ? updatedStockProduct : product
         ),
       }));
 
       setShowUpdateForm(false); // 更新フォームを閉じる
     } catch (error) {
-      console.error('Error updating product stock:', error);
+      console.error('Error updating product data or stock:', error);
       if (error instanceof Error) {
         alert(`更新中にエラーが発生しました: ${error.message}`);
       } else {
@@ -301,7 +319,6 @@ const StallMenuContents = () => {
       }
     }
   };
-
 
   return (
     <div>
