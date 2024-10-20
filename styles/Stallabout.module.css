@@ -39,7 +39,7 @@
 
 .logo {
   font-size: 3rem;
-  letter-spacing: 2px;
+  letter-spacing: 0.125rem;
   padding: 0.5rem;
 }
 
@@ -63,7 +63,7 @@
 
 .addButton {
   background-color: #B8D5F4;
-  color: white;
+  color: black;
   border: none;
   padding: 10px 20px;
   font-size: 1rem;
@@ -140,7 +140,7 @@
 
 .selectButton {
   background-color: #B8D5F4;
-  color: white;
+  color: black;
   border: none;
   padding: 10px 20px;
   font-size: 1rem;
@@ -283,8 +283,8 @@
 }
 
 .submitButton {
-  background-color: #B8D5F4;
-  color: white;
+  background-color: #D9D9D9;
+  color: black;
   border: none;
   padding: 10px 20px;
   font-size: 1rem;
@@ -297,15 +297,15 @@
 }
 
 .submitButton:hover {
-  background-color: #4d95e3;
+  background-color: #7d7d7d;
 }
 
 .stallList {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-  padding: 20px;
-  justify-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  justify-items: start;
 }
 
 .stallCard {
@@ -385,11 +385,10 @@
 }
 
 .stockInputBox {
-  width: 70px; /* 横幅を80pxに設定 */
+  width: 4.5vw; /* 横幅を80pxに設定 */
   padding: 1.5px; /* ボックス内の余白を設定 */
   font-size: 16px; /* 文字サイズを調整 */
-  border: 0.5px solid #ccc; /* 枠線のスタイル */
-  border-radius: 4px; /* 角を少し丸める */
+  border-bottom: 1px solid #000; /* アンダーバーを追加 */
 }
 
 .adjustStockLabel {
@@ -416,4 +415,25 @@
 
 .adjustButton:hover {
   background-color: #45a049;
+}
+
+.stallInput, .priceInput, .stockInput, .timeInput {
+  width: 100%; /* 入力フィールドを幅一杯に */
+  padding: 12px; /* 入力フィールドの内側の余白を増やす */
+  margin: 10px 0; /* 上下に余白を追加 */
+  font-size: 16px; /* フォントサイズを調整 */
+  border: 1px solid #ccc; /* ボーダーを薄いグレーに */
+  border-radius: 4px; /* 角を丸める */
+  box-sizing: border-box; /* パディングを含めた幅調整 */
+  transition: border-color 0.3s ease; /* ホバーやフォーカス時のアニメーション */
+}
+
+.stallInput:hover, .priceInput:hover, .stockInput:hover, .timeInput:hover {
+  border-color: #888; /* ホバー時にボーダーの色を少し濃く */
+}
+
+.stallInput:focus, .priceInput:focus, .stockInput:focus, .timeInput:focus {
+  border-color: #555; /* フォーカス時にボーダーの色を濃く */
+  outline: none; /* ブラウザのデフォルトのアウトラインを消す */
+  box-shadow: 0 0 5px rgba(81, 203, 238, 1); /* フォーカス時の影を追加 */
 }
