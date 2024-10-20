@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       } else {
           StoreOrder = mongoose.model(collectionName, StoreOrderSchema);
       }
-      const allStoreOrder = await StoreOrder.find({}, "orderId orderList.productId orderList.orderQuantity cookStatus getStatus orderTime")
+      const allStoreOrder = await StoreOrder.find({}, "orderId orderList.productId orderList.orderQuantity cancelStatus cookStatus getStatus orderTime")
         .populate([
           {path: 'orderId', select: 'clientName ticketNumber'}, 
           {path: 'orderList.productId', select: 'productName productImageUrl'},
@@ -43,6 +43,7 @@ export default async function handler(req, res) {
           productName: item.productId.productName,
           orderQuantity: item.orderQuantity,
         })),
+        cancelStatus: order.cancelStatus,
         cookStatus: order.cookStatus,            
         getStatus: order.getStatus,  
         orderTime: formatOrderTime(order.orderTime),            

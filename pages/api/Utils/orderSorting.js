@@ -47,40 +47,42 @@ export default async function orderSorting(orderId, session){
         const cleaneData = stores.filter(item => {
             // 各オブジェクトのプロパティをチェックし、リストが空でないものを保持
             return Object.values(item).some(value => Array.isArray(value) && value.length > 0);
-          });
+        });
 
-          for (const data of cleaneData) {
+        for (const data of cleaneData) {
             const storeName = Object.keys(data)[0];
             
             // 既存のモデルがあるかどうか確認し、なければ新しいモデルを定義
             const StoreOrder = mongoose.models[storeName + "_orders"] || mongoose.model(storeName + "_orders", StoreOrderSchema);
-          
+            
             // new キーワードを使ってインスタンスを作成
             const allStoreOrder = new StoreOrder({
-              orderId: orders._id, 
-              orderList: data[storeName],  // リストのデータを渡す
+                orderId: orders._id, 
+                orderList: data[storeName],  // リストのデータを渡す
             });
-          
+            
             // データベースに保存
             await allStoreOrder.save({ session });
-          }
+        }
 
-          const waitTimes = {};
-            cleaneData.forEach(data =>{
-                waitTimes[data.storeId] = data.waitTime;
-            });
+        const waitTimes = {};
+        cleaneData.forEach(data =>{
+            waitTimes[data.storeId] = data.waitTime;
+        });
 
-            const updatedStatus = await orderData.findOneAndUpdate(
-                {_id: orderId}, 
-                { 
-                    waitTime: waitTimes
-                }, 
-                {new: true }
-            );
-            
-            if (!updatedStatus) {
-                return { success: false, message: 'Status not found' };
-            }
+        const updatedStatus = await orderData.findOneAndUpdate(
+            { _id: orderId },
+            {
+                waitTime: waitTimes
+            },
+            { new: true, session }
+        );
+        
+        if (!updatedStatus) {
+            return { success: false, message: 'Status not found' };
+        }
+
+        return { success: true, message: '注文の仕分けに成功しました'};
     }
     catch(error){
         console.error(error); // エラーをコンソールに出力
