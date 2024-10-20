@@ -28,7 +28,7 @@ export default async function handler(req, res) {
       } else {
           StoreOrder = mongoose.model(collectionName, StoreOrderSchema);
       }
-      const allStoreOrder = await StoreOrder.find({}, "orderId orderList.productId orderList.orderQuantity cookStatus getStatus orderTime")
+      const allStoreOrder = await StoreOrder.find({}, "orderId orderList.productId orderList.orderQuantity cancelStatus cookStatus getStatus orderTime")
         .populate([
           {path: 'orderId', select: 'clientName ticketNumber'}, 
           {path: 'orderList.productId', select: 'productName productImageUrl'},
@@ -43,8 +43,10 @@ export default async function handler(req, res) {
           productName: item.productId.productName,
           orderQuantity: item.orderQuantity,
         })),
+        cancelStatus: order.cancelStatus,
         cookStatus: order.cookStatus,            
-        getStatus: order.getStatus,              
+        getStatus: order.getStatus,  
+        orderTime: formatOrderTime(order.orderTime),            
       }));
 
       return res.status(200).json(formattedOrders);
@@ -53,5 +55,12 @@ export default async function handler(req, res) {
       res.status(400).json({ success: false, error: error.message });
     }
     
-  }
+}
+
+function formatOrderTime(orderTime) {
+  const date = new Date(orderTime);
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
+}
 
