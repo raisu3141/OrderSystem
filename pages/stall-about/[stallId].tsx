@@ -264,7 +264,6 @@ const StallMenuContents = () => {
       _id: selectedProduct._id,
       productName: menuName,   // 商品名
       price: parseFloat(price.toString()),  // 値段
-      stock: parseInt(stock.toString(), 10),  // 在庫
       cookTime: parseInt(cookTime.toString(), 10),  // 調理時間
     };
 
