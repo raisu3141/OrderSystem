@@ -3,7 +3,7 @@ import connectToDatabase from "../../../lib/mongoose";
 import OrderData from "../../../models/OrderData";
 import ProductData from "../../../models/ProductData";
 import TicketManagement from "../../../models/TicketManagement";
-// import "./orderSorting"; (もとき実装中)
+import orderSorting from "./orderSorting";
 
 export default async function handler(req, res) {
   const client = await connectToDatabase(); // データベースに接続
@@ -18,43 +18,43 @@ export default async function handler(req, res) {
 
   try {
 
+    // 各商品の在庫が足りているか確認
+    const stockStatusList = await checkStock(req.body.orderList, session);
 
-      // 各商品の在庫が足りているか確認
-      const stockStatusList = await checkStock(req.body.orderList, session);
+    // 在庫不足があるか確認
+    const allStocksEnoughStatus = stockStatusList.every(
+      (stockStatus) => stockStatus.stockEnoughStatus
+    );
 
-      // 在庫不足があるか確認
-      const allStocksEnoughStatus = stockStatusList.every(
-        (stockStatus) => stockStatus.stockEnoughStatus
-      );
+    // 在庫不足の場合はエラーレスポンスを返す
+    if (!allStocksEnoughStatus) {
+      return res.status(400).json({
+        message: "在庫が不足しています",
+        stockStatusList,
+      });
+    }
 
-      // 在庫不足の場合はエラーレスポンスを返す
-      if (!allStocksEnoughStatus) {
-        return res.status(400).json({
-          message: "在庫が不足しています",
-          stockStatusList,
-        });
-      }
-
+    let result;
     // トランザクションを開始
     await session.withTransaction(async () => {
       console.log("startTransaction");
-
       // 注文処理を実行
       console.log("Start processOrder");
-      const result = await processOrder(
+      result = await processOrder(
         req.body.orderList,
         req.body.clientName,
         session
       );
       console.log("End processOrder");
-
-      // 成功レスポンスを返す
-      res.status(200).json({
-        ticketNumber: result.ticketNumber,
-        clientName: result.clientName,
-        stockStatusList,
-      });
     }, transactionOptions);
+
+
+    // 成功レスポンスを返す
+    res.status(200).json({
+      ticketNumber: result.ticketNumber,
+      clientName: result.clientName,
+      stockStatusList,
+    });
   } catch (error) {
     console.error(error.message);
 
@@ -74,6 +74,11 @@ export default async function handler(req, res) {
         message: "注文に失敗しました",
         error: `{ ${Object.keys(error.keyValue)[0]}: ${Object.values(error.keyValue)[0]} } が重複しています`,
       });
+    } else if (error.message === "Status not found") {
+      return res.status(404).json({
+        message: "注文の仕分けに失敗しました",
+        error: error.message,
+      });
     } else {
       return res.status(500).json({
         message: "注文に失敗しました",
@@ -86,55 +91,6 @@ export default async function handler(req, res) {
     console.log("endSession");
   }
 }
-
-// 在庫・売上個数を更新し、注文データを返す関数
-const processOrder = async (orderList, clientName, session) => {
-
-  // 在庫と売上個数を更新
-  const updateStockQuery = orderList.map((order) =>
-    ProductData.updateMany(
-      { _id: order.productId },
-      { $inc: { stock: -order.orderQuantity, soldCount: order.orderQuantity } },
-      { session }
-    )
-  );
-  console.log("zaiko update mae");
-  await Promise.all(updateStockQuery);
-  console.log("zaiko update ato");
-
-  // 整理券番号を生成
-  const newTicketNumber = await generateTicketNumber(session);
-
-  // LineUserIdの生成 (uniqueエラー回避のため)
-  let newLineUserId = newTicketNumber !== 1
-    ? "LineUserId" + newTicketNumber
-    : "LineUserId1";
-  
-  // 注文データを保存
-  const newOrderData = new OrderData({
-    ticketNumber: newTicketNumber,
-    lineUserId: newLineUserId,
-    clientName,
-    orderList,
-  });
-
-  console.log("save mae");
-  await newOrderData.save({ session });
-  console.log("save ato");
-
-
-  // 屋台ごとに注文商品をソート (もとき実装中)
-  // await orderSorting(result.orderId, session);
-
-  // 注文IDの取得
-  const orderId = newOrderData._id;
-
-  console.log("return processOrder");
-  return {
-    ticketNumber: newTicketNumber,
-    orderId,
-  };
-};
 
 // 注文商品の在庫が足りてるかチェックする関数
 const checkStock = async (orderList, session) => {
@@ -161,6 +117,60 @@ const checkStock = async (orderList, session) => {
 
   return stockStatusList;
 }
+
+// 在庫・売上個数を更新し、注文データを返す関数
+const processOrder = async (orderList, clientName, session) => {
+
+  // 在庫と売上個数を更新
+  const updateStockQuery = orderList.map((order) =>
+    ProductData.updateMany(
+      { _id: order.productId },
+      { $inc: { stock: -order.orderQuantity, soldCount: order.orderQuantity } },
+      { session }
+    )
+  );
+  console.log("zaiko update mae");
+  await Promise.all(updateStockQuery);
+  console.log("zaiko update ato");
+
+  // 整理券番号を生成
+  const newTicketNumber = await generateTicketNumber(session);
+
+  // LineUserIdの生成 (uniqueエラー回避のため)
+  // let newLineUserId = newTicketNumber !== 1
+  //   ? "LineUserId" + newTicketNumber
+  //   : "LineUserId1";
+  
+  // 注文データを保存
+  const newOrderData = new OrderData({
+    ticketNumber: newTicketNumber,
+    // ticketNumber: 1,
+    // lineUserId: newLineUserId,
+    clientName,
+    orderList,
+  });
+  console.log("save mae");
+  await newOrderData.save({ session });
+  console.log("save ato");
+
+
+  // 注文IDの取得
+  const orderId = newOrderData._id;
+  console.log("orderId", orderId);
+
+  // 屋台ごとに注文商品をソート (もとき実装中)
+  const orderResult = await orderSorting(orderId, session);
+  console.log("orderResult", orderResult);
+
+  if (!orderResult.success) {
+    throw new Error(orderResult.message);
+  }
+
+  console.log("return processOrder");
+  return {
+    ticketNumber: newTicketNumber,
+  };
+};
 
 // 整理券番号を生成する関数
 const generateTicketNumber = async (session) => {

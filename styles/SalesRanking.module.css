@@ -1,0 +1,69 @@
+.container {
+    font-size: 5vw;
+    float: light;
+}
+.times{
+    font-size: 1.5vw;
+    float: right; 
+    margin-right: 1vw;
+    margin-top: 1vw;
+}
+.flex{
+    display: flex;            /* Flexboxを適用して横並び */
+    grid-template-columns: 1fr 1fr;
+    align-items: center;  
+    width: 100%;
+}
+.imagecontainer {
+    display: flex; /* Enables flexbox layout */
+    flex-direction: column; /* Align items vertically */
+    align-items: flex-start; /* Align items to the start (left) */
+    text-align: center; /* Center the text */
+    height: 14vw; /* Set height based on viewport width (20% of width) */
+    width: 14vw; /* Set width based on viewport width (20% of width) */
+    transform: translateY(-18%);
+
+}
+.itemscontainer {
+    display: flex; /*横並び*/
+    flex-direction: column; /*縦に並べる*/
+    align-items: flex-start; /* 左揃え */
+    display: inline-block;
+    vertical-align: bottom;
+    text-align: center;
+    transform: translateY(-18%);
+    margin-right: 5vw;
+    height: 14vw;
+    width: 14vw;
+}
+.imageranker{
+    display: flex; /* 横並びにする */
+    text-align: center;
+    margin-top: 5vw;
+    margin-left: 5;
+    height: 25%;
+}
+.rankfontsize{
+    font-size: 4vw;
+    text-align: center;
+    margin-right: 5%;
+    margin-left: 3%;
+    transform: translateY(15%);
+}
+.namesfontmargin{
+    font-size: 4vw;
+    text-align: center;
+    margin-right: 10%;
+    transform: translateY(15%);
+}
+.itemmrgin{
+    text-align: center;
+    font-size: 4vw;
+    margin-right: 13%;
+    margin-left: 3%;
+    transform: translateY(15%);
+}
+.pagessize{
+    height: 100%;
+    width: 100%;
+}

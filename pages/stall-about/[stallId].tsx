@@ -23,43 +23,42 @@ const StallMenuContents = () => {
 
   useEffect(() => {
     if (stallId) {
-        // 初回データ取得
-        console.log('Fetching stall data...');
-        fetchStallData();
-
+      // 初回データ取得
+      console.log('Fetching stall data...');
+      fetchStallData();
         // サーバーサイドイベント (SSE) のセットアップ
-        const eventSource = new EventSource(`/api/Utils/productDataChanges?storeId=${stallId}`);
+      const eventSource = new EventSource(`/api/Utils/productDataChanges?storeId=${stallId}`);
 
-        // SSEの通信が確立したかの確認
-        eventSource.onopen = () => {
-          console.log('SSE connection established.');
-        };
+      // SSEの通信が確立したかの確認
+      eventSource.onopen = () => {
+        console.log('SSE connection established.');
+      };
 
-        // サーバーからメッセージを受信したときの処理
-        eventSource.onmessage = (event) => {
-            console.log('SSE message received:', event.data);
-            try {
-                const data = JSON.parse(event.data);
-                console.log('Parsed data:', data);
-                // 必要に応じてUIを更新
-                fetchStallData();  // データを再取得
-            } catch (error) {
-                console.error('Error parsing data:', error);
-            }
-        };
+      // サーバーからメッセージを受信したときの処理
+      eventSource.onmessage = (event) => {
+        console.log('SSE message received:', event.data);
+          try {
+            const data = JSON.parse(event.data);
+            console.log('Parsed data:', data);
+              // 必要に応じてUIを更新
+              fetchStallData();  // データを再取得
+          } catch (error) {
+              console.error('Error parsing data:', error);
+          }
+      };
 
-        // エラーハンドリング
-        eventSource.onerror = (error) => {
-            console.error('SSE connection error:', error);
-            eventSource.close();  // エラーが発生した場合は接続を閉じる
-        };
+      // エラーハンドリング
+      eventSource.onerror = (error) => {
+        console.error('SSE connection error:', error);
+        eventSource.close();  // エラーが発生した場合は接続を閉じる
+      };
 
-        // コンポーネントがアンマウントされた時にSSE接続を閉じる
-        return () => {
-            eventSource.close();
-        };
+      // コンポーネントがアンマウントされた時にSSE接続を閉じる
+      return () => {
+        eventSource.close();
+      };
     }
-}, [stallId]);
+  }, [stallId]);
 
 
   const fetchStallData = async () => {
@@ -96,6 +95,12 @@ const StallMenuContents = () => {
           ? prev.filter((id) => id !== productId) // すでに選択されていたら外す
           : [...prev, productId] // 選択されていなかったら追加
       );
+    } else{
+      // 選択状態でない時は更新フォームを表示
+      const selected = stallData?.productList.find((product: any) => product._id === productId);
+      if (selected) {
+        handleUpdateButtonClick(selected);
+      }
     }
   };
 
@@ -137,6 +142,7 @@ const StallMenuContents = () => {
         },
         body: JSON.stringify({ _id: productId, stock: newStock }),
       });
+      
 
       if (!response.ok) {
         throw new Error('Failed to update stock');
@@ -155,6 +161,7 @@ const StallMenuContents = () => {
       console.error('Error updating stock:', error);
     }
   };
+
 
   const handleCloseForm = () => {
     setShowForm(false);
@@ -182,6 +189,7 @@ const StallMenuContents = () => {
     event.preventDefault(); // デフォルトのフォーム送信動作を無効化
     if (!stallId || typeof stallId !== 'string') {
       console.error('Invalid stallId');
+      alert('無効な屋台IDです。');
       return;
     }
 
@@ -199,6 +207,7 @@ const StallMenuContents = () => {
       formData.append('image', imageFile);
     } else {
       console.error('No file selected or input element not found');
+      alert('商品画像が選択されていません。');
     }
 
     try {
@@ -219,6 +228,11 @@ const StallMenuContents = () => {
       handleCloseForm(); // フォームを閉じる
     } catch (error) {
       console.error('Error saving store data:', error);
+      if (error instanceof Error) {
+        alert(`メニューの保存中にエラーが発生しました: ${error.message}`);
+      } else {
+        alert('メニューの保存中に予期しないエラーが発生しました。');
+      }
     }
   };
 
@@ -229,6 +243,7 @@ const StallMenuContents = () => {
     setPrice(product.price);
     setStock(product.stock);
     setCookTime(product.cookTime);
+    setStock(0);
     setShowUpdateForm(true); // 更新フォームを表示
   };
 
@@ -238,43 +253,70 @@ const StallMenuContents = () => {
 
     if (!selectedProduct) {
       console.error('No product selected for update');
+      alert('更新する商品が選択されていません。');
       return;
     }
 
+    // ここで在庫の増減の値を取得
+    const updateStockAmount = parseInt(stock.toString(), 10); // 何個増やす/減らすか
+    const isIncrease = true; // ここで増減を選ぶ（増やす例）
     const updatedProductData = {
       _id: selectedProduct._id,
-      productName: menuName,
-      price: price,
-      stock: stock,
-      cookTime: cookTime,
+      productName: menuName,   // 商品名
+      price: parseFloat(price.toString()),  // 値段
+      stock: parseInt(stock.toString(), 10),  // 在庫
+      cookTime: parseInt(cookTime.toString(), 10),  // 調理時間
     };
 
+    // 在庫を増やすならそのまま、減らすならマイナスに変換
+    const updateStook = isIncrease ? updateStockAmount : -updateStockAmount;
+
     try {
+      // 商品名、値段、調理時間の更新APIエンドポイントへリクエストを送信
       const response = await fetch(`/api/ProductData/setter/updataPRODUCTS_DATA`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedProductData),
+        body: JSON.stringify(updatedProductData),  // 更新データを送信
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update product');
+        throw new Error('Failed to update product data');
       }
 
       const updatedProduct = await response.json();
+
+      // 在庫更新のAPIエンドポイントへリクエストを送信
+      const stockResponse = await fetch(`/api/ProductData/setter/updataStock?_id=${selectedProduct._id}&updateStook=${updateStook}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!stockResponse.ok) {
+        throw new Error('Failed to update product stock');
+      }
+
+      const updatedStockProduct = await stockResponse.json();
 
       // 商品リストをリアルタイムで更新
       setStallData((prev: any) => ({
         ...prev,
         productList: prev.productList.map((product: any) =>
-          product._id === updatedProduct._id ? updatedProduct : product
+          product._id === updatedStockProduct._id ? updatedStockProduct : product
         ),
       }));
 
       setShowUpdateForm(false); // 更新フォームを閉じる
     } catch (error) {
-      console.error('Error updating product:', error);
+      console.error('Error updating product data or stock:', error);
+      if (error instanceof Error) {
+        alert(`更新中にエラーが発生しました: ${error.message}`);
+      } else {
+        alert('更新中に予期しないエラーが発生しました。');
+      }
     }
   };
 
@@ -290,7 +332,7 @@ const StallMenuContents = () => {
               &lt;
             </div>
             {stallData ? (
-                `${stallData.storeName}のメニュー一覧`
+                `${stallData.storeName}のメニュー`
             ) : (
                 <p>データを読み込み中です...</p>
             )}
@@ -310,24 +352,16 @@ const StallMenuContents = () => {
         <div className={styles.stallList}>
           {stallData?.productList && stallData.productList.length > 0 ? (
             stallData.productList.map((product: any) => (
-                <div
-                    key={product._id}
-                    className={`${styles.stallCard} ${selectedProductIds.includes(product._id) ? styles.selectedCard : ''}`}
-                    onClick={() => handleSelectProduct(product._id)}
-                >
+              <div
+                  key={product._id}
+                  className={`${styles.stallCard} ${selectedProductIds.includes(product._id) ? styles.selectedCard : ''}`}
+                  onClick={() => handleSelectProduct(product._id)}
+              >
                 <img src={product.productImageUrl} alt={product.productName} className={styles.stallImage} />
                 <h2>{product.productName}</h2>
                 <p>値段: {product.price}円</p>
-                <p>在庫: 
-                  <input
-                    type="number"
-                    value={product.stock}
-                    onChange={(e) => handleStockUpdate(product._id, Number(e.target.value))}
-                    className={styles.stockInputBox}    
-                  />個
-                </p>
+                <p>在庫: {product.stock}個</p>
                 <p>調理時間: {product.cookTime}分</p>
-                <button onClick={() => handleUpdateButtonClick(product)}>編集</button> {/* 更新ボタンを追加 */}
               </div>
             ))
           ) : (
@@ -431,7 +465,7 @@ const StallMenuContents = () => {
                   />
                 </label>
                 <label className={styles.stockLabel}>
-                  在庫数(個):
+                  在庫調整(プラス何個):
                   <input
                     type="number"
                     name="stock"

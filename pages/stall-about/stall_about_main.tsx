@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import styles from '../../styles/Stallabout.module.css';
 import { useRouter } from 'next/router';
 
-
 const StallAboutMain = () => {
     const [showForm, setShowForm] = useState(false);
     const [selectedDay, setSelectedDay] = useState(1);
@@ -27,8 +26,10 @@ const StallAboutMain = () => {
 
             const result = await response.json();
             return result._id;  // 保存された屋台のIDを返す
-        } catch (error) {
+        } catch (error: any) {
+            alert(`保存中にエラーが発生しました: ${error.message}`);
             console.error('Error saving stall data:', error);
+            return null;  // エラーが発生した場合、nullを返して保存しない
         }
     };
 
@@ -37,7 +38,8 @@ const StallAboutMain = () => {
             const response = await fetch('/api/StoreData/getter/getAllSTORES_DATA');
             const result = await response.json();
             setStalls(result);
-        } catch (error) {
+        } catch (error: any) {
+            alert(`屋台データ取得中にエラーが発生しました: ${error.message}`);
             console.error('Error fetching stalls:', error);
         }
     };
@@ -76,13 +78,13 @@ const StallAboutMain = () => {
         formData.append('storeName', stallName);  // 入力された屋台名
         formData.append('openDay', selectedDay.toString());  // 選択された日
     
-        // input 要素が存在するか確認
         const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
         if (fileInput && fileInput.files && fileInput.files[0]) {
             const imageFile = fileInput.files[0];  // ファイルオブジェクトを取得
             formData.append('image', imageFile);
         } else {
-            console.error("No file selected or input element not found");
+            alert("画像が選択されていません。");
+            return;  // 画像がない場合、処理を中断してデータベースに追加しない
         }
     
         try {
@@ -96,18 +98,22 @@ const StallAboutMain = () => {
             }
     
             const result = await response.json();
+            
+            // データベースに成功して保存された場合のみ、屋台リストに追加
             setStalls(prev => [
                 ...prev,
                 { _id: result._id, storeName: stallName, Image: uploadedImage, openDay: selectedDay }
             ]);
+
+            // 新規屋台の画像がすぐに表示されるようにするため、強制的に再読み込みを実行
+            fetchStalls();
+
             handleCloseForm();  // フォームを閉じる
-        } catch (error) {
+        } catch (error: any) {
+            alert(`保存中にエラーが発生しました: ${error.message}`);
             console.error('Error saving stall data:', error);
         }
     };
-    
-    
-    
 
     const handleStallClick = (stallId: string) => {
         router.push(`/stall-about/${stallId}`);
