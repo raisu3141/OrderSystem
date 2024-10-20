@@ -9,6 +9,7 @@ import { AlertCircle, Loader2 } from 'lucide-react'
 import { Toaster, toast } from 'react-hot-toast'
 
 import styles from '../../components/ordermanege/orderticket.module.css'
+import { all } from 'axios'
 
 const LoadingOverlay = () => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -55,8 +56,8 @@ interface OrderticketProps {
   storeName: string;
 }
 
-export default function Component({ storeName }: OrderticketProps) {
-  const [activeTab, setActiveTab] = useState<'preparing' | 'ready' | 'all'>('preparing')
+export default function OrderTicket({ storeName }: OrderticketProps) {
+  const [activeTab, setActiveTab] = useState<'preparing' | 'ready' | 'active' | 'etc'>('preparing')
   const [showAllOrders, setShowAllOrders] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
   const queryClient = useQueryClient()
@@ -152,6 +153,8 @@ export default function Component({ storeName }: OrderticketProps) {
 
   const preparingOrders = allOrders?.filter(order => !order.cookStatus && !order.getStatus && !order.cancelStatus)
   const readyOrders = allOrders?.filter(order => order.cookStatus && !order.getStatus && !order.cancelStatus)
+  const activeOrders = allOrders?.filter(order => !order.getStatus && !order.cancelStatus)
+  const etcOrders = allOrders?.filter(order => order.getStatus || order.cancelStatus)
 
   const updateOrderStatusMutation = useMutation(
     async ({ order, newStatus }: { order: Order; newStatus: 'ready' | 'completed' }) => {
@@ -254,7 +257,7 @@ export default function Component({ storeName }: OrderticketProps) {
 
   const handleShowAllOrders = () => {
     setShowAllOrders(true)
-    setActiveTab('all')
+    setActiveTab('active')
   }
 
   const handleHideAllOrders = () => {
@@ -264,14 +267,21 @@ export default function Component({ storeName }: OrderticketProps) {
 
   return (
     <div className="container mx-auto p-4 pb-20"> 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'preparing' | 'ready' | 'all')}>  
-        <TabsList className={`grid w-full mb-4 ${showAllOrders ? 'grid-cols-1' : 'grid-cols-2'}`}>  
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'preparing' | 'ready' | 'active' | 'etc')}>  
+        <TabsList className={`grid w-full mb-4 grid-cols-2`}>  
           {showAllOrders ? ( 
-            <TabsTrigger  
-              value="all" 
-              className="text-lg px-4 py-2 border-b-2 border-blue-500 text-center"> 
-              全ての注文 
-            </TabsTrigger> 
+            <>
+              <TabsTrigger  
+                value="active" 
+                className={`text-lg px-4 py-2 ${activeTab === 'active' ? 'border-b-2 border-blue-500' : ''} text-center`}> 
+                全ての注文 
+              </TabsTrigger> 
+              <TabsTrigger
+                value="etc"
+                className={`text-lg px-4 py-2  ${activeTab === 'etc' ? 'border-b-2 border-gray-500' : ''} text-center`}>
+                完了・キャンセル
+              </TabsTrigger>
+            </>
           ) : ( 
             <> 
               <TabsTrigger   
@@ -302,11 +312,18 @@ export default function Component({ storeName }: OrderticketProps) {
           </div> 
         )} 
         {showAllOrders && ( 
-          <TabsContent value="all">  
-            <div>  
-              {allOrders?.map(order => renderOrderCard(order))}  
-            </div>  
-          </TabsContent>  
+          <div>
+            <TabsContent value="active">  
+              <div>  
+                {activeOrders?.map(order => renderOrderCard(order))}  
+              </div>  
+            </TabsContent>  
+            <TabsContent value="etc">
+              <div>
+                {etcOrders?.map(order => renderOrderCard(order))}
+              </div>
+            </TabsContent>
+          </div>
         )} 
       </Tabs> 
 
