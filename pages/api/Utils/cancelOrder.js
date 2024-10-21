@@ -31,42 +31,44 @@ export default async function handler(req, res) {
     const order = await OrderData.findOne({ ticketNumber: ticketNumber })
       .populate('orderList.storeId', 'storeName');
 
+    console.log("order", order);
+
     if (!order) {
       return res.status(404).json({ message: '注文が見つかりませんでした。' });
     }
 
-    // 屋台コレクション名を格納
+    // 屋台名を格納
     let storeOrders = new Set();
     order.orderList.forEach((item) => {
-      storeOrders.add(`${item.storeId.storeName}_orders`);
+      storeOrders.add(item.storeId.storeName);
     });
     storeOrders = Array.from(storeOrders); // Set を配列に変換
 
     console.log(storeOrders);
 
     // トランザクションを開始
-    let storeOrder; // cancelStatusをtrueにして、受け取ったドキュメントを格納
     let orderList = []; // cookStatusがfalseの商品をすべて格納
     await session.withTransaction(async () => {
       console.log("startTransaction");
     
       // 調理未完了の商品のcancelStatusをtrueに更新
       for (const store of storeOrders) {
-        const StoreOrder = mongoose.models[store] || mongoose.model(store, StoreOrderSchema);
-        
-        // cancelStatusをtrueに更新
-        storeOrder = await StoreOrder.findOneAndUpdate(
-          { orderId: order._id },
-          { $set: { cancelStatus: true } },
-          { new: true, session }
-        );
+        const StoreOrder = mongoose.models[`${store}_orders`] || mongoose.model(`${store}_orders`, StoreOrderSchema);
 
-        if (!storeOrder) {
-          throw new Error(`注文ID ${order._id} のキャンセル対象が見つかりませんでした。`);
+        // cookStatus: false なら cancelStatusをtrueに更新
+        const storeOrder = await StoreOrder.findOne({ orderId: order._id });
+        if (storeOrder && storeOrder.cookStatus === false) {
+            await storeOrder.updateOne({ $set: { cancelStatus: true } }, { session });
+        } else {
+            console.log("該当する cookStatus が false のレコードが見つかりませんでした。");
         }
-        
+
+
         orderList.push(...storeOrder.orderList);
+        console.log("storeOrder.orderList", storeOrder.orderList);
       }
+      // console.log("orderList", orderList);
+
 
       // orderListで同じ商品があったらorderQuantityを加算
       let aggregatedOrderList = [];
@@ -85,7 +87,7 @@ export default async function handler(req, res) {
         }
       });
       console.log("aggregatedOrderList", aggregatedOrderList);
-      
+
 
       // 在庫数・売上個数を戻す
       const updateStockQuery = aggregatedOrderList.map((item) => {
@@ -100,7 +102,9 @@ export default async function handler(req, res) {
       console.log("zaiko update ato");
 
       // 待ち時間を減らす
-      storeWaitTimeSuber2(aggregatedOrderList);
+      const waitTimeResult = await storeWaitTimeSuber2(aggregatedOrderList, session);
+      console.log("waitTimeResult", waitTimeResult);
+      
 
     }, transactionOptions);
     console.log("commitTransaction");
