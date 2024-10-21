@@ -25,11 +25,9 @@ export default async function handler(req, res) {
       const StoreOrder = mongoose.models[storeOrder] || mongoose.model(storeOrder, StoreOrderSchema);
       
       // 各屋台の注文データを取得
-      const orders = await StoreOrder.find({
-        $and: [
-          {},
-        ],
-      }, "orderId orderList.productId orderList.orderQuantity cookStatus"
+      const orders = await StoreOrder.find(
+        { cancelStatus: false },
+        "orderId orderList.productId orderList.orderQuantity cookStatus"
       ).populate([
         { path: 'orderList.productId', select: 'productName price'},
         { path: 'orderId', select: 'ticketNumber clientName'},
