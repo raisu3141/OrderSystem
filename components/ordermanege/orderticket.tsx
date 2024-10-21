@@ -224,7 +224,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
             <div className="flex-grow px-4 flex flex-col">
               <ul className="space-y-1">
                 {order.orderList.map((item, index) => (
-                  <li key={index} className="flex justify-between text-sm font-bold">
+                  <li key={index} className="flex justify-between text-lg font-bold">
                     <span>{item.productName} × {item.orderQuantity}</span>
                   </li>
                 ))}
