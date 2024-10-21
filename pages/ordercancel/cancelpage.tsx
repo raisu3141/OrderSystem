@@ -191,8 +191,8 @@ export default function OrderCancellation() {
         <title>注文キャンセル</title>
       </Head>
       <Header />
-      <div className={`${Styles.maincontainer} flex flex-col`}>
-        <h1 className="text-2xl font-bold mb-4">注文キャンセル</h1>
+      <div className= 'flex flex-col justify-center items-center min-h-screen'>
+        <h1 className="text-2xl font-bold m-4">注文キャンセル</h1>
 
         {/* 検索欄 */}
         <div className="flex gap-4 mb-4">
@@ -209,7 +209,7 @@ export default function OrderCancellation() {
         </div>
 
         {/* 注文一覧 */}
-        <Table>
+        <Table style={{ width: '80%', margin: '0 auto' }}>
           <TableHeader>
             <TableRow>
               <TableHead>注文番号</TableHead>
@@ -295,6 +295,5 @@ export default function OrderCancellation() {
         </Dialog>
       </div>
     </div>
-
   )
 }
