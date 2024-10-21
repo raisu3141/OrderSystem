@@ -47,37 +47,47 @@ export default async function handler(req, res) {
     console.log(storeOrders);
 
     // トランザクションを開始
+    let cancelOrders = []; // キャンセルした商品をすべて格納
     let orderList = []; // cookStatusがfalseの商品をすべて格納
+
     await session.withTransaction(async () => {
       console.log("startTransaction");
-    
-      // 調理未完了の商品のcancelStatusをtrueに更新
+
+      // 各屋台の注文情報を処理
       for (const store of storeOrders) {
         const StoreOrder = mongoose.models[`${store}_orders`] || mongoose.model(`${store}_orders`, StoreOrderSchema);
 
         // cookStatus: false なら cancelStatusをtrueに更新
-        const storeOrder = await StoreOrder.findOne({ orderId: order._id });
-        if (storeOrder && storeOrder.cookStatus === false) {
-            await storeOrder.updateOne({ $set: { cancelStatus: true } }, { session });
+        const storeOrder = await StoreOrder.findOneAndUpdate(
+          { orderId: order._id, cookStatus: false, cancelStatus: false },
+          { $set: { cancelStatus: true } },
+          { new: true, session }
+        );
+
+        if (storeOrder) {
+          cancelOrders.push(storeOrder); // キャンセルした商品を追加
+          if (storeOrder.orderList && storeOrder.orderList.length > 0) {
+            orderList.push(...storeOrder.orderList);
+            console.log("storeOrder.orderList", storeOrder.orderList);
+          }
         } else {
-            console.log("該当する cookStatus が false のレコードが見つかりませんでした。");
+          console.log(`キャンセル可能な注文が見つかりませんでした: ${store}`);
         }
-
-
-        orderList.push(...storeOrder.orderList);
-        console.log("storeOrder.orderList", storeOrder.orderList);
       }
-      // console.log("orderList", orderList);
 
+      // もしcancelOrdersに何も追加されなかった場合は、すべてがnullだったと判断してエラーをスロー
+      if (cancelOrders.length === 0) {
+        throw new Error("キャンセルできる注文が見つかりませんでした。すべての注文が既に処理済みです。");
+      }
 
       // orderListで同じ商品があったらorderQuantityを加算
       let aggregatedOrderList = [];
       orderList.forEach((item) => {
         if (!item.productId) return; // productId が存在しない場合はスキップ
-      
+
         // 既に productId が存在するかどうか確認
         const existingItem = aggregatedOrderList.find(i => item.productId.equals(i.productId));
-      
+
         if (existingItem) {
           // 既存のアイテムが見つかったら、orderQuantity を加算
           existingItem.orderQuantity += item.orderQuantity;
@@ -87,7 +97,6 @@ export default async function handler(req, res) {
         }
       });
       console.log("aggregatedOrderList", aggregatedOrderList);
-
 
       // 在庫数・売上個数を戻す
       const updateStockQuery = aggregatedOrderList.map((item) => {
@@ -104,17 +113,25 @@ export default async function handler(req, res) {
       // 待ち時間を減らす
       const waitTimeResult = await storeWaitTimeSuber2(aggregatedOrderList, session);
       console.log("waitTimeResult", waitTimeResult);
-      
 
     }, transactionOptions);
-    console.log("commitTransaction");
 
+    console.log("commitTransaction");
     res.status(200).json({ success: true, message: "注文をキャンセルしました" });
   } catch (error) {
     console.error("エラー:", error);
-    res.status(500).json({ message: 'エラーが発生しました', error: error.message });
+
+    // エラー詳細を含めたレスポンス
+    res.status(500).json({
+      message: 'キャンセル処理中にエラーが発生しました。',
+      error: error.message
+    });
   } finally {
-    session.endSession();
-    console.log("session ended");
+    try {
+      await session.endSession();
+      console.log("session ended");
+    } catch (endSessionError) {
+      console.error("セッション終了時にエラー:", endSessionError);
+    }
   }
 }
