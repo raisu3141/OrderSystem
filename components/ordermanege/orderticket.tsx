@@ -234,7 +234,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
               {!order.getStatus && !order.cancelStatus ? (
                 <Button 
                   onClick={() => updateOrderStatus(order, order.cookStatus ? 'completed' : 'ready')}
-                  className="mt-2 w-24 bg-gray-200 text-black hover:bg-gray-300"
+                  className={`mt-2 ${styles.completeButton} ${order.cookStatus ? styles.completeButtonSecondary : styles.completeButtonPrimary}`}
                 >
                   {order.cookStatus ? '受け渡し完了' : '調理完了'}
                 </Button>
