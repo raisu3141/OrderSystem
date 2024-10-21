@@ -224,7 +224,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
             <div className="flex-grow px-4 flex flex-col">
               <ul className="space-y-1">
                 {order.orderList.map((item, index) => (
-                  <li key={index} className="flex justify-between text-sm font-bold">
+                  <li key={index} className="flex justify-between text-lg font-bold">
                     <span>{item.productName} × {item.orderQuantity}</span>
                   </li>
                 ))}
@@ -234,7 +234,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
               {!order.getStatus && !order.cancelStatus ? (
                 <Button 
                   onClick={() => updateOrderStatus(order, order.cookStatus ? 'completed' : 'ready')}
-                  className="mt-2 w-24 bg-gray-200 text-black hover:bg-gray-300"
+                  className={`mt-2 ${styles.completeButton} ${order.cookStatus ? styles.completeButtonSecondary : styles.completeButtonPrimary}`}
                 >
                   {order.cookStatus ? '受け渡し完了' : '調理完了'}
                 </Button>
