@@ -4,7 +4,7 @@ import OrderData from "../../../models/OrderData";
 import ProductData from "../../../models/ProductData";
 import TicketManagement from "../../../models/TicketManagement";
 import orderSorting from "./orderSorting";
-import storeWaitTimeAdder from "./storeWaitTimeAdder";
+import { storeWaitTimeAdder2 } from "./storeWaitTimeAdder";
 
 export default async function handler(req, res) {
   const client = await connectToDatabase(); // データベースに接続
@@ -137,18 +137,16 @@ const processOrder = async (orderList, clientName, session) => {
   // 整理券番号を生成
   const newTicketNumber = await generateTicketNumber(session);
 
-  // LineUserIdの生成 (uniqueエラー回避のため)
-  // let newLineUserId = newTicketNumber !== 1
-  //   ? "LineUserId" + newTicketNumber
-  //   : "LineUserId1";
-  
+  // 各屋台の待ち時間の更新
+  const storeWaitTime = await storeWaitTimeAdder2(orderList, session);
+  console.log("storeWaitTime", storeWaitTime);
+
   // 注文データを保存
   const newOrderData = new OrderData({
     ticketNumber: newTicketNumber,
-    // ticketNumber: 1,
-    // lineUserId: newLineUserId,
     clientName,
     orderList,
+    waitTime: storeWaitTime,
   });
   console.log("save mae");
   await newOrderData.save({ session });
@@ -165,9 +163,6 @@ const processOrder = async (orderList, clientName, session) => {
   if (!orderResult.success) {
     throw new Error(orderResult.message);
   }
-
-  // 各屋台の待ち時間の更新（たけと変更待ち）
-  // storeWaitTimeAdder(orderList, session);
 
   console.log("return processOrder");
   return {
