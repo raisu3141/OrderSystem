@@ -72,10 +72,11 @@ export default async function handler(req, res){
 
             const waitTimes = {};
             const finishCookStatus = {};
-            cleaneData.forEach(data =>{
+            for (const data of cleaneData){
                 waitTimes[data.storeId] = data.waitTime + addWaitTime;
-                finishCookStatus[data.storeId] = false;
-            });
+                const stores = await StoreData.findById(data.storeId, "storeName");
+                finishCookStatus[stores.storeName + "_orders"] = false;
+            };
 
             const updatedStatus = await OrderData.findOneAndUpdate(
                 {_id: orderId}, 
@@ -91,7 +92,6 @@ export default async function handler(req, res){
             }
             addWaitTime += 60000;
         }
-
         res.status(200).json(orderData);
     }
     catch(error){

@@ -67,10 +67,11 @@ export default async function orderSorting(orderId, session){
 
         const waitTimes = {};
             const finishCookStatus = {};
-            cleaneData.forEach(data =>{
+            for (const data of cleaneData){
                 waitTimes[data.storeId] = data.waitTime + addWaitTime;
-                finishCookStatus[data.storeId] = false;
-            });
+                const stores = await StoreData.findById(data.storeId, "storeName");
+                finishCookStatus[stores.storeName + "_orders"] = false;
+            };
 
             const updatedStatus = await OrderData.findOneAndUpdate(
                 {_id: orderId}, 
