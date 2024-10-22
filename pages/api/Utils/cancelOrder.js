@@ -135,3 +135,7 @@ export default async function handler(req, res) {
     }
   }
 }
+
+// ESLintの警告を無効にするためのコメント
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+StoreData;

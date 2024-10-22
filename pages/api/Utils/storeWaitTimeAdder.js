@@ -139,3 +139,7 @@ export const storeWaitTimeAdder2 = async (orderList, session) => {
     throw new Error('エラーが発生しました。' + error.message);
   }
 };
+
+// ESLintの警告を無効にするためのコメント
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+mongoose;

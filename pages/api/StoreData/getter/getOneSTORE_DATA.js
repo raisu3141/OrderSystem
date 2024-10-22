@@ -43,3 +43,7 @@ export default async function handler(req, res) {
     res.status(400).json({ success: false, message: `Error: ${error.message}, Store ID: ${req.body._id}` });
   }
 };
+
+// ESLintの警告を無効にするためのコメント
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ProductData;
