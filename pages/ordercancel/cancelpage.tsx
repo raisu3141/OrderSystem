@@ -17,7 +17,7 @@ interface Order {
 async function fetchNotCanceledOrders() {
   // 未キャンセルの注文を取得する処理
   try {
-    const response = await fetch('/api/Utils/getNotCanceledOrders');
+    const response = await fetch('/api/Utils/getNotCanceledOrder');
     if (!response.ok) {
       throw new Error('Failed to fetch order list');
     }
@@ -28,17 +28,18 @@ async function fetchNotCanceledOrders() {
     return data;
   } catch (error) {
     console.error(error);
+    console.log('データとれてないよ');
     return [];
   }
 }
 
 export default function OrderCancellation() {
   const [orders, setOrders] = useState<Order[]>([])
-  const [searchTicketNumber, setSearchTicketNumber] = useState("")
+  const [searchTicketNumber, setSearchTicketNumber] = useState<number>()
   const [searchCustomerName, setSearchCustomerName] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const [confirmTicketNumber, setConfirmTicketNumber] = useState("")
+  const [confirmTicketNumber, setConfirmTicketNumber] = useState<number>()
   const [confirmCustomerName, setConfirmCustomerName] = useState("")
 
   useEffect(() => {
@@ -51,7 +52,7 @@ export default function OrderCancellation() {
 
   // 検索機能
   const filteredOrders = orders.filter(order =>
-    order.ticketNumber.toString().includes(searchTicketNumber.toLowerCase()) &&
+    order.ticketNumber.toString().includes(searchTicketNumber?.toString() ?? '') &&
     order.clientName.toLowerCase().includes(searchCustomerName.toLowerCase())
   )
 
@@ -64,12 +65,12 @@ export default function OrderCancellation() {
   // キャンセル確認
   const handleConfirmCancel = () => {
     if (selectedOrder &&
-      confirmTicketNumber.trim() === selectedOrder.ticketNumber.toString().trim() &&
-      confirmCustomerName.trim().toLowerCase() === selectedOrder.clientName.trim().toLowerCase()) {
+      confirmTicketNumber === selectedOrder.ticketNumber &&
+      confirmCustomerName === selectedOrder.clientName) {
       setOrders(orders.filter(order => order.ticketNumber !== selectedOrder.ticketNumber))
       setIsDialogOpen(false)
       setSelectedOrder(null)
-      setConfirmTicketNumber("")
+      setConfirmTicketNumber(undefined)
       setConfirmCustomerName("")
     }
   }
@@ -88,7 +89,7 @@ export default function OrderCancellation() {
           <Input
             placeholder="注文番号で検索"
             value={searchTicketNumber}
-            onChange={(e) => setSearchTicketNumber(e.target.value)}
+            onChange={(e) => setSearchTicketNumber(Number(e.target.value))}
           />
           <Input
             placeholder="注文者名で検索"
@@ -118,7 +119,7 @@ export default function OrderCancellation() {
                   {/* 商品ID、屋台ID、個数を縦並びに表示 */}
                   <TableCell>
                     {order.orderList.map(product => (
-                      <div key={product.productId}>{product.productId}</div>
+                      <div key={product.productId}>{product.productName}</div>
                     ))}
                   </TableCell>
                   <TableCell>
@@ -152,7 +153,7 @@ export default function OrderCancellation() {
                 <Input
                   id="confirmTicketNumber"
                   value={confirmTicketNumber}
-                  onChange={(e) => setConfirmTicketNumber(e.target.value)}
+                  onChange={(e) => setConfirmTicketNumber(Number(e.target.value))}
                   className="col-span-3"
                 />
               </div>
@@ -175,7 +176,7 @@ export default function OrderCancellation() {
               <Button
                 variant="destructive"
                 onClick={handleConfirmCancel}
-                disabled={!selectedOrder || confirmTicketNumber !== selectedOrder.ticketNumber.toString() || confirmCustomerName !== selectedOrder.clientName}
+                disabled={!selectedOrder || confirmTicketNumber !== selectedOrder.ticketNumber || confirmCustomerName !== selectedOrder.clientName}
               >
                 注文をキャンセルする
               </Button>
