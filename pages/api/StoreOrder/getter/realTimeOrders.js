@@ -33,7 +33,7 @@ async function monitorChanges(req, res) {
 
         changeStream.on('change', (change) => {
             // change.operationTypeが存在するかを確認
-            if (change.operationType && change.operationType === 'insert') {
+            if (change.operationType === 'insert') {
                 const updatedDocument = change.fullDocument;
                 console.log('Detected change:', updatedDocument);
 
