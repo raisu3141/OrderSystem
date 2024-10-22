@@ -5,6 +5,7 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import Styles from '../../styles/orderInput.module.css';
 import { CartItem } from '../../lib/types';
 import OrderCompleted from "./OrderCompleted";
+import { set } from "mongoose";
 
 interface OrderConfirmationProps {
   cart: CartItem[];
@@ -14,43 +15,27 @@ interface OrderConfirmationProps {
 }
 
 export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove }: OrderConfirmationProps) {
-  const [depositAmount, setDepositAmount] = useState<number | undefined>();
+  const [depositAmount, setDepositAmount] = useState<number>(0);
   const [clientName, setClientName] = useState<string | undefined>();
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isOpen, setIsOpen] = useState(false);
   const [isErrorOpen, setIsErrorOpen] = useState(false);
   const [ticketNumber, setTicketNumber] = useState<number | undefined>();
   const [stockStatusList, setStockStatusList] = useState<{ productId: string, stock: number }[]>([]);
-  const [stock, setStock] = useState<{ [productId: string]: number }>({});
-
-
+  const PRESET_AMOUNTS = [50, 100, 500, 1000, 5000, 10000];
 
   const resetForm = () => {
     setClientName('');
-    setDepositAmount(undefined);
+    setDepositAmount(0);
     setIsOpen(false);
     setIsErrorOpen(false);
-
-    // 在庫更新処理
-    stockStatusList.forEach(stockStatus => {
-      console.log(`Updating stock for productId: ${stockStatus.productId}, new stock: ${stockStatus.stock}`);
-      updateLocalStock(stockStatus.productId, stockStatus.stock);
-    });
 
     for (let i = 0; i < cart.length; i++) {
       onRemove(cart[i].productId);
     }
   };
 
-  const updateLocalStock = (productId: string, newStock: number) => {
-    setStock(prevStock => ({
-      ...prevStock,
-      [productId]: newStock
-    }));
-  };
-
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const katakanaRegex = /^[ァ-ヶー]+$/;
 
@@ -60,6 +45,15 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
     } else {
       setErrorMessage('お名前はカタカナで入力してください');
     }
+  }
+
+  const handleAmountInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    setDepositAmount(Number(inputValue));
+  }
+
+  const handleButtonClick = (value: number) => {
+    setDepositAmount(depositAmount ? depositAmount + value : value);
   }
 
   const postOrder = async () => {
@@ -88,6 +82,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         console.log('Order completed', responseData);
         setTicketNumber(responseData.ticketNumber);
         setStockStatusList(responseData.stockStatusList);
+        console.log('Stock status list:', stockStatusList);
         setIsOpen(true);
         onClose();
 
@@ -114,18 +109,32 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
               type="text"
               className="w-[70%] h-10 border-2 rounded-md"
               placeholder="コウセンタロウ"
-              onChange={handleInputChange}
+              onChange={handleNameInputChange}
             />
+            <div className="text-red-500">{errorMessage}</div>
             <div className="text-xl font-semibold mt-5">お預かり金額</div>
             <input
               type="number"
-              className="w-[70%] h-10 border-2 rounded-md"
               placeholder="お預かり金額"
-              value={depositAmount || ''}
-              onChange={(e) => setDepositAmount(Number(e.target.value))}
+              value={depositAmount}
+              onChange={handleAmountInputChange}
+              min={0}
+              className="w-[70%] h-10 border-2 rounded-md"
+              inputMode="numeric"
             />
+            <div className="grid grid-cols-3 gap-2 mt-5">
+              {PRESET_AMOUNTS.map(value => (
+                <Button
+                  key={value}
+                  onClick={() => handleButtonClick(value)}
+                  variant="outline"
+                >
+                  +{value.toLocaleString()}
+                </Button>
+              ))}
+            </div>
 
-            <div className="mt-20">
+            <div className="mt-10">
               <div className="bg-white w-auto h-auto border-2 rounded-md flex flex-col items-center p-4">
                 <div className="text-base font-semibold">
                   <p>ご注文が確定しますと、</p>
@@ -182,21 +191,23 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         >
           注文
         </Button>
-      </DialogContent>
+      </DialogContent >
 
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {/*注文完了ダイアログを開く  */}
+      < Dialog open={isOpen} onOpenChange={setIsOpen} >
         <OrderCompleted clientName={clientName} ticketNumber={ticketNumber} onClose={() => { setIsOpen(false); resetForm(); }} />
-      </Dialog>
+      </Dialog >
 
-      <Dialog open={isErrorOpen} onOpenChange={setIsErrorOpen}>
+      {/* エラーダイアログ */}
+      < Dialog open={isErrorOpen} onOpenChange={setIsErrorOpen} >
         <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[80vh] max-h-[80vh]">
           <DialogTitle className="text-5xl font-semibold">注文エラー</DialogTitle>
           <div className="w-full h-full flex flex-col items-center text-2xl mt-12">
             <p>再度注文お願いします</p>
           </div>
-          <Button className="w-[50%] mt-4" onClick={() => setIsErrorOpen(false)}>閉じる</Button>
+          <Button className="w-[50%] mt-4" onClick={() => { setIsErrorOpen(false); resetForm() }}>閉じる</Button>
         </DialogContent>
-      </Dialog>
+      </Dialog >
     </>
   );
 }

@@ -23,4 +23,4 @@ const TicketManagementSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-export default mongoose.models.TicketNumber || mongoose.model('TicketNumber', TicketManagementSchema);
+export default mongoose.models.TicketManagement || mongoose.model('TicketManagement', TicketManagementSchema);

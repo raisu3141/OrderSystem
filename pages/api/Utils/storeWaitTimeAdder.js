@@ -96,8 +96,12 @@ export const storeWaitTimeAdder2 = async (orderList, session) => {
         throw new Error('データの取得中にエラーが発生しました。');
       }
 
-      if (!product || !store) {
-        throw new Error('商品または屋台が見つかりませんでした。');
+      // 追加の確認
+      if (!product) {
+        console.warn(`Product not found (productId: ${productId}).`);
+      }
+      if (!store) {
+        console.warn(`Store not found (storeId: ${storeId}).`);
       }
 
       // 調理時間を個数に応じて計算
