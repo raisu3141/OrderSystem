@@ -26,8 +26,20 @@ export default async function handler(req, res) {
       return res.status(404).json({ success: false, message: `Store not found for ID: ${storeId}` });
     }
 
-    res.status(200).json(store);
+    // productListのcookTimeを/1000する
+    const updatedProductList = store.productList.map(product => {
+      // cookTimeを/1000し、新しいオブジェクトとして返す
+      const updatedCookTime = product.cookTime ? product.cookTime / 1000 : null;
+
+      return {
+        ...product.toObject(), // productの元のプロパティを全てコピー
+        cookTime: updatedCookTime, // cookTimeのみ/1000したものに置き換える
+      };
+    });
+
+    // フロントにstoreと更新されたproductListを返す
+    res.status(200).json({ ...store.toObject(), productList: updatedProductList });
   } catch (error) {
     res.status(400).json({ success: false, message: `Error: ${error.message}, Store ID: ${req.body._id}` });
   }
-}
+};

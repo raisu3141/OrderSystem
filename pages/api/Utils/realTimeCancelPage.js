@@ -68,7 +68,7 @@ export default async function monitorChanges(req, res) {
               console.log('Product data retrieved:', orderProductData);
 
               // 注文リストをフォーマット
-              const formatedOrderList = updatedDocument.orderList.map((order, index) => {
+              const formattedOrderList = updatedDocument.orderList.map((order, index) => {
                 return {
                   productName: orderProductData[index].productName,
                   orderQuantity: order.orderQuantity,
@@ -77,7 +77,7 @@ export default async function monitorChanges(req, res) {
               });
 
               // 注文商品の合計金額を計算
-              const totalAmount = formatedOrderList.reduce((acc, order) => {
+              const totalAmount = formattedOrderList.reduce((acc, order) => {
                 return acc + (order.price * order.orderQuantity);
               }, 0);
 
@@ -85,7 +85,7 @@ export default async function monitorChanges(req, res) {
               const responseData = {
                 ticketNumber: updatedDocument.ticketNumber,
                 clientName: updatedDocument.clientName,
-                orderList: formatedOrderList,
+                orderList: formattedOrderList,
                 totalAmount,
               };
 

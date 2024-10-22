@@ -42,8 +42,7 @@ const OrderDataSchema = new mongoose.Schema({
       min: 0,
     },
   }],
-
-
+  
   // 待ち時間
   "waitTime": {
       type: Map,
