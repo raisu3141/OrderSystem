@@ -19,6 +19,18 @@ export default async function handler(req, res) {
 
   try {
 
+    // ドキュメントがなかったら追加
+    await TicketManagement.findOneAndUpdate(
+      { name: "ticketNumber" }, // 検索条件
+      {},
+      {
+        new: true, // 更新後のドキュメントを返す
+        upsert: true, // ドキュメントがなければ新規作成
+        session,
+      }
+    );
+
+
     // 各商品の在庫が足りているか確認
     const stockStatusList = await checkStock(req.body.orderList, session);
 
@@ -64,12 +76,13 @@ export default async function handler(req, res) {
       const lastTicketNumber = await OrderData.findOne({}, "ticketNumber")
         .sort({ ticketNumber: -1 })
         .session(session);
+      console.log("lastTicketNumber", lastTicketNumber);
       const newTicketNumber = await TicketManagement.findOneAndUpdate(
         { name: "ticketNumber" },
         { $set: { ticketNumber: lastTicketNumber ? lastTicketNumber.ticketNumber + 1 : 1} },
         { session }
       );
-      console.log(newTicketNumber);
+      console.log("newTicketNumber", newTicketNumber);
 
       return res.status(400).json({
         message: "注文に失敗しました",
@@ -136,6 +149,7 @@ const processOrder = async (orderList, clientName, session) => {
 
   // 整理券番号を生成
   const newTicketNumber = await generateTicketNumber(session);
+  console.log("newTicketNumber----", newTicketNumber);
 
   // 各屋台の待ち時間の更新
   const storeWaitTime = await storeWaitTimeAdder2(orderList, session);
@@ -152,6 +166,8 @@ const processOrder = async (orderList, clientName, session) => {
   await newOrderData.save({ session });
   console.log("save ato");
 
+  // const test = await OrderData.findOne({ ticketNumber: newTicketNumber }, null, { session });
+  // console.log("test", test);
 
   // 注文IDの取得
   const orderId = newOrderData._id;
@@ -174,10 +190,10 @@ const processOrder = async (orderList, clientName, session) => {
 const generateTicketNumber = async (session) => {
   const ticketNumberDoc = await TicketManagement.findOneAndUpdate(
     { name: "ticketNumber" }, // 検索条件
-    { 
+    {
       $inc: { ticketNumber: 1 }, // 存在すれば `ticketNumber` をインクリメント
     },
-    { 
+    {
       new: true, // 更新後のドキュメントを返す
       upsert: true, // ドキュメントがなければ新規作成
       session,
