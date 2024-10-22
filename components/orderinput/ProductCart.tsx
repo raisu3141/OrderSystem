@@ -3,7 +3,7 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import Styles from '../../styles/orderInput.module.css';
 import { CartItem } from '../../lib/types';
 import { Button } from "../ui/button";
-import OrderConfirmation from "./OrderConfirmation";
+import OrderConfirmation from "./orderconfirmation";
 import { Dialog } from "@radix-ui/react-dialog";
 
 interface CartProps {
