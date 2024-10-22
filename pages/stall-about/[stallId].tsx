@@ -268,8 +268,6 @@ const StallMenuContents = () => {
         throw new Error('Failed to update product data');
       }
 
-      const updatedProduct = await response.json();
-
       const stockResponse = await fetch(
         `/api/ProductData/setter/updataStock?_id=${selectedProduct._id}&updateStook=${updateStockAmount}`,
         {

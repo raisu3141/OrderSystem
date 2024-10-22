@@ -29,33 +29,7 @@ const StallAboutMain = () => {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [stallName, setStallName] = useState('');  // 屋台名
     const [stalls, setStalls] = useState<STORE[]>([]);  // 作成された屋台リストを保持
-    const [stallId, setStallId] = useState<string | null>(null);  // stallIdの状態を管理
     const router = useRouter();
-
-    const saveStallData = async (stallData: STORE): Promise<string | null> => {
-        try {
-            const response = await fetch('/api/StoreData/setter/createSTORE_DATA', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(stallData),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to save stall data');
-            }
-
-            const result = await response.json();
-            return result._id;  // 保存された屋台のIDを返す
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                alert(`保存中にエラーが発生しました: ${error.message}`);
-                console.error('Error saving stall data:', error);
-            }
-            return null;  // エラーが発生した場合、nullを返して保存しない
-        }
-    };
 
     const fetchStalls = async () => {
         try {
