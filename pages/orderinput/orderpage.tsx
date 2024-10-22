@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Header from '../../components/header';
 import Styles from '../../styles/orderInput.module.css';
