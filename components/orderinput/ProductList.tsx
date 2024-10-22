@@ -4,6 +4,8 @@ import { Button } from "../ui/button";
 import { Product } from "../../lib/types";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
+import Image from "next/image"; // next/imageをインポート
+
 interface ProductListProps extends Product {
   addToCart: (product: Product, quantity: number) => void;
 }
@@ -27,10 +29,17 @@ export function ProductList({ addToCart, ...product }: ProductListProps) {
           disabled={product.stock === 0}
         >
           <div className="bg-gray-500 w-full h-48">
-            <img
+            {/* <img
               src={product.productImageUrl}
               alt={product.productName}
               className="w-full h-48 object-cover"
+            /> */}
+            <Image
+              src={product.productImageUrl}
+              alt={product.productName}
+              width={192} // 48px * 4 = 192px (w-48相当)
+              height={192}
+              className="object-cover"
             />
           </div>
           <div className="p-4">
@@ -43,10 +52,17 @@ export function ProductList({ addToCart, ...product }: ProductListProps) {
         <VisuallyHidden>
           <DialogTitle>個数入力ダイアログ</DialogTitle>
         </VisuallyHidden>
-        <img
+        {/* <img
           src={product.productImageUrl}
           alt={product.productName}
           className="w-50 h-48 object-contain mb-4"
+        /> */}
+        <Image
+          src={product.productImageUrl}
+          alt={product.productName}
+          width={200}
+          height={192} // w-50 h-48 相当
+          className="object-contain mb-4"
         />
         <span className="text-left font-semibold w-80">{product.productName}</span>
         <div className="flex items-center justify-between w-80">

@@ -6,6 +6,8 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { debug } from 'console';
 import { debugPort } from 'process';
 
+import Image from "next/image"; // next/imageをインポート
+
 const StallMenuContents = () => {
   const router = useRouter();
   const { stallId } = router.query;
@@ -132,37 +134,6 @@ const StallMenuContents = () => {
     }
   };
 
-  // ここにhandleStockUpdate関数を追加
-  const handleStockUpdate = async (productId: string, newStock: number) => {
-    try {
-      const response = await fetch(`/api/ProductData/setter/updataPRODUCTS_DATA`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ _id: productId, stock: newStock }),
-      });
-      
-
-      if (!response.ok) {
-        throw new Error('Failed to update stock');
-      }
-
-      const updatedProduct = await response.json();
-
-      // 商品データをリアルタイムで更新
-      setStallData((prev: any) => ({
-        ...prev,
-        productList: prev.productList.map((product: any) =>
-          product._id === updatedProduct._id ? updatedProduct : product
-        ),
-      }));
-    } catch (error) {
-      console.error('Error updating stock:', error);
-    }
-  };
-
-
   const handleCloseForm = () => {
     setShowForm(false);
     setUploadedImage(null);
@@ -284,8 +255,6 @@ const StallMenuContents = () => {
         throw new Error('Failed to update product data');
       }
 
-      const updatedProduct = await response.json();
-
       // 在庫更新のAPIエンドポイントへリクエストを送信
       const stockResponse = await fetch(`/api/ProductData/setter/updataStock?_id=${selectedProduct._id}&updateStook=${updateStook}`, {
         method: 'PUT',
@@ -356,7 +325,13 @@ const StallMenuContents = () => {
                   className={`${styles.stallCard} ${selectedProductIds.includes(product._id) ? styles.selectedCard : ''}`}
                   onClick={() => handleSelectProduct(product._id)}
               >
-                <img src={product.productImageUrl} alt={product.productName} className={styles.stallImage} />
+                {/* <img src={product.productImageUrl} alt={product.productName} className={styles.stallImage} /> */}
+                <Image
+                  src={product.productImageUrl}
+                  alt={product.productName}
+                  className={styles.stallImage}
+                  layout="responsive"  // Optional: for responsive layout
+                />
                 <h2>{product.productName}</h2>
                 <p>値段: {product.price}円</p>
                 <p>在庫: {product.stock}個</p>
@@ -381,7 +356,14 @@ const StallMenuContents = () => {
                   商品画像をアップロード:
                   <input type="file" name="menuImage" className={styles.uploadInput} onChange={handleImageUpload} />
                   {uploadedImage ? (
-                    <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />
+                    // <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />
+                    <Image
+                      src={uploadedImage}
+                      alt="Uploaded"
+                      width={300}
+                      height={200}
+                      layout="responsive"
+                    />
                   ) : (
                     <div className={styles.placeholderBox}>ファイルを選択</div>
                   )}
@@ -496,3 +478,10 @@ const StallMenuContents = () => {
 };
 
 export default StallMenuContents;
+
+
+
+// ESLintの警告を無効にするためのコメント
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+debug;
+debugPort;

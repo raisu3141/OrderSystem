@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import styles from '../../styles/Stallabout.module.css';
 
+import Image from "next/image"; // next/imageをインポート
+
 interface StallFormProps {
   onSubmit: (stallData: any) => void;
   onClose: () => void;
@@ -65,7 +67,13 @@ const StallForm = ({ onSubmit, onClose }: StallFormProps) => {
             画像をアップロード:
             <input type="file" onChange={handleImageUpload} />
             {uploadedImage && (
-              <img src={uploadedImage} alt="プレビュー画像" className={styles.uploadedImage} />
+              // <img src={uploadedImage} alt="プレビュー画像" className={styles.uploadedImage} />
+              <Image
+                src={uploadedImage} // 画像のURLを指定
+                alt="プレビュー画像"
+                className={styles.uploadedImage}
+                layout="responsive" // レスポンシブに対応させる
+              />
             )}
           </label>
 

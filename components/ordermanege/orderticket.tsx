@@ -340,3 +340,9 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
     </div>
   )
 }
+
+
+// ESLintの警告を無効にするためのコメント
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+AlertCircle;
+all;

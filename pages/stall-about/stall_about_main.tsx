@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import styles from '../../styles/Stallabout.module.css';
 import { useRouter } from 'next/router';
 
+import Image from "next/image"; // next/imageをインポート
+
 const StallAboutMain = () => {
     const [showForm, setShowForm] = useState(false);
     const [selectedDay, setSelectedDay] = useState(1);
@@ -9,29 +11,6 @@ const StallAboutMain = () => {
     const [stallName, setStallName] = useState('');  // 屋台名
     const [stalls, setStalls] = useState<any[]>([]);  // 作成された屋台リストを保持
     const router = useRouter();
-
-    const saveStallData = async (stallData: any) => {
-        try {
-            const response = await fetch('/api/StoreData/setter/createSTORE_DATA', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(stallData),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to save stall data');
-            }
-
-            const result = await response.json();
-            return result._id;  // 保存された屋台のIDを返す
-        } catch (error: any) {
-            alert(`保存中にエラーが発生しました: ${error.message}`);
-            console.error('Error saving stall data:', error);
-            return null;  // エラーが発生した場合、nullを返して保存しない
-        }
-    };
 
     const fetchStalls = async () => {
         try {
@@ -155,7 +134,12 @@ const StallAboutMain = () => {
                     ) : (
                         filteredStalls.map(stall => (
                             <div key={stall._id} className={styles.stallCard} onClick={() => handleStallClick(stall._id)}>
-                                <img src={stall.storeImageUrl} alt={stall.storeName} className={styles.stallImage} />
+                                {/* <img src={stall.storeImageUrl} alt={stall.storeName} className={styles.stallImage} /> */}
+                                <Image
+                                    src={stall.storeImageUrl}
+                                    alt={stall.storeName}
+                                    className={styles.stallImage}
+                                />
                                 <h2>{stall.storeName}</h2>
                             </div>
                         ))
@@ -188,7 +172,12 @@ const StallAboutMain = () => {
                                     屋台画像をアップロードしてください:
                                     <input type="file" name="stallImage" className={styles.uploadInput} onChange={handleImageUpload} />
                                     {uploadedImage ? (
-                                        <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />
+                                        // <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />
+                                        <Image
+                                            src={uploadedImage}
+                                            alt="Uploaded"
+                                            className={styles.uploadedImage}
+                                        />
                                     ) : (
                                         <div className={styles.placeholderBox}>ファイルを選択</div>
                                     )}

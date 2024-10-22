@@ -6,6 +6,8 @@ import { Button } from "../ui/button";
 import OrderConfirmation from "./OrderConfirmation";
 import { Dialog } from "@radix-ui/react-dialog";
 
+import Image from "next/image"; // next/imageをインポート
+
 interface CartProps {
   cart: CartItem[];
   onRemove: (id: string) => void; // 削除関数を追加
@@ -39,10 +41,19 @@ export default function Cart({ cart, onRemove, onQuantityChange }: CartProps) {
                 <div className="flex items-center justify-between space-x-4 mb-3">
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
-                      <img
+                      {/* <img
                         src={item.productImageUrl}
                         alt={item.productName}
                         className="w-12 h-12 object-cover"
+                      /> */}
+
+                      {/* w-12はTailwind CSSの48ピクセル */}
+                      <Image
+                        src={item.productImageUrl}
+                        alt={item.productName}
+                        width={48}
+                        height={48}
+                        className="object-cover"
                       />
                     </div>
                     <div className="flex flex-col">
