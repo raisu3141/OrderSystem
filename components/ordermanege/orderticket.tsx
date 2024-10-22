@@ -114,6 +114,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
     }
   )
 
+  // リアルタイム更新
   useEffect(() => {
     const eventSource = new EventSource(`/api/StoreOrder/getter/realTimeOrders?storeName=${storeName}`);
 
