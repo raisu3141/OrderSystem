@@ -49,6 +49,12 @@ const OrderDataSchema = new mongoose.Schema({
       required: false,
   },
 
+  //調理完了済みの商品を管理
+  "finishCook":{
+    type: Map,
+    required: false,
+  },
+
   // 注文者名
   "clientName": {
     type: mongoose.Schema.Types.String,

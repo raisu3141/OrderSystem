@@ -66,17 +66,21 @@ export default async function orderSorting(orderId, session){
         }
 
         const waitTimes = {};
-        cleaneData.forEach(data =>{
-            waitTimes[data.storeId] = data.waitTime;
-        });
+            const finishCookStatus = {};
+            for (const data of cleaneData){
+                waitTimes[data.storeId] = data.waitTime + addWaitTime;
+                const stores = await StoreData.findById(data.storeId, "storeName");
+                finishCookStatus[stores.storeName + "_orders"] = false;
+            };
 
-        const updatedStatus = await orderData.findOneAndUpdate(
-            { _id: orderId },
-            {
-                waitTime: waitTimes
-            },
-            { new: true, session }
-        );
+            const updatedStatus = await OrderData.findOneAndUpdate(
+                {_id: orderId}, 
+                { 
+                    waitTime: waitTimes,
+                    finishCook: finishCookStatus
+                }, 
+                {new: true }
+            );
         
         if (!updatedStatus) {
             return { success: false, message: 'Status not found' };

@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 import connectToDatabase from '../../../../lib/mongoose';
 import StoreOrderSchema from '../../../../models/StoreOrder';
+import orderData from'../../../../models/OrderData';
 
 export default async function handler(req, res) {
   await connectToDatabase();
@@ -36,6 +37,13 @@ export default async function handler(req, res) {
       {new: true }
     );
 
+    await orderData.findOneAndUpdate(
+      {_id: orderId},
+      {
+        $set: {[`finishCook.${collectionName}`]: true }
+      }
+    );
+
       res.status(200).json(updatedStatus);
 
     if (!updatedStatus) {
@@ -45,6 +53,6 @@ export default async function handler(req, res) {
     res.status(200).json(updatedStatus);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: 'Server Error' });
+    res.status(500).json({ success: false, message: error.message});
   }
 }
