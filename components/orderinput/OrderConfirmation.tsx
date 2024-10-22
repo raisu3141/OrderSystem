@@ -5,7 +5,6 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 import Styles from '../../styles/orderInput.module.css';
 import { CartItem } from '../../lib/types';
 import OrderCompleted from "./OrderCompleted";
-import { set } from "mongoose";
 
 interface OrderConfirmationProps {
   cart: CartItem[];
