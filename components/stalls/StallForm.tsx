@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import styles from '../../styles/Stallabout.module.css';
 
+import Image from "next/image"; // next/imageをインポート
+
 interface StallFormProps {
   onSubmit: (stallData: any) => void;
   onClose: () => void;
@@ -65,7 +67,12 @@ const StallForm = ({ onSubmit, onClose }: StallFormProps) => {
 
           {uploadedImage && (
             <div className={styles.imagePreview}>
-              <img src={uploadedImage} alt="プレビュー" className={styles.uploadedImage} />
+              {/* <img src={uploadedImage} alt="プレビュー" className={styles.uploadedImage} /> */}
+              <Image
+                src={uploadedImage} // base64 のデータを使用
+                alt="プレビュー"
+                className={styles.uploadedImage}
+              />
             </div>
           )}
 

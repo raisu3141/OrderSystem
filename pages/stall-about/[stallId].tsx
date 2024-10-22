@@ -341,6 +341,7 @@ const StallMenuContents = () => {
                 onClick={() => handleSelectProduct(product._id)}
               >
                 <img src={product.productImageUrl} alt={product.productName} className={styles.stallImage} />
+    
                 <h2>{product.productName}</h2>
                 <p>値段: {product.price}円</p>
                 <p>在庫: {product.stock}個</p>

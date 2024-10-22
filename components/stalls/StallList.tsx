@@ -1,5 +1,7 @@
 import styles from '../../styles/Stallabout.module.css';
 
+import Image from 'next/image'; // Imageコンポーネントをインポート
+
 interface StallListProps {
   stalls: any[];
   onStallClick: (stallId: string) => void;
@@ -17,7 +19,12 @@ const StallList = ({ stalls, onStallClick }: StallListProps) => {
             className={styles.stallCard}
             onClick={() => onStallClick(stall._id)}
           >
-            <img src={stall.storeImageUrl} alt={stall.storeName} className={styles.stallImage} />
+            {/* <img src={stall.storeImageUrl} alt={stall.storeName} className={styles.stallImage} /> */}
+            <Image 
+              src={stall.storeImageUrl} // URLまたはベース64データ
+              alt={stall.storeName}
+              className={styles.stallImage}
+            />
             <h2>{stall.storeName}</h2>
           </div>
         ))

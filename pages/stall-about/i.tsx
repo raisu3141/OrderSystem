@@ -187,7 +187,7 @@ const StallAboutMain = () => {
                     ) : (
                         filteredStalls.map(stall => (
                             <div key={stall._id} className={styles.stallCard} onClick={() => handleStallClick(stall._id)}>
-                                <img src={stall.storeImageUrl} alt={stall.storeName} className={styles.stallImage} />                                
+                                <img src={stall.storeImageUrl} alt={stall.storeName} className={styles.stallImage} />
                                 <h2>{stall.storeName}</h2>
                             </div>
                         ))
@@ -220,7 +220,7 @@ const StallAboutMain = () => {
                                     屋台画像をアップロードしてください:
                                     <input type="file" name="stallImage" className={styles.uploadInput} onChange={handleImageUpload} />
                                     {uploadedImage ? (
-                                        <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />                                        
+                                        <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />
                                     ) : (
                                         <div className={styles.placeholderBox}>ファイルを選択</div>
                                     )}
