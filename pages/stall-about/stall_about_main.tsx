@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import styles from '../../styles/Stallabout.module.css';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
+import Header from '../../components/header'
 
 export interface PRODUCT {
     _id: string;
@@ -131,9 +132,7 @@ const StallAboutMain = () => {
 
     return (
         <div>
-            <header className={styles.header}>
-                <div className={styles.logo}>NANCA</div>
-            </header>
+            <Header />
             <main>
                 <h1 className={styles.heading}>
                     屋台概要
@@ -201,28 +200,37 @@ const StallAboutMain = () => {
                             </div>
                             <form className={styles.form} onSubmit={handleFormSubmit}>
                                 <label className={styles.uploadLabel}>
-                                    屋台画像をアップロードしてください:
-                                    <input type="file" name="stallImage" className={styles.uploadInput} onChange={handleImageUpload} />
-                                    {uploadedImage ? (
-                                        // <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />   
-                                        <div className={styles.imageContainer}>
+                                    {/* 画像がアップロードされていない場合のみ、テキストを表示 */}
+                                    {!uploadedImage && (
+                                        <span className={styles.uploadText}>
+                                            屋台画像をアップロード
+                                        </span>
+                                    )}
+                                    <input
+                                        type="file"
+                                        name="stallImage"
+                                        className={styles.uploadInput}
+                                        onChange={handleImageUpload}
+                                    />
+                                    <div className={styles.imageContainer}>
+                                        {uploadedImage ? (
                                             <Image
-                                                src={uploadedImage || "/placeholder.jpg"}
+                                                src={uploadedImage}
                                                 alt="Uploaded"
                                                 layout="fill"
                                                 objectFit="cover"
                                                 className={styles.uploadedImage}
-                                            />  
-                                        </div>                                   
-                                    ) : (
-                                        <div className={styles.placeholderBox}>ファイルを選択</div>
-                                    )}
+                                            />
+                                        ) : (
+                                            <div className={styles.placeholderBox}></div>
+                                        )}
+                                    </div>
                                 </label>
                                 <label className={styles.stallNameLabel}>
                                     屋台名:
-                                    <input 
-                                        type="text" 
-                                        name="stallName" 
+                                    <input
+                                        type="text"
+                                        name="stallName"
                                         className={styles.stallNameInput}
                                         value={stallName}
                                         onChange={(e) => setStallName(e.target.value)}

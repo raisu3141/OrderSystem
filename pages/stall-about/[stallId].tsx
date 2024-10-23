@@ -4,6 +4,7 @@ import styles from '../../styles/Stallabout.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
+import Header from '../../components/header'
 
 export interface PRODUCT {
   _id: string;
@@ -220,6 +221,7 @@ const StallMenuContents = () => {
       setStallData((prev) =>
         prev ? { ...prev, productList: [...prev.productList, result] } : null
       );
+      resetFormFields();
       handleCloseForm();
     } catch (error) {
       console.error('Error saving store data:', error);
@@ -307,11 +309,17 @@ const StallMenuContents = () => {
     }
   };
 
+  const resetFormFields = () => {
+    setMenuName(''); // 商品名をリセット
+    setPrice(''); // 価格をリセット
+    setStock(''); // 在庫をリセット
+    setCookTime(''); // 調理時間をリセット
+    setUploadedImage(null); // アップロードされた画像をリセット
+  };
+
   return (
     <div>
-      <header className={styles.header}>
-        <div className={styles.logo}>NANCA</div>
-      </header>
+      <Header />
       <main>
         <h1 className={styles.heading}>
           <div className={styles.leftContainer}>
@@ -370,23 +378,31 @@ const StallMenuContents = () => {
               <h2 className={styles.formTitle}>メニュー入力フォーム</h2>
               <form className={styles.form} onSubmit={handleFormSubmit}>
                 <label className={styles.uploadLabel}>
-                  商品画像をアップロード:
-                  <input type="file" name="menuImage" className={styles.uploadInput} onChange={handleImageUpload} />
-                  {uploadedImage ? (
-                    // <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />
-                    <div className={styles.imageContainer}>
-                    <Image
-                      src={uploadedImage}
-                      alt="Uploaded"
-                      layout="fill"
-                      objectFit="cover"
-                      className={styles.uploadedImage}
-                    />
-                    </div>
-                  ) : (
-                    <div className={styles.placeholderBox}>ファイルを選択</div>
+                  {/* 画像がアップロードされていない場合のみ、テキストを表示 */}
+                  {!uploadedImage && (
+                    <span className={styles.uploadText}>商品画像をアップロード</span>
                   )}
+                  <input
+                    type="file"
+                    name="menuImage"
+                    className={styles.uploadInput}
+                    onChange={handleImageUpload}
+                  />
+                  <div className={styles.imageContainer}>
+                    {uploadedImage ? (
+                      <Image
+                        src={uploadedImage}
+                        alt="Uploaded"
+                        layout="fill"
+                        objectFit="cover"
+                        className={styles.uploadedImage}
+                      />
+                    ) : (
+                      <div className={styles.placeholderBox}></div>
+                    )}
+                  </div>
                 </label>
+                
                 <label className={styles.stallNameLabel}>
                   商品名:
                   <input
@@ -397,6 +413,7 @@ const StallMenuContents = () => {
                     onChange={(e) => setMenuName(e.target.value)}
                   />
                 </label>
+                
                 <label className={styles.priceLabel}>
                   値段(円):
                   <input
@@ -407,6 +424,7 @@ const StallMenuContents = () => {
                     onChange={(e) => setPrice(e.target.value)}
                   />
                 </label>
+                
                 <label className={styles.stockLabel}>
                   在庫数(個):
                   <input
@@ -417,6 +435,7 @@ const StallMenuContents = () => {
                     onChange={(e) => setStock(e.target.value)}
                   />
                 </label>
+                
                 <label className={styles.timeLabel}>
                   調理時間(分):
                   <input
@@ -427,6 +446,7 @@ const StallMenuContents = () => {
                     onChange={(e) => setCookTime(e.target.value)}
                   />
                 </label>
+                
                 <button type="submit" className={styles.submitButton}>
                   完了
                 </button>
