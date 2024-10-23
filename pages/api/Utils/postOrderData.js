@@ -79,7 +79,7 @@ export default async function handler(req, res) {
       console.log("lastTicketNumber", lastTicketNumber);
       const newTicketNumber = await TicketManagement.findOneAndUpdate(
         { name: "ticketNumber" },
-        { $set: { ticketNumber: lastTicketNumber ? lastTicketNumber.ticketNumber + 1 : 1} },
+        { $set: { ticketNumber: lastTicketNumber ? lastTicketNumber.ticketNumber + 1 : 1 } },
         { session }
       );
       console.log("newTicketNumber", newTicketNumber);
@@ -117,7 +117,7 @@ const checkStock = async (orderList, session) => {
     const stockEnoughStatus = order
       ? productStock.stock >= order.orderQuantity
       : true;
-    
+
     const stock = order && stockEnoughStatus
       ? productStock.stock - order.orderQuantity
       : productStock.stock;
