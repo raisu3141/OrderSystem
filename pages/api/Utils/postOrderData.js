@@ -7,8 +7,8 @@ import orderSorting from "./orderSorting";
 import { storeWaitTimeAdder2 } from "./storeWaitTimeAdder";
 
 export default async function handler(req, res) {
-  const client = await connectToDatabase(); // データベースに接続
-  const session = await client.startSession(); // セッションを開始
+  const client = await connectToDatabase();
+  const session = await client.startSession();
 
   // トランザクションのオプションを設定
   const transactionOptions = {
@@ -80,18 +80,21 @@ export default async function handler(req, res) {
       const newTicketNumber = await TicketManagement.findOneAndUpdate(
         { name: "ticketNumber" },
         { $set: { ticketNumber: lastTicketNumber ? lastTicketNumber.ticketNumber + 1 : 1 } },
+        { $set: { ticketNumber: lastTicketNumber ? lastTicketNumber.ticketNumber + 1 : 1 } },
         { session }
       );
-      console.log("newTicketNumber", newTicketNumber);
 
       return res.status(400).json({
+        message: "注文に失敗しました。重複するデータがあります",
         message: "注文に失敗しました。重複するデータがあります",
         error: `{ ${Object.keys(error.keyValue)[0]}: ${Object.values(error.keyValue)[0]} } が重複しています`,
       });
 
     } else {
       // 想定外のエラー
+      // 想定外のエラー
       return res.status(500).json({
+        message: "サーバーエラーが発生しました。再度お試しください。",
         message: "サーバーエラーが発生しました。再度お試しください。",
         error: error.message,
       });
@@ -103,7 +106,7 @@ export default async function handler(req, res) {
   }
 }
 
-// 注文商品の在庫が足りてるかチェックする関数
+// checkStock 関数などもエラーハンドリングを強化
 const checkStock = async (orderList, session) => {
 
   // すべての商品の在庫が十分かチェック
@@ -127,7 +130,7 @@ const checkStock = async (orderList, session) => {
         stockEnoughStatus,
       };
     });
-
+    
     return stockStatusList;
   } catch (error) {
     console.error("在庫確認中にエラーが発生しました:", error.message);
@@ -135,7 +138,6 @@ const checkStock = async (orderList, session) => {
   }
 };
 
-// 在庫・売上個数を更新し、注文データを返す関数
 const processOrder = async (orderList, clientName, session) => {
   try {
     // 在庫と売上個数を更新
