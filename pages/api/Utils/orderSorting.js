@@ -18,7 +18,7 @@ export default async function orderSorting(orderId, session){
         //注文の受け取り
         const orders = await orderData.findById(orderId, "_id orderList")
         .populate([
-            {path: "orderList.storeId", select: "storeName", session}
+            {path: "orderList.storeId", select: "storeName",  options: { session } }
         ]).session(session);
 
 
@@ -65,22 +65,23 @@ export default async function orderSorting(orderId, session){
             await allStoreOrder.save({ session });
         }
 
-        const waitTimes = {};
-            const finishCookStatus = {};
-            for (const data of cleaneData){
-                waitTimes[data.storeId] = data.waitTime + addWaitTime;
-                const stores = await StoreData.findById(data.storeId, "storeName");
-                finishCookStatus[stores.storeName + "_orders"] = false;
-            };
+        // const waitTimes = {};
+        const finishCookStatus = {};
+        for (const data of cleaneData){
+            // waitTimes[data.storeId] = data.waitTime;
+            const stores = await StoreData.findById(data.storeId, "storeName");
+            finishCookStatus[stores.storeName + "_orders"] = false;
+        };
 
-            const updatedStatus = await OrderData.findOneAndUpdate(
-                {_id: orderId}, 
-                { 
-                    waitTime: waitTimes,
-                    finishCook: finishCookStatus
-                }, 
-                {new: true }
-            );
+        console.log(orderId);
+        const updatedStatus = await orderData.findOneAndUpdate(
+            {_id: orderId}, 
+            { 
+                // waitTime: waitTimes,
+                finishCook: finishCookStatus
+            }, 
+            {new: true, session }
+        );
         
         if (!updatedStatus) {
             return { success: false, message: 'Status not found' };
