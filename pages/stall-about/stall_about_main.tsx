@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import styles from '../../styles/Stallabout.module.css';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
+import Header from '../../components/header'
 
 export interface PRODUCT {
     _id: string;
@@ -131,9 +132,7 @@ const StallAboutMain = () => {
 
     return (
         <div>
-            <header className={styles.header}>
-                <div className={styles.logo}>NANCA</div>
-            </header>
+            <Header />
             <main>
                 <h1 className={styles.heading}>
                     屋台概要
