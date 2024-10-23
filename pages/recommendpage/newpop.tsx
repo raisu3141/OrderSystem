@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import Header from '../../components/header';
 import Styles from '../../styles/Home.module.css';
 import Image from 'next/image';
-import teststyle from '../../styles/recommend.module.css';
 
 // items インターフェースをAPIレスポンスに合わせて変更
 interface items {
