@@ -12,7 +12,7 @@ const GoldHolizonLine = (props: PropsType) => {
       backgroundColor: "#e6b422",
     } as CSSProperties;
   
-    return <div style={props.style ? props.style : defaultStyle}></div>;
+    return <div style={props.style ? props.style : defaultStyle} />;
   };
 
 export default GoldHolizonLine;

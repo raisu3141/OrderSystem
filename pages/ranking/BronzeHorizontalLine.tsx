@@ -13,7 +13,7 @@ interface PropsType {
       backgroundColor: "#8c4841",
     } as CSSProperties;
   
-    return <div style={props.style ? props.style : defaultStyle}></div>;
+    return <div style={props.style ? props.style : defaultStyle} />;
   };
 
 
