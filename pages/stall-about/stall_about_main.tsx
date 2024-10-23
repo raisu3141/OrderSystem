@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styles from '../../styles/Stallabout.module.css';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 
 export interface PRODUCT {
     _id: string;
@@ -161,7 +162,16 @@ const StallAboutMain = () => {
                     ) : (
                         filteredStalls.map(stall => (
                             <div key={stall._id} className={styles.stallCard} onClick={() => handleStallClick(stall._id)}>
-                                <img src={stall.storeImageUrl} alt={stall.storeName} className={styles.stallImage} />                                
+                                {/* <img src={stall.storeImageUrl} alt={stall.storeName} className={styles.stallImage} />*/}
+                                <div className={styles.imageContainer}>
+                                    <Image
+                                        src={stall.storeImageUrl || "/placeholder.jpg"}
+                                        alt={stall.storeName}
+                                        layout="fill"
+                                        objectFit="cover"
+                                        className={styles.stallImage}                                    
+                                    />
+                                </div>
                                 <h2>{stall.storeName}</h2>
                             </div>
                         ))
@@ -194,7 +204,16 @@ const StallAboutMain = () => {
                                     屋台画像をアップロードしてください:
                                     <input type="file" name="stallImage" className={styles.uploadInput} onChange={handleImageUpload} />
                                     {uploadedImage ? (
-                                        <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />                                        
+                                        // <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />   
+                                        <div className={styles.imageContainer}>
+                                            <Image
+                                                src={uploadedImage || "/placeholder.jpg"}
+                                                alt="Uploaded"
+                                                layout="fill"
+                                                objectFit="cover"
+                                                className={styles.uploadedImage}
+                                            />  
+                                        </div>                                   
                                     ) : (
                                         <div className={styles.placeholderBox}>ファイルを選択</div>
                                     )}

@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import styles from '../../styles/Stallabout.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import Image from 'next/image';
 
 export interface PRODUCT {
   _id: string;
@@ -338,7 +339,16 @@ const StallMenuContents = () => {
                 className={`${styles.stallCard} ${selectedProductIds.includes(product._id) ? styles.selectedCard : ''}`}
                 onClick={() => handleSelectProduct(product._id)}
               >
-                <img src={product.productImageUrl} alt={product.productName} className={styles.stallImage} />
+                {/* <img src={product.productImageUrl} alt={product.productName} className={styles.stallImage} /> */}
+                <div className={styles.imageContainer}>
+                  <Image
+                    src={product.productImageUrl}
+                    alt={product.productName}
+                    layout="fill"
+                    objectFit="cover"
+                    className={styles.stallImage}
+                  />
+                </div>
     
                 <h2>{product.productName}</h2>
                 <p>値段: {product.price}円</p>
@@ -363,7 +373,16 @@ const StallMenuContents = () => {
                   商品画像をアップロード:
                   <input type="file" name="menuImage" className={styles.uploadInput} onChange={handleImageUpload} />
                   {uploadedImage ? (
-                    <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />
+                    // <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />
+                    <div className={styles.imageContainer}>
+                    <Image
+                      src={uploadedImage}
+                      alt="Uploaded"
+                      layout="fill"
+                      objectFit="cover"
+                      className={styles.uploadedImage}
+                    />
+                    </div>
                   ) : (
                     <div className={styles.placeholderBox}>ファイルを選択</div>
                   )}
