@@ -1,46 +1,50 @@
 import { useState, useEffect } from 'react';
 import styles from '../../styles/Stallabout.module.css';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
+
+export interface PRODUCT {
+    _id: string;
+    storeId: string;
+    productName: string;
+    productImageUrl: string;
+    price: number;
+    cookTime: number;
+    stock: number;
+    soldCount: number;
+}
+
+export interface STORE {
+    _id: string;
+    storeName: string;
+    storeImageUrl: string;
+    productList: PRODUCT[];
+    storeWaitTime: number;
+    openDay: number;
+    storeOrder: string;
+}
 
 const StallAboutMain = () => {
     const [showForm, setShowForm] = useState(false);
     const [selectedDay, setSelectedDay] = useState(1);
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [stallName, setStallName] = useState('');  // 屋台名
-    const [stalls, setStalls] = useState<any[]>([]);  // 作成された屋台リストを保持
+    const [stalls, setStalls] = useState<STORE[]>([]);  // 作成された屋台リストを保持
     const router = useRouter();
-
-    const saveStallData = async (stallData: any) => {
-        try {
-            const response = await fetch('/api/StoreData/setter/createSTORE_DATA', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(stallData),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to save stall data');
-            }
-
-            const result = await response.json();
-            return result._id;  // 保存された屋台のIDを返す
-        } catch (error: any) {
-            alert(`保存中にエラーが発生しました: ${error.message}`);
-            console.error('Error saving stall data:', error);
-            return null;  // エラーが発生した場合、nullを返して保存しない
-        }
-    };
 
     const fetchStalls = async () => {
         try {
             const response = await fetch('/api/StoreData/getter/getAllSTORES_DATA');
-            const result = await response.json();
+            if (!response.ok) {
+                throw new Error('Failed to fetch stalls');
+            }
+            const result: STORE[] = await response.json();
             setStalls(result);
-        } catch (error: any) {
-            alert(`屋台データ取得中にエラーが発生しました: ${error.message}`);
-            console.error('Error fetching stalls:', error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                alert(`屋台データ取得中にエラーが発生しました: ${error.message}`);
+                console.error('Error fetching stalls:', error);
+            }
         }
     };
 
@@ -102,18 +106,21 @@ const StallAboutMain = () => {
             // データベースに成功して保存された場合のみ、屋台リストに追加
             setStalls(prev => [
                 ...prev,
-                { _id: result._id, storeName: stallName, Image: uploadedImage, openDay: selectedDay }
+                { _id: result._id, storeName: stallName, storeImageUrl: uploadedImage || '', productList: [], storeWaitTime: 0, openDay: selectedDay, storeOrder: result.storeOrder }
             ]);
 
             // 新規屋台の画像がすぐに表示されるようにするため、強制的に再読み込みを実行
             fetchStalls();
-
+    
             handleCloseForm();  // フォームを閉じる
-        } catch (error: any) {
-            alert(`保存中にエラーが発生しました: ${error.message}`);
-            console.error('Error saving stall data:', error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                alert(`保存中にエラーが発生しました: ${error.message}`);
+                console.error('Error saving stall data:', error);
+            }
         }
     };
+    
 
     const handleStallClick = (stallId: string) => {
         router.push(`/stall-about/${stallId}`);
@@ -155,7 +162,16 @@ const StallAboutMain = () => {
                     ) : (
                         filteredStalls.map(stall => (
                             <div key={stall._id} className={styles.stallCard} onClick={() => handleStallClick(stall._id)}>
-                                <img src={stall.storeImageUrl} alt={stall.storeName} className={styles.stallImage} />
+                                {/* <img src={stall.storeImageUrl} alt={stall.storeName} className={styles.stallImage} />*/}
+                                <div className={styles.imageContainer}>
+                                    <Image
+                                        src={stall.storeImageUrl || "/placeholder.jpg"}
+                                        alt={stall.storeName}
+                                        layout="fill"
+                                        objectFit="cover"
+                                        className={styles.stallImage}                                    
+                                    />
+                                </div>
                                 <h2>{stall.storeName}</h2>
                             </div>
                         ))
@@ -188,7 +204,16 @@ const StallAboutMain = () => {
                                     屋台画像をアップロードしてください:
                                     <input type="file" name="stallImage" className={styles.uploadInput} onChange={handleImageUpload} />
                                     {uploadedImage ? (
-                                        <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />
+                                        // <img src={uploadedImage} alt="Uploaded" className={styles.uploadedImage} />   
+                                        <div className={styles.imageContainer}>
+                                            <Image
+                                                src={uploadedImage || "/placeholder.jpg"}
+                                                alt="Uploaded"
+                                                layout="fill"
+                                                objectFit="cover"
+                                                className={styles.uploadedImage}
+                                            />  
+                                        </div>                                   
                                     ) : (
                                         <div className={styles.placeholderBox}>ファイルを選択</div>
                                     )}

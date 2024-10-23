@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb');
+import { MongoClient } from 'mongodb';
 
 async function monitorChanges(req, res) {
     const storeName = req.query; // フロントから送られたコレクション名を取得

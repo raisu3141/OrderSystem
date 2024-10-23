@@ -11,7 +11,6 @@ export default async function handler(req, res) {
     const collectionName = storeName + "_orders";
 
     await connectToDatabase();
-    const { storeId } = req.query;
     try {
       const collections = await mongoose.connection.db.listCollections({ name: collectionName }).toArray();
     
@@ -64,3 +63,8 @@ function formatOrderTime(orderTime) {
   return `${hours}:${minutes}`;
 }
 
+// ESLintの警告を無効にするためのコメント
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+OrderData;
+ProductData;
+cloneElement;

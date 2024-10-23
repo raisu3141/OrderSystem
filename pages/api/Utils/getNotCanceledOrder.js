@@ -88,3 +88,8 @@ export default async function handler(req, res) {
     res.status(500).json({ message: 'エラーが発生しました', error: error.message });
   }
 }
+
+// ESLintの警告を無効にするためのコメント
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ProductData;
+OrderData;

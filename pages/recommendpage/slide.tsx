@@ -1,29 +1,67 @@
+import { useState, useEffect } from 'react';
 import Image from 'next/image'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Navigation, Pagination, Autoplay } from 'swiper/modules'
+import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
+import teststyle from '../../styles/recommend.module.css'
 
 interface items {
-  id: number;
-  stall: string;
-  name: string;
+  storeName: string;
+  productName: string;
+  productImageUrl: string;
   price: number;
-  image: string;
 }
 
 const testitems: items[] = [
-  {id: 1, stall: '屋台1', name: '商品1', price: 300, image: '/images/yatai1.png'},
-  {id: 2, stall: '屋台2', name: '商品2', price: 200, image: '/images/yatai1.png'},
-  {id: 3, stall: '屋台3', name: '商品3', price: 100, image: '/images/yatai1.png'},
-  {id: 4, stall: '屋台4', name: '商品4', price: 3100, image: '/images/yatai1.png'},
+  {storeName: '屋台1', productName: 'product1', price: 300, productImageUrl: '/images/yatai1.png'},
+  {storeName: '屋台2', productName: 'p2', price: 200, productImageUrl: '/images/yatai1.png'},
+  {storeName: '屋台3', productName: 'p3', price: 100, productImageUrl: '/images/yatai1.png'},
+  {storeName: '屋台4', productName: 'p4', price: 3100, productImageUrl: '/images/yatai1.png'},
 ]
 
-const Slider = () => {
+export function Slider(){
+
+  const [stallData, setStallData] = useState<items[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchRecommendData();
+
+    const fetchIntervalId = setInterval(() => {
+      fetchRecommendData();
+    }, 10000); // 10秒ごとに変更
+
+    return () => {
+      clearInterval(fetchIntervalId);
+    };  
+  }, [stallData.length]);
+
+  const fetchRecommendData = async () => {
+    try {
+      const response = await fetch('/api/Utils/getStoreRecommend', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const result = await response.json();
+      setStallData(result);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching stall data:', error);
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <p>Loading...</p>;  // データがロード中の表示
+  }
+
   return (
-    <div>
-      <h1 className='font-semibold text-5xl text-center mt-10'>recommendation</h1>
+    <div className='bg-blue-900 w-screen h-screen'>
+      <Image src='/images/recommendtitle.png' width={500} height={200} alt='recommend'/>
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         slidesPerView={2} //一度に表示するスライドの数
@@ -39,18 +77,17 @@ const Slider = () => {
         {testitems.map((src: items, index: number) => {
           return (
             <SwiperSlide key={`${index}`} className="mt-10">
-              <div className='grid justify-items-center'>
+              {/*<div className='grid justify-items-center'>
                 <div className="
-                  border 
+                  border
+                  border-blue-200
+                  bg-white 
                   rounded-lg
-                  shadow-md
-                  hover:shadow-lg
-                  transition-shadow
-                  duration-300 
+                  shadow-lg
                   relative
                   grid"
                   >
-                  <Image src={src.image} width={540} height={400} alt="test_image" />
+                  <Image src={src.productImageUrl} width={540} height={400} alt={src.productName} />
                   <div>
                     <div className='
                       absolute
@@ -58,9 +95,9 @@ const Slider = () => {
                       font-semibold 
                       text-5xl 
                       bg-gray-100 
-                      bg-opacity-100'
+                      bg-opacity-75'
                       >
-                      {src.stall}
+                      {src.storeName}
                     </div>
                     <div className='
                       absolute
@@ -69,13 +106,47 @@ const Slider = () => {
                       font-semibold 
                       text-5xl 
                       bg-gray-100 
-                      bg-opacity-100'
+                      bg-opacity-75'
                       >
-                      {src.name} &yen;{src.price}
+                      {src.productName} &yen;{src.price}
                     </div>
                   </div>
                 </div>
+              </div>*/}
+              <div className=" 
+                    flex justify-center items-center" >
+                  <div className="w-540 h-400 
+                    flex justify-center items-center 
+                    text-sky-200 
+                    border-2 rounded-lg border-sky-200 
+                    shadow-[0_0_2px_#fff,inset_0_0_2px_#fff,0_0_5px_#08f,0_0_15px_#08f,0_0_30px_#08f]">
+                <div
+                className={`flex  items-center justify-center  rounded-lg relative p-10`}>
+                <div className={`${teststyle.neonborder} relative bg-white rounded-lg`}>
+                  <Image
+                    src={src.productImageUrl}
+                    //layout="fill"  // 画像が親要素にフィットするように設定
+                    width={300}
+                    height={300}
+                    //objectFit="cover"  // アスペクト比を保ちながら表示
+                    alt={src.productName}
+                    className="rounded-lg"
+                  />
+                </div>
+                <div className={`${teststyle.neontext} mt-4 text-center text-white pl-14`}>  {/* テキストを中央に配置 */}
+                  <div className={`font-semibold`}>
+                    {src.storeName}
+                  </div>
+                  <div className={`font-bold mt-1`}>
+                    {src.productName}
+                  </div>
+                  <div className={` text-3xl font-extrabold mt-2`}>
+                    &yen;  {src.price}
+                  </div>
+                </div>
               </div>
+              </div>
+    </div>
             </SwiperSlide>
           )
         })}

@@ -1,11 +1,12 @@
-import { useState, useEffect, use } from "react";
+import { useState, } from "react";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import Styles from '../../styles/orderInput.module.css';
 import { CartItem } from '../../lib/types';
 import OrderCompleted from "./OrderCompleted";
-import { set } from "mongoose";
+
+import Image from "next/image"; // next/imageをインポート
 
 interface OrderConfirmationProps {
   cart: CartItem[];
@@ -154,10 +155,17 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
                     <div className="flex items-center justify-between space-x-4 mb-3">
                       <div className="flex items-center space-x-4">
                         <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
-                          <img
+                          {/* <img
                             src={item.productImageUrl}
                             alt={item.productName}
                             className="w-12 h-12 object-cover"
+                          /> */}
+                          <Image
+                            src={item.productImageUrl}
+                            alt={item.productName}
+                            width={48}  // w-12相当
+                            height={48}
+                            className="object-cover"
                           />
                         </div>
                         <div className="flex flex-col">
@@ -211,3 +219,4 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
     </>
   );
 }
+

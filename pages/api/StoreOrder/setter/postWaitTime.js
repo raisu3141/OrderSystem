@@ -2,7 +2,7 @@
 
 //このファイルは基本的に使わない！機能をstoreWaitTimeAdderに統合しているから!一応残しているだけ！
 
-import StoreOrder from '../../models/StoreOrder';
+import StoreOrder from '../../../../models/StoreOrder';
 import { storeWaitTimeAdder } from '../../Utils/storeWaitTimeAdder';
 
 export default async function handler(req, res) {

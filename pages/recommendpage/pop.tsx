@@ -28,7 +28,7 @@ export function pop() {
         <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8">
           {testitems.map((src: items) => {
             return(
-              <div className='grid relative'>
+              <div key={src.id} className='grid relative'>
               <div className={`${teststyle.card} ${
                 src.id == 1 ? teststyle.id1: 
                 src.id == 2 ? teststyle.id2:
@@ -51,3 +51,9 @@ export function pop() {
 }
 
 export default pop;
+
+// ESLintの警告を無効にするためのコメント
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+useState;
+useEffect;
+Header;

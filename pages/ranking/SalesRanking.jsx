@@ -27,15 +27,15 @@ function SalesRanking() {
     }
   };
 
-  // 10分ごとのAPI再取得のロジック
-  const startAutoRefresh = () => {
-    setTimeout(() => {
-      fetchSalesData(); // 10分後にAPIを再取得
-      startAutoRefresh(); // 再び10分後に実行
-    }, 10 * 60 * 1000); // 10分間隔でAPIを再取得
-  };
-
   useEffect(() => {
+    // 10分ごとのAPI再取得のロジック
+    const startAutoRefresh = () => {
+      setTimeout(() => {
+        fetchSalesData(); // 10分後にAPIを再取得
+        startAutoRefresh(); // 再び10分後に実行
+      }, 10 * 60 * 1000); // 10分間隔でAPIを再取得
+    };
+
     fetchSalesData(); // 初回マウント時にAPIからデータ取得
     startAutoRefresh(); // 10分ごとにAPIを再取得するタイマーを開始
   }, []);

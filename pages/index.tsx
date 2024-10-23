@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div
-      className={`grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
+      className='grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]'
     >
       <h1 className="text-4xl font-bold">
         Rootのページだよ！
@@ -26,6 +26,12 @@ export default function Home() {
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
         >
           注文入力ページ！！
+        </Link>
+        <Link
+          href="/stall-about/stall_about_main"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+        >
+          屋台概要ページ！！
         </Link>
         <Link
           href="/ordercancel/cancelpage"
