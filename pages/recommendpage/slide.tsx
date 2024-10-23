@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Navigation, Pagination, Autoplay } from 'swiper/modules'
+import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
@@ -156,7 +156,3 @@ export function Slider(){
 }
 
 export default Slider
-
-// ESLintの警告を無効にするためのコメント
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-SwiperCore;
