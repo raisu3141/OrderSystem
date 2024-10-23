@@ -27,6 +27,12 @@ export default function Home() {
         >
           注文入力ページ！！
         </Link>
+        <Link
+          href="/stall-about/stall_about_main"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+        >
+          屋台概要ページ！！
+        </Link>
       </div>
     </div>
   );

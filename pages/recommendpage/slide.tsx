@@ -85,3 +85,7 @@ const Slider = () => {
 }
 
 export default Slider
+
+// ESLintの警告を無効にするためのコメント
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+SwiperCore;

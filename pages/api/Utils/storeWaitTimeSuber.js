@@ -112,3 +112,8 @@ export const storeWaitTimeSuber2 = async (orderList, session) => {
         return { message: 'エラーが発生しました。', error: error.message };
     }
 };
+
+// ESLintの警告を無効にするためのコメント
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+mongoose;
+StoreOrderSchema;

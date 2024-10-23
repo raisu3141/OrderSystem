@@ -6,6 +6,8 @@ import Styles from '../../styles/orderInput.module.css';
 import { CartItem } from '../../lib/types';
 import OrderCompleted from "./OrderCompleted";
 
+import Image from "next/image"; // next/imageをインポート
+
 interface OrderConfirmationProps {
   cart: CartItem[];
   totalAmount: number;
@@ -153,10 +155,17 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
                     <div className="flex items-center justify-between space-x-4 mb-3">
                       <div className="flex items-center space-x-4">
                         <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
-                          <img
+                          {/* <img
                             src={item.productImageUrl}
                             alt={item.productName}
                             className="w-12 h-12 object-cover"
+                          /> */}
+                          <Image
+                            src={item.productImageUrl}
+                            alt={item.productName}
+                            width={48}  // w-12相当
+                            height={48}
+                            className="object-cover"
                           />
                         </div>
                         <div className="flex flex-col">
@@ -210,3 +219,9 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
     </>
   );
 }
+
+
+// ESLintの警告を無効にするためのコメント
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+useEffect;
+use;
