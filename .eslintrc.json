@@ -3,6 +3,8 @@
   "rules": {
     "no-unused-expressions": "off",
     "@typescript-eslint/no-unused-expressions": "off",
+    "no-unused-vars": "off",
+    "@typescript-script/no-unused-vars": "off",
     "react/jsx-no-useless-fragment": "warn",
     "react/jsx-curly-brace-presence": ["warn", { "props": "never", "children": "never" }],
     "react/self-closing-comp": ["warn", {
