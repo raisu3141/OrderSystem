@@ -5,8 +5,7 @@ import Styles from '../../styles/orderInput.module.css';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import { StoreList, CartItem, Product } from '../../lib/types';
 import Cart from '../../components/orderinput/ProductCart';
-import { ProductList } from '../../components/orderinput/productlist';
-import { set } from 'mongoose';
+import { ProductList } from '../../components/orderinput/ProductList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
 
 
@@ -122,8 +121,3 @@ export function OrderPage() {
 }
 
 export default OrderPage;
-
-// ESLintの警告を無効にするためのコメント
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-use;
-set;
