@@ -35,11 +35,11 @@ async function fetchNotCanceledOrders() {
 
 export default function OrderCancellation() {
   const [orders, setOrders] = useState<Order[]>([])
-  const [searchTicketNumber, setSearchTicketNumber] = useState<number>()
+  const [searchTicketNumber, setSearchTicketNumber] = useState("")
   const [searchCustomerName, setSearchCustomerName] = useState("")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const [confirmTicketNumber, setConfirmTicketNumber] = useState<number>()
+  const [confirmTicketNumber, setConfirmTicketNumber] = useState("")
   const [confirmCustomerName, setConfirmCustomerName] = useState("")
 
   useEffect(() => {
@@ -52,11 +52,11 @@ export default function OrderCancellation() {
 
   // 検索機能
   const filteredOrders = orders.filter(order =>
-    order.ticketNumber.toString().includes(searchTicketNumber?.toString() ?? '') &&
+    order.ticketNumber.toString().includes(searchTicketNumber.toLowerCase()) &&
     order.clientName.toLowerCase().includes(searchCustomerName.toLowerCase())
   )
 
-  // キャンセルボタンのハンドラー
+
   const handleCancelClick = (order: Order) => {
     setSelectedOrder(order)
     setIsDialogOpen(true)
@@ -65,13 +65,34 @@ export default function OrderCancellation() {
   // キャンセル確認
   const handleConfirmCancel = () => {
     if (selectedOrder &&
-      confirmTicketNumber === selectedOrder.ticketNumber &&
-      confirmCustomerName === selectedOrder.clientName) {
-      setOrders(orders.filter(order => order.ticketNumber !== selectedOrder.ticketNumber))
+      confirmTicketNumber.trim() === selectedOrder.ticketNumber.toString().trim() &&
+      confirmCustomerName.trim().toLowerCase() === selectedOrder.clientName.trim().toLowerCase()) {
+      cancelOrder(selectedOrder.ticketNumber)
       setIsDialogOpen(false)
       setSelectedOrder(null)
-      setConfirmTicketNumber(undefined)
+      setConfirmTicketNumber("")
       setConfirmCustomerName("")
+    }
+  }
+
+  const cancelOrder = async (ticketNumber: number) => {
+
+    try {
+      const response = await fetch('/api/Utils/cancelOrder', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ticketNumber })
+      });
+
+      if (response.ok) {
+        console.log('Order canceled:', ticketNumber);
+        setOrders(orders.filter(order => order.ticketNumber !== ticketNumber))
+      }
+
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -89,7 +110,7 @@ export default function OrderCancellation() {
           <Input
             placeholder="注文番号で検索"
             value={searchTicketNumber}
-            onChange={(e) => setSearchTicketNumber(Number(e.target.value))}
+            onChange={(e) => setSearchTicketNumber(e.target.value)}
           />
           <Input
             placeholder="注文者名で検索"
@@ -153,7 +174,7 @@ export default function OrderCancellation() {
                 <Input
                   id="confirmTicketNumber"
                   value={confirmTicketNumber}
-                  onChange={(e) => setConfirmTicketNumber(Number(e.target.value))}
+                  onChange={(e) => setConfirmTicketNumber(e.target.value)}
                   className="col-span-3"
                 />
               </div>
@@ -176,7 +197,7 @@ export default function OrderCancellation() {
               <Button
                 variant="destructive"
                 onClick={handleConfirmCancel}
-                disabled={!selectedOrder || confirmTicketNumber !== selectedOrder.ticketNumber || confirmCustomerName !== selectedOrder.clientName}
+                disabled={!selectedOrder || confirmTicketNumber !== selectedOrder.ticketNumber.toString() || confirmCustomerName !== selectedOrder.clientName}
               >
                 注文をキャンセルする
               </Button>
