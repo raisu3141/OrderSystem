@@ -5,11 +5,10 @@ import { useQuery, useMutation, useQueryClient } from 'react-query'
 import { Button } from '../../components/ui/button'
 import { Card, CardContent } from '../../components/ui/ticketcard'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { Toaster, toast } from 'react-hot-toast'
 
 import styles from '../../components/ordermanege/orderticket.module.css'
-import { all } from 'axios'
 
 const LoadingOverlay = () => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -340,9 +339,3 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
     </div>
   )
 }
-
-
-// ESLintの警告を無効にするためのコメント
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-AlertCircle;
-all;

@@ -437,3 +437,15 @@
   outline: none; /* ブラウザのデフォルトのアウトラインを消す */
   box-shadow: 0 0 5px rgba(81, 203, 238, 1); /* フォーカス時の影を追加 */
 }
+
+.imageContainer {
+  position: relative;
+  width: 100%;   /* カードの幅に合わせる */
+  height: 200px; /* カードの高さに合わせる */
+  overflow: hidden;  /* 画像が親要素からはみ出ないようにする */
+}
+
+.uploadedImage {
+  object-fit: cover; /* 画像を親要素にフィットさせる */
+  border-radius: 5px; /* 必要に応じて画像に丸みを持たせる */
+}
