@@ -24,13 +24,13 @@ const testitems: items[] = [
 export function Slider(){
 
   const [stallData, setStallData] = useState<items[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    //fetchRecommendData();
+    fetchRecommendData();
 
     const fetchIntervalId = setInterval(() => {
-      //fetchRecommendData();
+      fetchRecommendData();
     }, 10000); // 10秒ごとに変更
 
     return () => {
