@@ -57,7 +57,7 @@ function SalesRanking() {
               <div className = {styles.rankfontsize}>1位</div >
               <Image
                 className={styles.itemscontainer}
-                src={state.rankings[0].productImageUrl} // APIから取得した1位の商品の画像URL
+                src={state.rankings[0].productImageUrl || 'fallback-image-url.jpg'} // APIから取得した1位の商品の画像URL
                 alt="1位の商品画像"
                   width={175}
                   height={175}
@@ -75,7 +75,7 @@ function SalesRanking() {
               />
               <div className = {styles.rankfontsize}>2位</div>
               <Image className = {styles.itemscontainer}
-                   src={state.rankings[1].productImageUrl} // APIから取得した2位の商品の画像URL
+                   src={state.rankings[1].productImageUrl || 'fallback-image-url.jpg'} // APIから取得した2位の商品の画像URL
                   alt="商品の画像"
               />
               <div className={styles.itemmrgin}>{state.rankings[1].productName}</div> {/* 2位の商品名 */}
@@ -93,7 +93,7 @@ function SalesRanking() {
               />
               <div className = {styles.rankfontsize}>3位</div >
               <Image className = {styles.itemscontainer}
-                  src={state.rankings[2].productImageUrl} // APIから取得した3位の商品の画像URL
+                  src={state.rankings[2].productImageUrl || 'fallback-image-url.jpg'} // APIから取得した3位の商品の画像URL
                   alt="商品の画像"
                   width={175}
                   height={175}
