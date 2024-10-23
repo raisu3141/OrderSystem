@@ -4,6 +4,7 @@ import styles from '../../styles/Stallabout.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
+import Header from '../../components/header'
 
 export interface PRODUCT {
   _id: string;
@@ -318,9 +319,7 @@ const StallMenuContents = () => {
 
   return (
     <div>
-      <header className={styles.header}>
-        <div className={styles.logo}>NANCA</div>
-      </header>
+      <Header />
       <main>
         <h1 className={styles.heading}>
           <div className={styles.leftContainer}>
