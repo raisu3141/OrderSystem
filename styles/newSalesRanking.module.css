@@ -1,0 +1,77 @@
+.pageContainer {
+    padding: 20px;
+    background-color: #f9f9f9;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .title {
+    font-size: 2em;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .time {
+    font-size: 1.2em;
+    color: #666;
+  }
+  
+  .rankingContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+  }
+  
+  .rankingItem {
+    text-align: center;
+    margin: 10px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    transition: transform 0.3s;
+  }
+  
+  .rankingItem:hover {
+    transform: scale(1.05);
+  }
+  
+  .crownImage {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .rank {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  .productImage {
+    width: 250px; /* 大きさを調整 */
+    height: 250px; /* 大きさを調整 */
+    border-radius: 8px;
+  }
+  
+  .productName {
+    font-size: 1.2em;
+    margin-top: 10px;
+  }
+  
+  .storeName {
+    font-size: 1em;
+    color: #555;
+  }
+  
+  .divider {
+    width: 10px; /* スペーサーの幅 */
+    height: 100%; /* スペーサーの高さ */
+    background-color: #ddd; /* スペーサーの色 */
+  }
+  
