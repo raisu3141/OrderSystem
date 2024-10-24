@@ -7,7 +7,7 @@ export default function Home() {
   // 屋台概要ページに飛ぶ際のパスワード確認
   const handleStallPageClick = () => {
     const password = prompt("パスワードを入力してください:");
-    if (password === "1234") {
+    if (password === "cisco") {
       localStorage.setItem("authenticated", "true"); // 認証済みを保存
       router.push("/stall-about/stall_about_main");
     } else {
