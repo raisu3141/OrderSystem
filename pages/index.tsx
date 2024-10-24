@@ -39,6 +39,12 @@ export default function Home() {
         >
           cancelページ！！
         </Link>
+        <Link
+          href="/showcompleted/showcompletedpage"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+          >
+          マックのやつ
+        </Link>
       </div>
     </div>
   );

@@ -60,7 +60,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
   };
 
   const { data: allOrders, isLoading: isLoadingAll, error: errorAll, refetch } = useQuery(
-    ['orders', storeName, 'all'],
+    ['orders', storeName],
     () => fetchOrders(storeName),
     { 
       staleTime: Infinity,
