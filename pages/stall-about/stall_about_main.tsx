@@ -222,7 +222,7 @@ const StallAboutMain = () => {
                                                 className={styles.uploadedImage}
                                             />
                                         ) : (
-                                            <div className={styles.placeholderBox}></div>
+                                            <div className={styles.placeholderBox} />
                                         )}
                                     </div>
                                 </label>
