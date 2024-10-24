@@ -6,12 +6,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "../../components/ui/label"
 import Head from 'next/head';
 import Header from '../../components/header';
+import { Loader2 } from 'lucide-react';
+import { set } from 'mongoose'
+
+const LoadingOverlay = () => (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <Loader2 className="animate-spin text-white w-16 h-16" />
+  </div>
+)
+
 
 interface Order {
   ticketNumber: number;
   clientName: string;
   totalAmount: number;
-  orderList: { productId: string, orderQuantity: number, productName: string ,price: number }[];
+  orderList: { productId: string, orderQuantity: number, productName: string, price: number }[];
 }
 
 async function fetchNotCanceledOrders() {
@@ -29,6 +38,7 @@ async function fetchNotCanceledOrders() {
   } catch (error) {
     console.error(error);
     console.log('データとれてないよ');
+    (<p>データ取得に失敗しました</p>)
     return [];
   }
 }
@@ -41,11 +51,16 @@ export default function OrderCancellation() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [confirmTicketNumber, setConfirmTicketNumber] = useState("")
   const [confirmCustomerName, setConfirmCustomerName] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false)
+  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false)
 
   useEffect(() => {
     const loadOrders = async () => {
+      setIsLoading(true);
       const orders = await fetchNotCanceledOrders();
       setOrders(orders);
+      setIsLoading(false);
     }
     loadOrders();
   }, []);
@@ -67,11 +82,10 @@ export default function OrderCancellation() {
     if (selectedOrder &&
       confirmTicketNumber.trim() === selectedOrder.ticketNumber.toString().trim() &&
       confirmCustomerName.trim().toLowerCase() === selectedOrder.clientName.trim().toLowerCase()) {
-      cancelOrder(selectedOrder.ticketNumber)
       setIsDialogOpen(false)
-      setSelectedOrder(null)
       setConfirmTicketNumber("")
       setConfirmCustomerName("")
+      setIsCancelDialogOpen(true)
     }
   }
 
@@ -88,7 +102,12 @@ export default function OrderCancellation() {
 
       if (response.ok) {
         console.log('Order canceled:', ticketNumber);
+        setIsLoading(false);
+        handleConfirmCancel()
         setOrders(orders.filter(order => order.ticketNumber !== ticketNumber))
+      } else {
+        setIsLoading(false);
+        setIsErrorDialogOpen(true)
       }
 
     } catch (error) {
@@ -102,7 +121,7 @@ export default function OrderCancellation() {
         <title>注文キャンセル</title>
       </Head>
       <Header />
-      <div className= 'flex flex-col justify-start items-center min-h-screen'>
+      <div className='flex flex-col justify-start items-center min-h-screen'>
         <h1 className="text-2xl font-bold m-4">注文キャンセル</h1>
 
         {/* 検索欄 */}
@@ -196,7 +215,12 @@ export default function OrderCancellation() {
               </Button>
               <Button
                 variant="destructive"
-                onClick={handleConfirmCancel}
+                onClick={() => {
+                  if (selectedOrder?.ticketNumber !== undefined) {
+                    cancelOrder(selectedOrder.ticketNumber);
+                    setIsLoading(true);
+                  }
+                }}
                 disabled={!selectedOrder || confirmTicketNumber !== selectedOrder.ticketNumber.toString() || confirmCustomerName !== selectedOrder.clientName}
               >
                 注文をキャンセルする
@@ -204,6 +228,51 @@ export default function OrderCancellation() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* キャンセル完了ダイアログ */}
+        <Dialog open={isCancelDialogOpen} onOpenChange={setIsCancelDialogOpen}>
+          <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[80vh] max-h-[80vh]">
+            <DialogTitle className="text-5xl font-semibold">キャンセル完了</DialogTitle>
+            <div className="w-full h-full flex flex-col items-center text-2xl mt-12">
+              <p>整理券番号</p>
+              <p className="text-9xl font-semibold mt-5">{selectedOrder?.ticketNumber}</p>
+              <p className="mt-8">{selectedOrder?.clientName}様</p>
+              <p className="mt-14">注文がキャンセルされました</p>
+            </div>
+            {/* 閉じる */}
+            <Button
+              className="w-[50%] mt-4"
+              onClick={() => {
+                setIsCancelDialogOpen(false)
+                setSelectedOrder(null)
+              }}
+            >
+              閉じる
+            </Button>
+          </DialogContent>
+        </Dialog>
+
+        {/* エラーダイアログ */}
+        <Dialog open={isErrorDialogOpen} onOpenChange={setIsErrorDialogOpen}>
+          <DialogContent className="bg-white flex flex-col items-center w-[50vw] max-w-[1200px] h-[50vh] max-h-[80vh]">
+            <DialogTitle className="text-3xl font-semibold">キャンセルエラー</DialogTitle>
+            <div className="w-full h-full flex flex-col items-center text-2xl mt-12">
+              <p className="mt-14">キャンセルできませんでした</p>
+              <p>再度送信お願いします</p>
+            </div>
+            {/* 閉じる */}
+            <Button
+              className="w-[50%] mt-4"
+              onClick={() => {
+                setIsErrorDialogOpen(false)
+              }}
+            >
+              閉じる
+            </Button>
+          </DialogContent>
+        </Dialog>
+
+        {isLoading && <LoadingOverlay />}
       </div>
     </div>
   )
