@@ -34,7 +34,7 @@ export default async function handler(req, res) {
   try {
     // 新しいProductDataを保存
     if (req.body.cookTime) {
-      req.body.cookTime = req.body.cookTime * 1000;
+      req.body.cookTime = req.body.cookTime * 1000 * 60;
     }
     else{
       return res.status(401).json({ success: false, message: 'Error cookTime edit'});
