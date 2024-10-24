@@ -1,7 +1,9 @@
 // pages/api/Utils/storeWaitTimeSuber.js
+import mongoose from 'mongoose';
 import connectToDatabase from '../../../lib/mongoose';
 import ProductData from '../../../models/ProductData';
 import StoreData from '../../../models/StoreData';
+import StoreOrderSchema from '../../../models/StoreOrder';
 
 export default async function handler(req, res) {
     if (req.method === 'POST') {
@@ -49,3 +51,69 @@ export const storeWaitTimeSuber = async (req, res) => {
         return res.status(500).json({ message: 'エラーが発生しました' });
     }
 }
+
+export const storeWaitTimeSuber2 = async (orderList, session) => {
+    await connectToDatabase();
+    try {
+        const storeWaitTimes = {};
+
+        // 注文リストを処理する
+        for (const order of orderList) {
+            const { productId, storeId, orderQuantity } = order;
+
+            try {
+                const product = await ProductData.findById(productId).session(session);
+                const store = await StoreData.findById(storeId).session(session);
+
+                if (!product || !store) {
+                    console.error(`商品または屋台が見つかりませんでした。productId: ${productId}, storeId: ${storeId}`);
+                    return { message: '商品または屋台が見つかりませんでした。' };
+                }
+
+                // 調理時間を個数に応じて計算
+                const subTime = product.cookTime * orderQuantity;
+                storeWaitTimes[storeId] = (storeWaitTimes[storeId] || store.storeWaitTime) - subTime;
+
+            } catch (findError) {
+                console.error(`Error fetching product or store: ${findError.message}`);
+                return { message: `商品または屋台の取得中にエラーが発生しました。`, error: findError.message };
+            }
+        }
+
+        // 各屋台の待ち時間をデータベースに一括更新
+        await Promise.all(
+            Object.keys(storeWaitTimes).map(async (storeId) => {
+                try {
+                    const store = await StoreData.findById(storeId).session(session);
+                    if (store) {
+                        store.storeWaitTime = storeWaitTimes[storeId];
+                        try {
+                            await store.save({ session });
+                        } catch (saveError) {
+                            console.error(`Error saving store ${storeId}:`, saveError);
+                            return { message: '待ち時間の保存中にエラーが発生しました。', error: saveError.message };
+                        }
+                    } else {
+                        console.error(`Store with storeId ${storeId} not found`);
+                        return { message: `Store with storeId ${storeId} not found` };
+                    }
+                } catch (findStoreError) {
+                    console.error(`Error finding store ${storeId}: ${findStoreError.message}`);
+                    return { message: `屋台の取得中にエラーが発生しました。`, error: findStoreError.message };
+                }
+            })
+        );
+
+        console.log("storeWaitTimes", storeWaitTimes);
+        return { storeWaitTimes };
+
+    } catch (error) {
+        console.error(`全体の処理中にエラーが発生しました: ${error.message}`);
+        return { message: 'エラーが発生しました。', error: error.message };
+    }
+};
+
+// ESLintの警告を無効にするためのコメント
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+mongoose;
+StoreOrderSchema;

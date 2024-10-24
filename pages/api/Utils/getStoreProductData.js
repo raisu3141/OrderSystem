@@ -8,9 +8,7 @@ export default async function handler(req, res) {
   try {
     // StoreDataモデルを使用してクエリを実行し、productList を populate
     const storeProducts = await StoreData.find({}, 'storeName productList openDay')
-      .populate('productList', 'productName productImageUrl price stock')
-      .then((storeProduct) => { return storeProduct })
-      .catch((error) => { return error });
+      .populate('productList', 'productName productImageUrl price stock');
 
     // フロントに渡せるようにフォーマット
     const formattedStoreProducts = storeProducts.map((storeProduct) => ({
@@ -18,7 +16,7 @@ export default async function handler(req, res) {
       storeName: storeProduct.storeName,
       productList: storeProduct.productList.map((product) => ({
         productId: product._id,
-        productName: product.ProductName,
+        productName: product.productName,
         productImageUrl: product.productImageUrl,
         price: product.price,
         stock: product.stock,

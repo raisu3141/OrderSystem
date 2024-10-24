@@ -13,6 +13,6 @@ export default async function handler(req, res) {
     const stores = await StoreData.find({ openDay: openDay });
     res.status(200).json(stores);
   } catch (error) {
-    res.status(400).json({ success: false });
+    res.status(400).json({ success: false, error: error.message });
   }
 }

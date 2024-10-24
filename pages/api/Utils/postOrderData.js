@@ -3,13 +3,14 @@ import connectToDatabase from "../../../lib/mongoose";
 import OrderData from "../../../models/OrderData";
 import ProductData from "../../../models/ProductData";
 import TicketManagement from "../../../models/TicketManagement";
-// import "./orderSorting"; (もとき実装中)
+import orderSorting from "./orderSorting";
+import { storeWaitTimeAdder2 } from "./storeWaitTimeAdder";
 
 export default async function handler(req, res) {
-  const client = await connectToDatabase(); // データベースに接続
-  const session = await client.startSession(); // セッションを開始
+  const client = await connectToDatabase();
+  const session = await client.startSession();
 
-  // トランザクションを開始
+  // トランザクションのオプションを設定
   const transactionOptions = {
     readPreference: 'primary',
     readConcern: { level: 'local' },
@@ -17,159 +18,184 @@ export default async function handler(req, res) {
   };
 
   try {
+    // トランザクション開始前に、ドキュメントがなければ追加
+    await TicketManagement.findOneAndUpdate(
+      { name: "ticketNumber" },
+      {},
+      { new: true, upsert: true, session }
+    );
 
+    let result;
+    let stockStatusList;
+    await session.withTransaction(async () => {
+      console.log("start transaction");
 
-      // 各商品の在庫が足りているか確認
-      const stockStatusList = await checkStock(req.body.orderList, session);
+      // 在庫確認
+      stockStatusList = await checkStock(req.body.orderList, session);
 
-      // 在庫不足があるか確認
+      if (!stockStatusList) {
+        throw new Error("在庫確認に失敗しました");
+      }
+
       const allStocksEnoughStatus = stockStatusList.every(
         (stockStatus) => stockStatus.stockEnoughStatus
       );
 
-      // 在庫不足の場合はエラーレスポンスを返す
       if (!allStocksEnoughStatus) {
-        return res.status(400).json({
-          message: "在庫が不足しています",
-          stockStatusList,
-        });
+        throw new Error("在庫が不足しています");
       }
 
-    // トランザクションを開始
-    await session.withTransaction(async () => {
-      console.log("startTransaction");
-
-      // 注文処理を実行
-      console.log("Start processOrder");
-      const result = await processOrder(
-        req.body.orderList,
-        req.body.clientName,
-        session
-      );
-      console.log("End processOrder");
-
-      // 成功レスポンスを返す
-      res.status(200).json({
-        ticketNumber: result.ticketNumber,
-        clientName: result.clientName,
-        stockStatusList,
-      });
+      // 注文処理
+      console.log("start processOrder");
+      result = await processOrder(req.body.orderList, req.body.clientName, session);
+      if (!result) {
+        throw new Error("注文処理に失敗しました");
+      }
     }, transactionOptions);
-  } catch (error) {
-    console.error(error.message);
+    console.log("commit transaction");
 
-    if (error.code === 11000) {
-      // 整理券番号をリセット
+    // 正常終了時のレスポンス
+    res.status(200).json({
+      ticketNumber: result.ticketNumber,
+      clientName: result.clientName,
+      stockStatusList,
+    });
+
+  } catch (error) {
+    console.error("Error occurred:", error.message, error.stack);
+
+    // エラーメッセージに基づいて異なるレスポンスを返す
+    if (error.message.includes("在庫が不足しています")) {
+      return res.status(400).json({ message: error.message });
+
+    } else if (error.message === "Status not found") {  // 注文の仕分けに失敗しました
+      return res.status(404).json({ message: error.message });
+
+    } else if (error.code === 11000) {  // 整理券番号の重複エラー
       const lastTicketNumber = await OrderData.findOne({}, "ticketNumber")
         .sort({ ticketNumber: -1 })
         .session(session);
+      console.log("lastTicketNumber", lastTicketNumber);
+      
       const newTicketNumber = await TicketManagement.findOneAndUpdate(
         { name: "ticketNumber" },
-        { $set: { ticketNumber: lastTicketNumber ? lastTicketNumber.ticketNumber + 1 : 1} },
+        { $set: { ticketNumber: lastTicketNumber ? lastTicketNumber.ticketNumber + 1 : 1 } },
+        { $set: { ticketNumber: lastTicketNumber ? lastTicketNumber.ticketNumber + 1 : 1 } },
         { session }
       );
-      console.log(newTicketNumber);
 
       return res.status(400).json({
-        message: "注文に失敗しました",
+        message: "注文に失敗しました。重複するデータがあります",
+        message: "注文に失敗しました。重複するデータがあります",
         error: `{ ${Object.keys(error.keyValue)[0]}: ${Object.values(error.keyValue)[0]} } が重複しています`,
       });
+
     } else {
+      // 想定外のエラー
+      // 想定外のエラー
       return res.status(500).json({
-        message: "注文に失敗しました",
+        message: "サーバーエラーが発生しました。再度お試しください。",
+        message: "サーバーエラーが発生しました。再度お試しください。",
         error: error.message,
       });
     }
 
   } finally {
-    session.endSession(); // セッションを終了
-    console.log("endSession");
+    session.endSession();
+    console.log("end session");
   }
 }
 
-// 在庫・売上個数を更新し、注文データを返す関数
-const processOrder = async (orderList, clientName, session) => {
+// checkStock 関数などもエラーハンドリングを強化
+const checkStock = async (orderList, session) => {
 
-  // 在庫と売上個数を更新
-  const updateStockQuery = orderList.map((order) =>
-    ProductData.updateMany(
-      { _id: order.productId },
-      { $inc: { stock: -order.orderQuantity, soldCount: order.orderQuantity } },
-      { session }
-    )
-  );
-  console.log("zaiko update mae");
-  await Promise.all(updateStockQuery);
-  console.log("zaiko update ato");
+  // すべての商品の在庫が十分かチェック
+  try {
+    const allProductStocks = await ProductData.find({}, "stock").session(session);
+    const stockStatusList = allProductStocks.map((productStock) => {
+      const order = orderList.find(
+        (order) => order.productId === productStock._id.toString()
+      );
+      const stockEnoughStatus = order
+        ? productStock.stock >= order.orderQuantity
+        : true;
 
-  // 整理券番号を生成
-  const newTicketNumber = await generateTicketNumber(session);
+      const stock = order && stockEnoughStatus
+        ? productStock.stock - order.orderQuantity
+        : productStock.stock;
 
-  // LineUserIdの生成 (uniqueエラー回避のため)
-  let newLineUserId = newTicketNumber !== 1
-    ? "LineUserId" + newTicketNumber
-    : "LineUserId1";
-  
-  // 注文データを保存
-  const newOrderData = new OrderData({
-    ticketNumber: newTicketNumber,
-    lineUserId: newLineUserId,
-    clientName,
-    orderList,
-  });
-
-  console.log("save mae");
-  await newOrderData.save({ session });
-  console.log("save ato");
-
-
-  // 屋台ごとに注文商品をソート (もとき実装中)
-  // await orderSorting(result.orderId, session);
-
-  // 注文IDの取得
-  const orderId = newOrderData._id;
-
-  console.log("return processOrder");
-  return {
-    ticketNumber: newTicketNumber,
-    orderId,
-  };
+      return {
+        productId: productStock._id,
+        stock,
+        stockEnoughStatus,
+      };
+    });
+    
+    return stockStatusList;
+  } catch (error) {
+    console.error("在庫確認中にエラーが発生しました:", error.message);
+    throw new Error("在庫確認に失敗しました");
+  }
 };
 
-// 注文商品の在庫が足りてるかチェックする関数
-const checkStock = async (orderList, session) => {
-  // すべての商品の在庫が十分かチェック
-  const allProductStocks = await ProductData.find({}, "stock").session(session);
-  const stockStatusList = allProductStocks.map((productStock) => {
-    const order = orderList.find(
-      (order) => order.productId === productStock._id.toString()
+const processOrder = async (orderList, clientName, session) => {
+  try {
+    // 在庫と売上個数を更新
+    const updateStockQuery = orderList.map((order) =>
+      ProductData.updateMany(
+        { _id: order.productId },
+        { $inc: { stock: -order.orderQuantity, soldCount: order.orderQuantity } },
+        { session }
+      )
     );
-    const stockEnoughStatus = order
-      ? productStock.stock >= order.orderQuantity
-      : true;
+
+    console.log("before stock update");
+    await Promise.all(updateStockQuery);
+    console.log("after stock update");
+
+    // 整理券番号を生成
+    const newTicketNumber = await generateTicketNumber(session);
+
+    // 待ち時間を計算
+    const storeWaitTime = await storeWaitTimeAdder2(orderList, session);
+
+    // 注文データを保存
+    const newOrderData = new OrderData({
+      ticketNumber: newTicketNumber,
+      clientName,
+      orderList,
+      waitTime: storeWaitTime,
+    });
+    console.log("before order post");
+    await newOrderData.save({ session });
+    console.log("after order post");
+
+    // 注文データを仕分け
+    const orderId = newOrderData._id;
+    const orderResult = await orderSorting(orderId, session);
     
-    const stock = order && stockEnoughStatus
-      ? productStock.stock - order.orderQuantity
-      : productStock.stock;
+    if (!orderResult.success) {
+      throw new Error(orderResult.message);
+    }
 
+    console.log("return precessOrder");
     return {
-      productId: productStock._id,
-      stock,
-      stockEnoughStatus,
+      ticketNumber: newTicketNumber,
     };
-  });
-
-  return stockStatusList;
-}
+  } catch (error) {
+    console.error("注文処理中にエラーが発生しました:", error.message);
+    throw new Error("注文処理に失敗しました");
+  }
+};
 
 // 整理券番号を生成する関数
 const generateTicketNumber = async (session) => {
   const ticketNumberDoc = await TicketManagement.findOneAndUpdate(
     { name: "ticketNumber" }, // 検索条件
-    { 
+    {
       $inc: { ticketNumber: 1 }, // 存在すれば `ticketNumber` をインクリメント
     },
-    { 
+    {
       new: true, // 更新後のドキュメントを返す
       upsert: true, // ドキュメントがなければ新規作成
       session,

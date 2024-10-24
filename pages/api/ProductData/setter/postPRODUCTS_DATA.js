@@ -33,6 +33,13 @@ export default async function handler(req, res) {
   let productID;  // productIDをスコープの外で宣言
   try {
     // 新しいProductDataを保存
+    if (req.body.cookTime) {
+      req.body.cookTime = req.body.cookTime * 1000 * 60;
+    }
+    else{
+      return res.status(401).json({ success: false, message: 'Error cookTime edit'});
+    }
+
     const Product = new ProductData(req.body);
     await Product.save();
     
