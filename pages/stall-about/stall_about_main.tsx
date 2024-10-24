@@ -1,8 +1,15 @@
 import { useState, useEffect } from 'react';
 import styles from '../../styles/Stallabout.module.css';
 import { useRouter } from 'next/router';
+import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Header from '../../components/header'
+
+const LoadingOverlay = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <Loader2 className="animate-spin text-white w-16 h-16" />
+    </div>
+);
 
 export interface PRODUCT {
     _id: string;
@@ -31,9 +38,12 @@ const StallAboutMain = () => {
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
     const [stallName, setStallName] = useState('');  // 屋台名
     const [stalls, setStalls] = useState<STORE[]>([]);  // 作成された屋台リストを保持
+    const [loading, setLoading] = useState(false);  // ローディング状態の追加
+    const [formSubmitting, setFormSubmitting] = useState(false);  // フォーム送信中のローディング状態
     const router = useRouter();
 
     const fetchStalls = async () => {
+        setLoading(true);
         try {
             const response = await fetch('/api/StoreData/getter/getAllSTORES_DATA');
             if (!response.ok) {
@@ -46,6 +56,8 @@ const StallAboutMain = () => {
                 alert(`屋台データ取得中にエラーが発生しました: ${error.message}`);
                 console.error('Error fetching stalls:', error);
             }
+        } finally {
+            setLoading(false);  // データフェッチ終了後にローディングを終了
         }
     };
 
@@ -78,6 +90,7 @@ const StallAboutMain = () => {
 
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();  // デフォルトのフォーム送信動作を無効化
+        setFormSubmitting(true);
     
         const formData = new FormData();
         formData.append('storeName', stallName);  // 入力された屋台名
@@ -89,6 +102,7 @@ const StallAboutMain = () => {
             formData.append('image', imageFile);
         } else {
             alert("画像が選択されていません。");
+            setFormSubmitting(false);
             return;  // 画像がない場合、処理を中断してデータベースに追加しない
         }
     
@@ -119,6 +133,8 @@ const StallAboutMain = () => {
                 alert(`保存中にエラーが発生しました: ${error.message}`);
                 console.error('Error saving stall data:', error);
             }
+        } finally {
+            setFormSubmitting(false);  // フォーム送信完了後にローディングを終了
         }
     };
     
@@ -132,6 +148,7 @@ const StallAboutMain = () => {
 
     return (
         <div>
+            {loading && <LoadingOverlay />}
             <Header />
             <main>
                 <h1 className={styles.heading}>
@@ -241,6 +258,7 @@ const StallAboutMain = () => {
                         </div>
                     </div>
                 )}
+                {formSubmitting && <LoadingOverlay />}
             </main>
         </div>
     );
