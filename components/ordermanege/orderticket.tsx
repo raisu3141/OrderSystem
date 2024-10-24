@@ -154,6 +154,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
           position: 'top-right',
           duration: 3000,
         });
+        queryClient.invalidateQueries('orders');
       },
     }
   )

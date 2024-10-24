@@ -8,7 +8,7 @@ import { toast, Toaster } from 'react-hot-toast'
 
 interface CompletedOrder {
   stallName: string;
-  orderNumbers: string[];
+  orderNumbers: string[] | null; // Allow null in case of error
 }
 
 // APIから全ての屋台を取得する関数
@@ -36,21 +36,26 @@ export default function CompletedOrders() {
 
   const { data: stalls, isLoading: isLoadingStalls, error: stallsError } = useQuery('stalls', getAllStore)
 
-  const { data: orders, isLoading: isLoadingOrders, error: ordersError, refetch } = useQuery(
+  const { isLoading: isLoadingOrders, refetch } = useQuery(
     ['orders', stalls],
     async () => {
       if (!stalls) return []
       const orders = await Promise.all(
         stalls.map(async (stall) => {
-          const orderNumbers = await getCookTrueAndGetFalse(stall)
-          return { stallName: stall, orderNumbers }
+          try {
+            const orderNumbers = await getCookTrueAndGetFalse(stall)
+            return { stallName: stall, orderNumbers }
+          } catch (error) {
+            toast.error(`${stall}の注文データ取得に失敗しました`)
+            return { stallName: stall, orderNumbers: null } // Set null for stalls with errors
+          }
         })
       )
       return orders
     },
     {
       enabled: !!stalls,
-      onSuccess: (data) => setCompletedOrders(data)
+      onSuccess: (data) => setCompletedOrders(data),
     }
   )
 
@@ -69,15 +74,20 @@ export default function CompletedOrders() {
     return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin" /></div>
   }
 
-  if (stallsError || ordersError) {
-    return <div className="text-red-500 items-center">エラーが発生しました。再度お試しください。</div>
+  if (stallsError) {
+    return <div className="text-red-500 items-center">屋台データの取得に失敗しました。再度お試しください。</div>
   }
+
 
   return (
     <div className="container mx-auto p-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {completedOrders.map((order) => (
-          <StallCard key={order.stallName} stallName={order.stallName} orderNumbers={order.orderNumbers} />
+          order.orderNumbers ? (
+            <StallCard key={order.stallName} stallName={order.stallName} orderNumbers={order.orderNumbers} />
+          ) : (
+            <></>
+          )
         ))}
       </div>
       <Toaster />

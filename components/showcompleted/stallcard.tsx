@@ -6,6 +6,20 @@ interface StallCardProps {
 }
 
 export function StallCard({ stallName, orderNumbers }: StallCardProps) {
+
+  if (orderNumbers.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>{stallName}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-gray-400">お呼び出し中の注文がありません</div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card className="w-full">
       <CardHeader>
