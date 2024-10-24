@@ -38,6 +38,7 @@ async function fetchNotCanceledOrders() {
   } catch (error) {
     console.error(error);
     console.log('データとれてないよ');
+    (<p>データ取得に失敗しました</p>)
     return [];
   }
 }
