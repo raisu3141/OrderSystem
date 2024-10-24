@@ -5,6 +5,8 @@ import GoldHolizonLine from './GoldHolizonLine.tsx';
 import SilverHolizonLine from './SilverHolizonLine.tsx'; 
 import BronzeHorizontalLine from './BronzeHorizontalLine.tsx'; 
 import axios from 'axios'; 
+import { useRouter } from 'next/router';  // 追加: useRouterのインポート
+
  
 const initialState = { 
   rankings: [], // ランキングデータを保存する配列 
@@ -13,6 +15,7 @@ const initialState = {
  
 function SalesRanking() { 
   const [state, setState] = useState(initialState); 
+  const router = useRouter();  // ページ遷移用のルーター
  
   // API呼び出し: 商品情報と時刻を取得 
   const fetchSalesData = async () => { 
@@ -26,17 +29,24 @@ function SalesRanking() {
   }; 
  
   useEffect(() => { 
-    // 10分ごとのAPI再取得のロジック 
-    const startAutoRefresh = () => { 
-      setTimeout(() => { 
-        fetchSalesData(); // 10分後にAPIを再取得 
-        startAutoRefresh(); // 再び10分後に実行 
-      }, 10 * 60 * 1000); // 10分間隔でAPIを再取得 
-    }; 
- 
-    fetchSalesData(); // 初回マウント時にAPIからデータ取得 
-    startAutoRefresh(); // 10分ごとにAPIを再取得するタイマーを開始 
+    // 10分ごとのAPI再取得のロジック
+    fetchSalesData(); // 初回マウント時にAPIからデータ取得
+
+    const intervalId = setInterval(() => {
+      fetchSalesData(); // 10分ごとにAPIを再取得
+    }, 10 * 60 * 1000); // 10分間隔
+    
+
+    return () => clearInterval(intervalId); // コンポーネントがアンマウントされる際にタイマーをクリーンアップ
   }, []); 
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      router.push('/recommendpage/newpop'); // 60秒後にページ遷移
+    }, 60000); // 60秒 = 60000ms
+
+    return () => clearTimeout(timeoutId); // コンポーネントがアンマウントされる際にタイマーをクリア
+  }, [router]);
  
   const renderRankingItem = (ranking, index) => {
     // ランキングデータが存在するか確認し、存在しない場合にフォールバックを適用
@@ -54,7 +64,7 @@ function SalesRanking() {
         <div className={styles.rankfontsize}>{index + 1}位</div>
         <Image 
           className={styles.itemscontainer} 
-          src={ranking.productImageUrl || 'fallback-image-url.jpg'} // 画像URLがない場合フォールバック 
+          src={ranking.productImageUrl || '/images/fallback-image-url.jpg'} // 画像URLがない場合フォールバック
           alt={`${index + 1}位の商品画像`} 
           width={175} 
           height={175} 

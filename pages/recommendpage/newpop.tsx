@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Styles from '../../styles/Home.module.css';
 import Image from 'next/image';
+import { useRouter } from "next/router";
 
 // items インターフェースをAPIレスポンスに合わせて変更
 interface items {
@@ -10,7 +11,22 @@ interface items {
   productImageUrl: string;
 }
 
-export function Pop() {
+const Pop = () => {
+  const [isClient, setIsClient] = useState(false);  // クライアントサイドかどうかを判定するための状態
+  const router = useRouter();
+
+  useEffect(() => {
+    setIsClient(typeof window !== "undefined");
+
+    if (isClient) {
+      const timer = setTimeout(() => {
+        router.push("/ranking/SalesRanking"); // 1分後にランキングページへ遷移
+      }, 60000); // 60秒
+
+      return () => clearTimeout(timer); // クリーンアップ
+    }
+  }, [isClient, router]);
+
   const [stallData, setStallData] = useState<items[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState(0);  // 大きく表示する屋台のインデックス
@@ -24,12 +40,12 @@ export function Pop() {
 
     const fetchIntervalId = setInterval(() => {
       fetchRecommendData();
-    }, 10000); // 10秒ごとに変更
+    }, 10000); // 10秒ごとにデータ更新
 
     return () => {
       clearInterval(activeIntervalId);
       clearInterval(fetchIntervalId);
-    };  
+    };
   }, [stallData.length]);
 
   const fetchRecommendData = async () => {
@@ -100,6 +116,6 @@ export function Pop() {
       </div>
     </div>
   );
-}
+};
 
 export default Pop;
