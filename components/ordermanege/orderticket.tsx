@@ -9,47 +9,14 @@ import { Loader2 } from 'lucide-react'
 import { Toaster, toast } from 'react-hot-toast'
 
 import styles from '../../components/ordermanege/orderticket.module.css'
+import { fetchOrders } from '../Utils/fetchstoreorder';
+import type { Order } from '../../types/ordermanage';
 
 const LoadingOverlay = () => (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <Loader2 className="animate-spin text-white w-16 h-16" />
   </div>
 )
-
-interface OrderList {
-  productId: string;
-  productName: string;
-  orderQuantity: number;
-}
-
-interface Order {
-  clientName: string;
-  cookStatus: boolean;
-  cancelStatus: boolean;
-  getStatus: boolean;
-  orderId: string;
-  orderList: OrderList[];
-  ticketNumber: number;
-  orderTime: string;
-}
-
-async function fetchOrders(storeName: string, status: 'preparing' | 'ready' | 'all', isSSE: boolean, isCancelUpdate: boolean): Promise<Order[]> {
-  const response = await fetch(`/api/StoreOrder/getter/getOrders?storeName=${storeName}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch orders');
-  }
-  const data: Order[] = await response.json();
-  
-  if (isSSE) {
-    console.log('SSEによる更新:', data);
-  } else if (isCancelUpdate) {
-    console.log('キャンセルによる更新:', data);
-  } else {
-    console.log('通常の取得:', data);
-  }
-
-  return data;
-}
 
 interface OrderticketProps {
   storeName: string;
@@ -94,7 +61,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
 
   const { data: allOrders, isLoading: isLoadingAll, error: errorAll, refetch } = useQuery(
     ['orders', storeName, 'all'],
-    () => fetchOrders(storeName, 'all', isSSERef.current, isCancelUpdateRef.current),
+    () => fetchOrders(storeName),
     { 
       staleTime: Infinity,
       cacheTime: Infinity,
