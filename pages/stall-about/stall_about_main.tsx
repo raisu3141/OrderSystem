@@ -33,6 +33,7 @@ export interface STORE {
 }
 
 const StallAboutMain = () => {
+    const [authenticated, setAuthenticated] = useState(false); // 認証状態
     const [showForm, setShowForm] = useState(false);
     const [selectedDay, setSelectedDay] = useState(1);
     const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -41,6 +42,16 @@ const StallAboutMain = () => {
     const [loading, setLoading] = useState(false);  // ローディング状態の追加
     const [formSubmitting, setFormSubmitting] = useState(false);  // フォーム送信中のローディング状態
     const router = useRouter();
+
+    // 認証状態の確認
+    useEffect(() => {
+        const isAuthenticated = localStorage.getItem("authenticated");
+        if (isAuthenticated === "true") {
+            setAuthenticated(true); // 認証済み
+        } else {
+            router.push("/"); // 認証されていない場合はルートページにリダイレクト
+        }
+    }, [router]);
 
     const fetchStalls = async () => {
         setLoading(true);
@@ -62,8 +73,10 @@ const StallAboutMain = () => {
     };
 
     useEffect(() => {
-        fetchStalls();
-    }, []);
+        if (authenticated) {
+            fetchStalls();
+        }
+    }, [authenticated]);
 
     const handleButtonClick = () => {
         setShowForm(!showForm);
@@ -137,7 +150,6 @@ const StallAboutMain = () => {
             setFormSubmitting(false);  // フォーム送信完了後にローディングを終了
         }
     };
-    
 
     const handleStallClick = (stallId: string) => {
         router.push(`/stall-about/${stallId}`);
@@ -145,6 +157,10 @@ const StallAboutMain = () => {
 
     // selectedDayに基づいてフィルタリングする
     const filteredStalls = stalls.filter(stall => stall.openDay === selectedDay);
+
+    if (!authenticated) {
+        return null; // 認証されていない場合は何も表示しない
+    }
 
     return (
         <div>
@@ -178,7 +194,6 @@ const StallAboutMain = () => {
                     ) : (
                         filteredStalls.map(stall => (
                             <div key={stall._id} className={styles.stallCard} onClick={() => handleStallClick(stall._id)}>
-                                {/* <img src={stall.storeImageUrl} alt={stall.storeName} className={styles.stallImage} />*/}
                                 <div className={styles.imageContainer}>
                                     <Image
                                         src={stall.storeImageUrl || "/placeholder.jpg"}
