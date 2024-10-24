@@ -5,6 +5,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import Image from 'next/image';
 import Header from '../../components/header'
+import { Loader2 } from 'lucide-react'; 
+
+const LoadingOverlay = () => (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <Loader2 className="animate-spin text-white w-16 h-16" />
+  </div>
+);
 
 export interface PRODUCT {
   _id: string;
@@ -42,6 +49,8 @@ const StallMenuContents = () => {
   const [isSelecting, setIsSelecting] = useState(false); // 選択状態を管理
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]); // 複数選択された商品ID
   const [selectedProduct, setSelectedProduct] = useState<PRODUCT | null>(null); // 編集するための商品データ
+  const [loading, setLoading] = useState(false);  // データ取得中のローディング状態
+    const [formSubmitting, setFormSubmitting] = useState(false); // フォーム送信中のローディング状態
 
   // stallIdが確実に取得できるまで待つ
   useEffect(() => {
@@ -84,6 +93,7 @@ const StallMenuContents = () => {
   }, [resolvedStallId]);
 
   const fetchStallData = async (stallId: string) => {
+    setLoading(true);
     try {
       const response = await fetch('/api/StoreData/getter/getOneSTORE_DATA', {
         method: 'POST',
@@ -100,6 +110,8 @@ const StallMenuContents = () => {
       setStallData(result);
     } catch (error) {
       console.error('Error fetching stall data:', error);
+    } finally {
+      setLoading(false);  // データフェッチ終了後にローディングを終了
     }
   };
 
@@ -190,6 +202,8 @@ const StallMenuContents = () => {
       return;
     }
 
+    setFormSubmitting(true);
+
     const formData = new FormData();
     formData.append('storeName', stallData!.storeName);
     formData.append('productName', menuName);
@@ -205,6 +219,8 @@ const StallMenuContents = () => {
     } else {
       console.error('No file selected or input element not found');
       alert('商品画像が選択されていません。');
+      setFormSubmitting(false);
+      return;
     }
 
     try {
@@ -230,6 +246,8 @@ const StallMenuContents = () => {
       } else {
         alert('メニューの保存中に予期しないエラーが発生しました。');
       }
+    } finally {
+      setFormSubmitting(false);  // フォーム送信完了後にローディングを終了
     }
   };
 
@@ -247,6 +265,7 @@ const StallMenuContents = () => {
     if (!selectedProduct) {
       console.error('No product selected for update');
       alert('更新する商品が選択されていません。');
+      setFormSubmitting(false);
       return;
     }
 
@@ -257,6 +276,8 @@ const StallMenuContents = () => {
       price: parseFloat(price.toString()),
       cookTime: parseInt(cookTime.toString(), 10),
     };
+
+    setFormSubmitting(true);
 
     try {
       const response = await fetch(`/api/ProductData/setter/updataPRODUCTS_DATA`, {
@@ -306,6 +327,8 @@ const StallMenuContents = () => {
       } else {
         alert('更新中に予期しないエラーが発生しました。');
       }
+    } finally {
+      setFormSubmitting(false);  // フォーム送信完了後にローディングを終了
     }
   };
 
@@ -321,6 +344,7 @@ const StallMenuContents = () => {
     <div>
       <Header />
       <main>
+      {loading && <LoadingOverlay />}
         <h1 className={styles.heading}>
           <div className={styles.leftContainer}>
             <div className={styles.backButton} onClick={() => router.back()}>
@@ -398,7 +422,7 @@ const StallMenuContents = () => {
                         className={styles.uploadedImage}
                       />
                     ) : (
-                      <div className={styles.placeholderBox}></div>
+                      <div className={styles.placeholderBox} />
                     )}
                   </div>
                 </label>
@@ -454,6 +478,7 @@ const StallMenuContents = () => {
             </div>
           </div>
         )}
+        {formSubmitting && <LoadingOverlay />}
 
         {showUpdateForm && (
           <div className={styles.modalOverlay}>
@@ -510,6 +535,7 @@ const StallMenuContents = () => {
             </div>
           </div>
         )}
+        {formSubmitting && <LoadingOverlay />}
       </main>
     </div>
   );
