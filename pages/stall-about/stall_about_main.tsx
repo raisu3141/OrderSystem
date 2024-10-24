@@ -269,6 +269,7 @@ const StallAboutMain = () => {
                                     />
                                 </label>
                                 <button type="submit" className={styles.submitButton}>完了</button>
+                                {formSubmitting && <LoadingOverlay />}
                             </form>
                         </div>
                     </div>

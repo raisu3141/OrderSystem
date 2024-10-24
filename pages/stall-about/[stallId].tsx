@@ -142,7 +142,8 @@ const StallMenuContents = () => {
 
   const handleDeleteSelectedProducts = async () => {
     if (selectedProductIds.length === 0) return;
-
+  
+    setLoading(true); // ローディングを開始
     try {
       await Promise.all(
         selectedProductIds.map(async (productId) => {
@@ -169,8 +170,11 @@ const StallMenuContents = () => {
       setSelectedProductIds([]);
     } catch (error) {
       console.error('Error deleting products:', error);
+    } finally {
+      setLoading(false); // ローディングを終了
     }
   };
+  
 
   const handleCloseForm = () => {
     setShowForm(false);
@@ -474,6 +478,7 @@ const StallMenuContents = () => {
                 <button type="submit" className={styles.submitButton}>
                   完了
                 </button>
+                {formSubmitting && <LoadingOverlay />}
               </form>
             </div>
           </div>
@@ -531,6 +536,7 @@ const StallMenuContents = () => {
                 <button type="submit" className={styles.submitButton}>
                   更新完了
                 </button>
+                {formSubmitting && <LoadingOverlay />}
               </form>
             </div>
           </div>
