@@ -8,7 +8,8 @@ import { cloneElement } from 'react';
 
 export default async function handler(req, res) {
     const { storeName } = req.query;
-    const collectionName = storeName + "_orders";
+    console.log(storeName);
+    const collectionName = storeName.toLowerCase() + "_orders";
 
     await connectToDatabase();
     try {
