@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     }));
 
     const sortFormatData = formatData.sort((a, b) => b.soldCount - a.soldCount);
-    res.status(200).json(sortFormatData);
+    res.status(200).json(sortFormatData.slicer(0, 3));
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: error.message });
