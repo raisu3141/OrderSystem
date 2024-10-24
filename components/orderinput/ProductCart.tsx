@@ -41,20 +41,20 @@ export default function Cart({ cart, onRemove, onQuantityChange }: CartProps) {
                 <div className="flex items-center justify-between space-x-4 mb-3">
                   <div className="flex items-center space-x-4">
                     <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
-                      {/* <img
+                      <img
                         src={item.productImageUrl}
                         alt={item.productName}
                         className="w-12 h-12 object-cover"
-                      /> */}
+                      />
 
                       {/* w-12はTailwind CSSの48ピクセル */}
-                      <Image
+                      {/* <Image
                         src={item.productImageUrl}
                         alt={item.productName}
                         width={48}
                         height={48}
                         className="object-cover"
-                      />
+                      /> */}
                     </div>
                     <div className="flex flex-col">
                       <span className="text-sm font-semibold">{item.productName}</span>
@@ -64,7 +64,7 @@ export default function Cart({ cart, onRemove, onQuantityChange }: CartProps) {
                   <div className="flex flex-col items-end">
                     <Button
                       variant="link"
-                      className="text-gray-500 p-0"
+                      className="text-gray-500 text-xl p-0"
                       onClick={() => handleRemove(item.productId)}
                     >×</Button>
                     <select
