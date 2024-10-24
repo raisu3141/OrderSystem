@@ -6,6 +6,7 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import teststyle from '../../styles/recommend.module.css'
+//import { useQuery } from 'react-query';
 
 interface items {
   storeName: string;
@@ -24,13 +25,13 @@ const testitems: items[] = [
 export function Slider(){
 
   const [stallData, setStallData] = useState<items[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    //fetchRecommendData();
+    fetchRecommendData();
 
     const fetchIntervalId = setInterval(() => {
-      //fetchRecommendData();
+      fetchRecommendData();
     }, 10000); // 10秒ごとに変更
 
     return () => {
@@ -54,14 +55,15 @@ export function Slider(){
       setLoading(false);
     }
   };
-
   if (loading) {
     return <p>Loading...</p>;  // データがロード中の表示
   }
 
   return (
     <div className='bg-blue-900 w-screen h-screen'>
+      <div className='flex justify-center'>
       <Image src='/images/recommendtitle.png' width={500} height={200} alt='recommend'/>
+      </div>
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         slidesPerView={2} //一度に表示するスライドの数
@@ -74,45 +76,9 @@ export function Slider(){
           disableOnInteraction: false,
         }}
         >
-        {testitems.map((src: items, index: number) => {
+        {stallData.map((src: items, index: number) => {
           return (
-            <SwiperSlide key={`${index}`} className="mt-10">
-              {/*<div className='grid justify-items-center'>
-                <div className="
-                  border
-                  border-blue-200
-                  bg-white 
-                  rounded-lg
-                  shadow-lg
-                  relative
-                  grid"
-                  >
-                  <Image src={src.productImageUrl} width={540} height={400} alt={src.productName} />
-                  <div>
-                    <div className='
-                      absolute
-                      top-0
-                      font-semibold 
-                      text-5xl 
-                      bg-gray-100 
-                      bg-opacity-75'
-                      >
-                      {src.storeName}
-                    </div>
-                    <div className='
-                      absolute
-                      bottom-0
-                      right-0
-                      font-semibold 
-                      text-5xl 
-                      bg-gray-100 
-                      bg-opacity-75'
-                      >
-                      {src.productName} &yen;{src.price}
-                    </div>
-                  </div>
-                </div>
-              </div>*/}
+            <SwiperSlide key={`${index}`} className="my-5">
               <div className=" 
                     flex justify-center items-center" >
                   <div className="w-540 h-400 
@@ -134,13 +100,13 @@ export function Slider(){
                   />
                 </div>
                 <div className={`${teststyle.neontext} mt-4 text-center text-white pl-14`}>  {/* テキストを中央に配置 */}
-                  <div className={`font-semibold`}>
+                  <div className={`text-3xl font-semibold pb-8`}>
                     {src.storeName}
                   </div>
-                  <div className={`font-bold mt-1`}>
+                  <div className={`text-4xl font-bold mt-1 pb-8`}>
                     {src.productName}
                   </div>
-                  <div className={` text-3xl font-extrabold mt-2`}>
+                  <div className={`text-5xl font-extrabold mt-2`}>
                     &yen;  {src.price}
                   </div>
                 </div>
