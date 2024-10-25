@@ -110,7 +110,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "pages/ranking/Sales1st.jsx"  ],
   "exclude": [
     "node_modules"
   ],
