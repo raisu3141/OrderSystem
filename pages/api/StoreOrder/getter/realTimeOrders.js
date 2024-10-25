@@ -57,9 +57,15 @@ async function monitorChanges(req, res) {
             }
         });
 
+        // Keep the connection alive by sending a comment every 30 seconds
+        const keepAlive = setInterval(() => {
+            res.write(': keep-alive\n\n');
+        }, 30000);
+
         // クライアントが切断した場合の処理
         req.on('close', () => {
             console.log('Client disconnected');
+            clearInterval(keepAlive);
             changeStream.close(); // 変更ストリームを閉じる
             client.close(); // MongoDBクライアントを閉じる
             res.end(); // 接続を終了
