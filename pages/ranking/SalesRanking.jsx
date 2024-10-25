@@ -5,10 +5,13 @@ import Sales2nd from './Sales2nd';
 import Sales3rd from './Sales3rd';
 import axios from 'axios';
 import Image from 'next/image'
+import { useRouter } from 'next/router';  // 追加: useRouterのインポート
 
 function SalesRanking() {
   const [currentTime, setCurrentTime] = useState('');
   const [data, setData] = useState(null); // APIから取得したデータを保存
+
+  const router = useRouter();  // ページ遷移用のルーター
 
   // API呼び出し: 商品情報と時刻を取得
   const fetchSalesData = async () => {
@@ -37,7 +40,12 @@ function SalesRanking() {
   useEffect(() => {
     fetchSalesData(); // 初回マウント時にAPIからデータ取得
     startAutoRefresh(); // 5分ごとにAPIを再取得するタイマーを開始
-  }, []);
+    const timeoutId = setTimeout(() => {
+      router.push('/recommendpage/slide'); // 60秒後にページ遷移
+    }, 60 * 1000); // 60秒 = 60000ms
+
+    return () => clearTimeout(timeoutId); // コンポーネントがアンマウントされる際にタイマーをクリア
+  }, [router]);
 
   const renderProductRank = (item, index) => {
     switch (item.productRanks) {
