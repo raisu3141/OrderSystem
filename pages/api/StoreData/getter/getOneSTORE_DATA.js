@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     // productListのcookTimeを/1000する
     const updatedProductList = store.productList.map(product => {
       // cookTimeを/1000し、新しいオブジェクトとして返す
-      const updatedCookTime = product.cookTime ? product.cookTime / 1000 / 60 : null;
+      const updatedCookTime = product.cookTime ? product.cookTime / 1000 / 60 : 0;
 
       return {
         ...product.toObject(), // productの元のプロパティを全てコピー

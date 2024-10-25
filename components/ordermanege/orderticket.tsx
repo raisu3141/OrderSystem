@@ -63,8 +63,10 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
     ['orders', storeName],
     () => fetchOrders(storeName),
     { 
-      staleTime: Infinity,
-      cacheTime: Infinity,
+      staleTime: 0,
+      cacheTime: 0,
+      refetchOnMount: true, // マウント時に再フェッチを確実に行う
+      refetchOnWindowFocus: true, // オプション：ウィンドウフォーカス時に再フェッチ
       onSuccess: (newOrders) => {
         const updatedOrders = newOrders.map(newOrder => {
           const previousOrder = previousOrdersRef.current.find(order => order.orderId === newOrder.orderId);

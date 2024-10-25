@@ -1,12 +1,20 @@
-import { useState, } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import Styles from '../../styles/orderInput.module.css';
 import { CartItem } from '../../lib/types';
 import OrderCompleted from "./OrderCompleted";
+import { Loader2 } from 'lucide-react';
 
-import Image from "next/image"; // next/imageをインポート
+// import Image from "next/image"; // next/imageをインポート
+import { set } from "mongoose";
+
+const LoadingOverlay = () => (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <Loader2 className="animate-spin text-white w-16 h-16" />
+  </div>
+)
 
 interface OrderConfirmationProps {
   cart: CartItem[];
@@ -23,6 +31,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
   const [isErrorOpen, setIsErrorOpen] = useState(false);
   const [ticketNumber, setTicketNumber] = useState<number | undefined>();
   const [stockStatusList, setStockStatusList] = useState<{ productId: string, stock: number }[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const PRESET_AMOUNTS = [50, 100, 500, 1000, 5000, 10000];
 
   const resetForm = () => {
@@ -38,15 +47,16 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
 
   const handleNameInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    const katakanaRegex = /^[ァ-ヶー]+$/;
+    const hiraganaRegex = /^[\u3040-\u309Fー]+$/; // ひらがな用の正規表現
 
-    if (katakanaRegex.test(inputValue) || inputValue === '') {
+    if (hiraganaRegex.test(inputValue) || inputValue === '') {
       setClientName(inputValue);
       setErrorMessage('');
     } else {
-      setErrorMessage('お名前はカタカナで入力してください');
+      setErrorMessage('お名前はひらがなで入力してください');
     }
-  }
+  };
+
 
   const handleAmountInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
@@ -57,6 +67,12 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
     setDepositAmount(depositAmount ? depositAmount + value : value);
   }
 
+  const chengeKatakana = (str: string) => {
+    return str.replace(/[\u3040-\u309F]/g, (ch) =>
+      String.fromCharCode(ch.charCodeAt(0) + 0x60)
+    );
+  };
+
   const postOrder = async () => {
     const orderList = cart.map(item => ({
       productId: item.productId,
@@ -65,11 +81,12 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
     }));
 
     const requestBody = {
-      clientName,
+      clientName: clientName ? chengeKatakana(clientName) : "",
       orderList,
     };
 
     try {
+      setIsLoading(true);
       const response = await fetch('/api/Utils/postOrderData', {
         method: 'POST',
         headers: {
@@ -77,7 +94,6 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         },
         body: JSON.stringify(requestBody)
       });
-
       if (response.ok) {
         const responseData = await response.json();
         console.log('Order completed', responseData);
@@ -86,7 +102,6 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         console.log('Stock status list:', stockStatusList);
         setIsOpen(true);
         onClose();
-
       } else {
         console.error('Failed to post order');
         const errorData = await response.json();
@@ -96,20 +111,33 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
     } catch (error) {
       console.error('Error posting order:', error);
       setIsErrorOpen(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const checkStock = () => {
+    // 在庫が10個以下のアイテムを確認
+    const lowStockItems = stockStatusList.filter(
+      (item: { productId: string; stock: number }) => item.stock <= 10
+    );
+    // 在庫が少ない商品がある場合、ページをリロード
+    if (lowStockItems.length > 0) {
+      window.location.reload();
     }
   };
 
   return (
     <>
-      <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[80vh] max-h-[80vh]">
+      <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[85vh] max-h-[80vh] overflow-y-auto">
         <DialogTitle className="text-4xl font-semibold">注文確認</DialogTitle>
         <div className="w-full h-full flex flex-row items-center">
           <div className="w-[50%] h-full flex flex-col items-center">
-            <div className="text-xl font-semibold mt-10"><p>お名前(カタカナ)</p></div>
+            <div className="text-xl font-semibold mt-10"><p>お名前(ひらがな)</p></div>
             <input
               type="text"
               className="w-[70%] h-10 border-2 rounded-md"
-              placeholder="コウセンタロウ"
+              placeholder="こうせんたろう"
               onChange={handleNameInputChange}
             />
             <div className="text-red-500">{errorMessage}</div>
@@ -135,7 +163,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
               ))}
             </div>
 
-            <div className="mt-10">
+            <div className="mt-5">
               <div className="bg-white w-auto h-auto border-2 rounded-md flex flex-col items-center p-4">
                 <div className="text-base font-semibold">
                   <p>ご注文が確定しますと、</p>
@@ -155,18 +183,18 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
                     <div className="flex items-center justify-between space-x-4 mb-3">
                       <div className="flex items-center space-x-4">
                         <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden">
-                          {/* <img
+                          <img
                             src={item.productImageUrl}
                             alt={item.productName}
                             className="w-12 h-12 object-cover"
-                          /> */}
-                          <Image
+                          />
+                          {/* <Image
                             src={item.productImageUrl}
                             alt={item.productName}
                             width={48}  // w-12相当
                             height={48}
                             className="object-cover"
-                          />
+                          /> */}
                         </div>
                         <div className="flex flex-col">
                           <span className="text-sm font-semibold">{item.productName}</span>
@@ -195,15 +223,16 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         <Button
           className="w-[50%] mt-4"
           onClick={() => { postOrder(); }}
-          disabled={!clientName || (depositAmount === undefined || depositAmount < totalAmount)}
+          disabled={!clientName || (depositAmount === undefined || depositAmount < totalAmount) || isLoading} 
         >
           注文
         </Button>
+        {isLoading && <LoadingOverlay />}
       </DialogContent >
 
       {/*注文完了ダイアログを開く  */}
       < Dialog open={isOpen} onOpenChange={setIsOpen} >
-        <OrderCompleted clientName={clientName} ticketNumber={ticketNumber} onClose={() => { setIsOpen(false); resetForm(); }} />
+        <OrderCompleted clientName={clientName} ticketNumber={ticketNumber} onClose={() => { setIsOpen(false); resetForm(); checkStock(); }} />
       </Dialog >
 
       {/* エラーダイアログ */}
@@ -213,9 +242,17 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
           <div className="w-full h-full flex flex-col items-center text-2xl mt-12">
             <p>再度注文お願いします</p>
           </div>
-          <Button className="w-[50%] mt-4" onClick={() => { setIsErrorOpen(false); resetForm() }}>閉じる</Button>
+          <Button
+            className="w-[50%] mt-4"
+            onClick={() => {
+              setIsErrorOpen(false);
+              window.location.reload();
+            }}>
+            閉じる
+          </Button>
         </DialogContent>
-      </Dialog >
+      </Dialog>
+
     </>
   );
 }

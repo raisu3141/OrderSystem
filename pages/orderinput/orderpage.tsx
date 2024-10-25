@@ -7,6 +7,7 @@ import { StoreList, CartItem, Product } from '../../lib/types';
 import Cart from '../../components/orderinput/ProductCart';
 import { ProductList } from '../../components/orderinput/ProductList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import { set } from 'mongoose';
 
 
 async function fetchProductList(): Promise<Product[]> {
@@ -17,7 +18,7 @@ async function fetchProductList(): Promise<Product[]> {
     }
 
     const data: StoreList[] = await response.json();
-    console.log('Fetched product list:', data); // データを出力して確認
+    console.log('Fetched product list:', data);
 
     // 各商品の productList に storeId を追加
     const allProducts: Product[] = data.flatMap(store =>
@@ -28,7 +29,7 @@ async function fetchProductList(): Promise<Product[]> {
       }))
     );
 
-    console.log('All products:', allProducts); // データを出力して確認
+    console.log('All products:', allProducts);
 
     return allProducts;
   } catch (error) {
@@ -39,12 +40,15 @@ async function fetchProductList(): Promise<Product[]> {
 
 export function OrderPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [storeList, setStoreList] = useState<StoreList[]>([]);
   const [productList, setProductList] = useState<Product[]>([]);
+  const [activeTab, setActiveTab] = useState<'0' | '1' | '2'>('0');
 
   useEffect(() => {
     const loadProducts = async () => {
       const products = await fetchProductList();
       setProductList(products);
+      setStoreList(storeList);
     }
     loadProducts();
   }, []);
@@ -84,11 +88,11 @@ export function OrderPage() {
       </Head>
       <Header />
       <div className={`${Styles.maincontainer} flex`}>
-        <Tabs className="flex-1 overflow-auto p-4" defaultValue='0'>
+        <Tabs className="flex-1 overflow-auto p-4" value={activeTab} onValueChange={(value) => setActiveTab(value as '0' | '1' | '2')}>
           <TabsList>
-            <TabsTrigger value="0">すべて</TabsTrigger>
-            <TabsTrigger value="1">1日目</TabsTrigger>
-            <TabsTrigger value="2">2日目</TabsTrigger>
+            <TabsTrigger value="0" className={`text-lg px-4 py-2 ${activeTab === '0' ? 'border-b-2 border-blue-500' : ''} `}>すべて</TabsTrigger>
+            <TabsTrigger value="1" className={`text-lg px-4 py-2 ${activeTab === '1' ? 'border-b-2 border-blue-500' : ''} `}>1日目</TabsTrigger>
+            <TabsTrigger value="2" className={`text-lg px-4 py-2 ${activeTab === '2' ? 'border-b-2 border-blue-500' : ''} `}>2日目</TabsTrigger>
           </TabsList>
           <ScrollArea className="flex-1 overflow-auto p-4">
             <TabsContent value="0">
@@ -96,6 +100,7 @@ export function OrderPage() {
                 {productList.map((product) => (
                   <ProductList key={product.productId} {...product} addToCart={addToCart} />
                 ))}
+
               </div>
             </TabsContent>
             <TabsContent value="1">

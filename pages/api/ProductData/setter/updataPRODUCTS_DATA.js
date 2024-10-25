@@ -10,6 +10,9 @@ export default async function handler(req, res) {
   if (req.body.cookTime) {
     req.body.cookTime = req.body.cookTime * 1000 * 60;
   }
+  else if(req.body.cookTime === 0){
+    req.body.cookTime = 0;
+  }
   else{
     return res.status(401).json({ success: false, message: 'Error cookTime edit'});
   }

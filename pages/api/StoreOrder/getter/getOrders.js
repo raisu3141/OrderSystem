@@ -10,6 +10,7 @@ export default async function handler(req, res) {
     const { storeName } = req.query;
     console.log(storeName);
     const collectionName = storeName.toLowerCase() + "_orders";
+    console.log(collectionName);
 
     await connectToDatabase();
     try {
@@ -48,6 +49,8 @@ export default async function handler(req, res) {
         getStatus: order.getStatus,  
         orderTime: formatOrderTime(order.orderTime),            
       }));
+
+      console.log(formattedOrders);
 
       return res.status(200).json(formattedOrders);
     } catch (error) {

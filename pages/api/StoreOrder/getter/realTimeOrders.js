@@ -52,14 +52,38 @@ async function monitorChanges(req, res) {
                     res.write(`data: ${JSON.stringify({ name: updatedName })}\n\n`);
                     res.flush();
                 }
+                else if (updatedFields && updatedFields.hasOwnProperty('cookStatus')) {
+                    const updatedName = updatedFields.cookStatus;
+                    console.log('Name field was updated:', updatedName);
+                    console.log(change);
+              
+                    // クライアントに変更された特定のフィールドを送信
+                    res.write(`data: ${JSON.stringify({ name: updatedName })}\n\n`);
+                    res.flush();
+                }
+                else if (updatedFields && updatedFields.hasOwnProperty('getStatus')) {
+                    const updatedName = updatedFields.getStatus;
+                    console.log('Name field was updated:', updatedName);
+                    console.log(change);
+              
+                    // クライアントに変更された特定のフィールドを送信
+                    res.write(`data: ${JSON.stringify({ name: updatedName })}\n\n`);
+                    res.flush();
+                }
             } else {
                 console.log('No operationType or unsupported operation');
             }
         });
 
+        // Keep the connection alive by sending a comment every 30 seconds
+        const keepAlive = setInterval(() => {
+            res.write(': keep-alive\n\n');
+        }, 30000);
+
         // クライアントが切断した場合の処理
         req.on('close', () => {
             console.log('Client disconnected');
+            clearInterval(keepAlive);
             changeStream.close(); // 変更ストリームを閉じる
             client.close(); // MongoDBクライアントを閉じる
             res.end(); // 接続を終了
