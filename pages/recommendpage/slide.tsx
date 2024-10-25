@@ -6,6 +6,7 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import teststyle from '../../styles/recommend.module.css'
+import { useRouter } from 'next/router';  // 追加: useRouterのインポート
 
 interface items {
   storeName: string;
@@ -22,6 +23,8 @@ const testitems: items[] = [
 ]
 
 export function Slider(){
+  
+  const router = useRouter();  // ページ遷移用のルーター
 
   const [stallData, setStallData] = useState<items[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,11 +35,21 @@ export function Slider(){
     const fetchIntervalId = setInterval(() => {
       fetchRecommendData();
     }, 10000); // 10秒ごとに変更
+    
+    
 
     return () => {
       clearInterval(fetchIntervalId);
     };  
   }, [stallData.length]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      router.push('/ranking/'); // 60秒後にページ遷移
+    }, 10 * 1000); // 60秒 = 60000ms
+
+    return () => clearTimeout(timeoutId); // コンポーネントがアンマウントされる際にタイマーをクリア
+  }, [router]);
 
   const fetchRecommendData = async () => {
     try {
