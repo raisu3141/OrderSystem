@@ -45,8 +45,8 @@ export function Slider(){
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      router.push('/ranking/'); // 60秒後にページ遷移
-    }, 10 * 1000); // 60秒 = 60000ms
+      router.push('/ranking/SalesRanking'); // 60秒後にページ遷移
+    }, 60 * 1000); // 60秒 = 60000ms
 
     return () => clearTimeout(timeoutId); // コンポーネントがアンマウントされる際にタイマーをクリア
   }, [router]);
@@ -68,7 +68,14 @@ export function Slider(){
     }
   };
   if (loading) {
-    return <p>Loading...</p>;  // データがロード中の表示
+    return (
+      <div className='bg-blue-900 w-screen h-screen' style={{background: "url(/images/recommendbg.png)", backgroundSize: "cover"}}>
+        <div className='flex justify-center'>
+          <Image src='/images/recommendtitle.png' width={500} height={200} alt='recommend'/>
+        </div>
+        <div className={`${teststyle.neontext} text-center text-white text-4xl font-bold mt-1`}>loading...</div>
+      </div>
+    );  // データがロード中の表示
   }
 
   return (
