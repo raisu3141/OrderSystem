@@ -45,8 +45,8 @@ export function Slider(){
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      router.push('/ranking/'); // 60秒後にページ遷移
-    }, 10 * 1000); // 60秒 = 60000ms
+      router.push('/ranking/SalesRanking'); // 60秒後にページ遷移
+    }, 5 * 60 * 1000); // 60秒 = 60000ms
 
     return () => clearTimeout(timeoutId); // コンポーネントがアンマウントされる際にタイマーをクリア
   }, [router]);
