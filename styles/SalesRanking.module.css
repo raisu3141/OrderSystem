@@ -84,4 +84,7 @@
     background-color: #FDF0C4;
     display:flex;
     flex-flow: column;
+    max-height: 768px;
+    height: 100vw;
+
 }

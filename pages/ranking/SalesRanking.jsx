@@ -4,6 +4,7 @@ import Sales1st from './Sales1st';
 import Sales2nd from './Sales2nd';
 import Sales3rd from './Sales3rd';
 import axios from 'axios';
+import Image from 'next/image'
 
 function SalesRanking() {
   const [currentTime, setCurrentTime] = useState('');
@@ -55,7 +56,7 @@ function SalesRanking() {
   return (
     <div className={styles.pagessize}>
       <div className={styles.flex}>
-        <span className={styles.container}>売り上げランキング!</span>
+        <Image src='/images/rankingtitle.png' width={400} height={200} alt='売り上げランキング'/>
         <span className={styles.times}>更新時刻: {currentTime}</span> {/* 時刻表示 */}
       </div>
         {data && data.length > 0 ? (
