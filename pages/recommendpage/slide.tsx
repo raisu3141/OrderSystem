@@ -61,7 +61,7 @@ export function Slider(){
   return (
     <div className='bg-blue-900 w-screen h-screen' style={{background: "url(/images/recommendbg.png)", backgroundSize: "cover"}}>
       <div className='flex justify-center'>
-      <Image src='/images/recommendtitle.png' width={500} height={200} alt='recommend'/>
+        <Image src='/images/recommendtitle.png' width={500} height={200} alt='recommend'/>
       </div>
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
@@ -74,44 +74,40 @@ export function Slider(){
           delay: 3000,
           disableOnInteraction: false,
         }}
-        >
+      >
         {stallData.map((src: items, index: number) => {
           return (
             <SwiperSlide key={`${index}`} className="my-5">
-              <div className=" 
-                    flex justify-center items-center" >
-                  <div className="w-540 h-400 
-                    flex justify-center items-center 
-                    text-sky-200 
-                    border-2 rounded-lg border-sky-200 
-                    shadow-[0_0_2px_#fff,inset_0_0_2px_#fff,0_0_5px_#08f,0_0_15px_#08f,0_0_30px_#08f]">
-                <div
-                className={`flex  items-center justify-center  rounded-lg relative p-10`}>
-                <div className={`${teststyle.neonborder} relative bg-white rounded-lg`}>
-                  <Image
-                    src={src.productImageUrl}
-                    //layout="fill"  // 画像が親要素にフィットするように設定
-                    width={300}
-                    height={300}
-                    //objectFit="cover"  // アスペクト比を保ちながら表示
-                    alt={src.productName}
-                    className="rounded-lg"
-                  />
-                </div>
-                <div className={`${teststyle.neontext} mt-4 text-center text-white pl-14`}>  {/* テキストを中央に配置 */}
-                  <div className={`text-3xl font-semibold pb-8`}>
-                    {src.storeName}
-                  </div>
-                  <div className={`text-4xl font-bold mt-1 pb-8`}>
-                    {src.productName}
-                  </div>
-                  <div className={`text-5xl font-extrabold mt-2`}>
-                    &yen;  {src.price}
+              <div className="flex justify-center items-center" >
+                <div className="w-540 h-400 
+                  flex justify-center items-center 
+                  text-sky-200 
+                  border-2 rounded-lg border-sky-200 
+                  shadow-[0_0_2px_#fff,inset_0_0_2px_#fff,0_0_5px_#08f,0_0_15px_#08f,0_0_30px_#08f]">
+                  <div className={`flex  items-center justify-center  rounded-lg relative p-10`}>
+                    <div className={`${teststyle.neonborder} relative bg-white rounded-lg`}>
+                      <Image
+                        src={src.productImageUrl}
+                        width={300}
+                        height={300}
+                        alt={src.productName}
+                        className="rounded-lg"
+                      />
+                    </div>
+                    <div className={`${teststyle.neontext} mt-4 text-center text-white pl-14`}>  {/* テキストを中央に配置 */}
+                      <div className={`text-3xl font-semibold pb-8`}>
+                        {src.storeName}
+                      </div>
+                      <div className={`text-4xl font-bold mt-1 pb-8`}>
+                        {src.productName}
+                      </div>
+                      <div className={`text-5xl font-extrabold mt-2`}>
+                        &yen;  {src.price}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-              </div>
-    </div>
             </SwiperSlide>
           )
         })}

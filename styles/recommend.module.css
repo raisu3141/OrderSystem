@@ -1,13 +1,9 @@
-@tailwind components;
-@layer components {
-  
-    .neontext {
-      text-shadow: 0 0 5px aqua, 0 0 10px aqua, 0 0 15px aqua, 0 0 20px #ff00de, 0 0 35px #ff00de, 0 0 40px #ff00de;
-  }
+.neontext {
+    text-shadow: 0 0 5px aqua, 0 0 10px aqua, 0 0 15px aqua, 0 0 20px blue, 0 0 35px blue;
+}
 
-  .neonborder {
-      box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #ff00de, 0 0 35px #ff00de, 0 0 40px #ff00de;
-  }
+.neonborder {
+    box-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #fff, 0 0 20px #ff00de, 0 0 35px #ff00de, 0 0 40px #ff00de;
 }
 
 
