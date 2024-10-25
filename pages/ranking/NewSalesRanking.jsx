@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react'; 
 import Image from 'next/image'; 
 import styles from '/styles/newSalesRanking.module.css'; 
-import GoldHolizonLine from './GoldHolizonLine.tsx'; 
-import SilverHolizonLine from './SilverHolizonLine.tsx'; 
-import BronzeHorizontalLine from './BronzeHorizontalLine.tsx'; 
 import axios from 'axios'; 
 import { useRouter } from 'next/router';  // 追加: useRouterのインポート
 
