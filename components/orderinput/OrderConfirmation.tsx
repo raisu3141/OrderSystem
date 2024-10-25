@@ -119,7 +119,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
 
   return (
     <>
-      <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[85vh] max-h-[80vh]">
+      <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[85vh] max-h-[80vh] overflow-y-auto">
         <DialogTitle className="text-4xl font-semibold">注文確認</DialogTitle>
         <div className="w-full h-full flex flex-row items-center">
           <div className="w-[50%] h-full flex flex-col items-center">
