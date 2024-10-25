@@ -50,6 +50,16 @@ export default function Home() {
             受け取り待ち番号表示ページ
           </Link>
         </li>
+        <li className={styles.listItem}>
+          <Link href="/ranking/SalesRanking" className={styles.link}>
+            売上ランキングページ
+          </Link>
+        </li>
+        <li className={styles.listItem}>
+          <Link href="/recommendpage/slide" className={styles.link}>
+            おすすめ商品ページ
+          </Link>
+        </li>
       </ul>
     </div>
   );
