@@ -102,7 +102,6 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         console.log('Stock status list:', stockStatusList);
         setIsOpen(true);
         onClose();
-
       } else {
         console.error('Failed to post order');
         const errorData = await response.json();
@@ -114,6 +113,17 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
       setIsErrorOpen(true);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const checkStock = () => {
+    // 在庫が10個以下のアイテムを確認
+    const lowStockItems = stockStatusList.filter(
+      (item: { productId: string; stock: number }) => item.stock <= 10
+    );
+    // 在庫が少ない商品がある場合、ページをリロード
+    if (lowStockItems.length > 0) {
+      window.location.reload();
     }
   };
 
@@ -222,7 +232,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
 
       {/*注文完了ダイアログを開く  */}
       < Dialog open={isOpen} onOpenChange={setIsOpen} >
-        <OrderCompleted clientName={clientName} ticketNumber={ticketNumber} onClose={() => { setIsOpen(false); resetForm(); }} />
+        <OrderCompleted clientName={clientName} ticketNumber={ticketNumber} onClose={() => { setIsOpen(false); resetForm(); checkStock(); }} />
       </Dialog >
 
       {/* エラーダイアログ */}
