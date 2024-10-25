@@ -29,18 +29,18 @@ export function ProductList({ addToCart, ...product }: ProductListProps) {
           disabled={product.stock === 0}
         >
           <div className="bg-gray-500 w-full h-48">
-            {/* <img
+            <img
               src={product.productImageUrl}
               alt={product.productName}
               className="w-full h-48 object-cover"
-            /> */}
-            <Image
+            />
+            {/* <Image
               src={product.productImageUrl}
               alt={product.productName}
               width={192} // 48px * 4 = 192px (w-48相当)
               height={192}
               className="object-cover"
-            />
+            /> */}
           </div>
           <div className="p-4">
             <h2 className="text-xl font-semibold">{product.productName}</h2>
@@ -52,18 +52,18 @@ export function ProductList({ addToCart, ...product }: ProductListProps) {
         <VisuallyHidden>
           <DialogTitle>個数入力ダイアログ</DialogTitle>
         </VisuallyHidden>
-        {/* <img
+        <img
           src={product.productImageUrl}
           alt={product.productName}
           className="w-50 h-48 object-contain mb-4"
-        /> */}
-        <Image
+        />
+        {/* <Image
           src={product.productImageUrl}
           alt={product.productName}
           width={200}
           height={192} // w-50 h-48 相当
           className="object-contain mb-4"
-        />
+        /> */}
         <span className="text-left font-semibold w-80">{product.productName}</span>
         <div className="flex items-center justify-between w-80">
           <span className="text-2xl font-semibold">￥{product.price}</span>
@@ -72,6 +72,9 @@ export function ProductList({ addToCart, ...product }: ProductListProps) {
             onChange={(e) => setQuantity(parseInt(e.target.value))}
             className="w-20 h-10 border rounded-md"
           >
+            <option value="" disabled>
+              選択してください
+            </option>
             {Array.from({ length: product.stock }, (_, index) => (
               <option key={index + 1} value={index + 1}>
                 {index + 1}
