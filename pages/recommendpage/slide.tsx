@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import SwiperCore, { Navigation, Pagination, Autoplay } from 'swiper/modules'
+import { Navigation, Pagination, Autoplay } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
 import teststyle from '../../styles/recommend.module.css'
-//import { useQuery } from 'react-query';
 
 interface items {
   storeName: string;
@@ -60,7 +59,7 @@ export function Slider(){
   }
 
   return (
-    <div className='bg-blue-900 w-screen h-screen'>
+    <div className='bg-blue-900 w-screen h-screen' style={{background: "url(/images/recommendbg.png)", backgroundSize: "cover"}}>
       <div className='flex justify-center'>
       <Image src='/images/recommendtitle.png' width={500} height={200} alt='recommend'/>
       </div>
