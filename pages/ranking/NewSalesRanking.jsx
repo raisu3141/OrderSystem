@@ -33,7 +33,7 @@ function SalesRanking() {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       router.push('/recommendpage/newpop'); // 60秒後にページ遷移
-    }, 5 * 60 * 1000); // 60秒 = 60000ms
+    },60 * 1000); // 60秒 = 60000ms
 
     return () => clearTimeout(timeoutId); // コンポーネントがアンマウントされる際にタイマーをクリア
   }, [router]);
