@@ -26,7 +26,7 @@ export default async function handler(req, res) {
       
       // 各屋台の注文データを取得
       const orders = await StoreOrder.find(
-        { cancelStatus: false, getStatus: false },
+        { cancelStatus: false, cookStatus: false, getStatus: false },
         "orderId orderList.productId orderList.orderQuantity cookStatus"
       ).populate([
         { path: 'orderList.productId', select: 'productName price'},
