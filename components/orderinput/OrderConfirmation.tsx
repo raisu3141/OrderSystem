@@ -223,7 +223,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         <Button
           className="w-[50%] mt-4"
           onClick={() => { postOrder(); }}
-          disabled={!clientName || (depositAmount === undefined || depositAmount < totalAmount)}
+          disabled={!clientName || (depositAmount === undefined || depositAmount < totalAmount) || isLoading} 
         >
           注文
         </Button>
