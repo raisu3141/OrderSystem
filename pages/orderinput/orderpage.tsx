@@ -7,6 +7,7 @@ import { StoreList, CartItem, Product } from '../../lib/types';
 import Cart from '../../components/orderinput/ProductCart';
 import { ProductList } from '../../components/orderinput/ProductList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import { set } from 'mongoose';
 
 
 async function fetchProductList(): Promise<Product[]> {
@@ -47,6 +48,7 @@ export function OrderPage() {
     const loadProducts = async () => {
       const products = await fetchProductList();
       setProductList(products);
+      setStoreList(storeList);
     }
     loadProducts();
   }, []);
@@ -98,13 +100,7 @@ export function OrderPage() {
                 {productList.map((product) => (
                   <ProductList key={product.productId} {...product} addToCart={addToCart} />
                 ))}
-                {/* {storeList.map((store) => (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                {productList.map((product) => (
-                  <ProductList key={product.productId} {...product} addToCart={addToCart} />
-                ))}
-              </div>
-                ))} */}
+
               </div>
             </TabsContent>
             <TabsContent value="1">
