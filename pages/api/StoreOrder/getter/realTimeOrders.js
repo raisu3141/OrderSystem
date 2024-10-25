@@ -52,6 +52,24 @@ async function monitorChanges(req, res) {
                     res.write(`data: ${JSON.stringify({ name: updatedName })}\n\n`);
                     res.flush();
                 }
+                else if (updatedFields && updatedFields.hasOwnProperty('cookStatus')) {
+                    const updatedName = updatedFields.cookStatus;
+                    console.log('Name field was updated:', updatedName);
+                    console.log(change);
+              
+                    // クライアントに変更された特定のフィールドを送信
+                    res.write(`data: ${JSON.stringify({ name: updatedName })}\n\n`);
+                    res.flush();
+                }
+                else if (updatedFields && updatedFields.hasOwnProperty('getStatus')) {
+                    const updatedName = updatedFields.getStatus;
+                    console.log('Name field was updated:', updatedName);
+                    console.log(change);
+              
+                    // クライアントに変更された特定のフィールドを送信
+                    res.write(`data: ${JSON.stringify({ name: updatedName })}\n\n`);
+                    res.flush();
+                }
             } else {
                 console.log('No operationType or unsupported operation');
             }
