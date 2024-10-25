@@ -31,7 +31,7 @@ export default function Home() {
           </Link>
         </li>
         <li className={styles.listItem}>
-          <Link href="/orderinput/orderpage" className={styles.link}>
+          <Link href="/orderinput/testorderpage" className={styles.link}>
             注文入力ページ
           </Link>
         </li>

@@ -30,7 +30,7 @@ function SalesRanking() {
     setTimeout(() => {
       fetchSalesData(); // データを取得
       startAutoRefresh(); // 5分ごとに再取得
-    }, 5 * 60 * 1000); // 5分 (ミリ秒)
+    },  60 * 1000); // 1分 (ミリ秒)
   };
 
   useEffect(() => {

@@ -1,14 +1,16 @@
 .container {
-    font-size: 5vw;
+    font-size: 4vw;
     left: 2vw;
-    font-family: YuMincho, "Hiragino Mincho ProN", serif;
-    color:#0f1419;
+    font-family: "Yu Mincho", serif;
+    color: #BF2C39;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
 }
 .times{
-    font-size: 1.5vw;
+    font-size: 1.1vw;
     display: inline-block;
     position: absolute;
     right: 1vw; 
+    color: #008080;
 }
 
 .flex{
@@ -20,8 +22,8 @@
     flex-direction: column; 
     align-items: flex-start; 
     text-align: center; 
-    height: 13vw;
-    width: 13vw; 
+    height: 10vw;
+    width: 10vw; 
     transform: translateY(-18%);
 
 }
@@ -34,52 +36,52 @@
     text-align: center;
     transform: translateY(-18%);
     margin-right: 5vw;
-    height: 13vw;
-    width: 13vw;
+    height: 10vw;
+    width: 10vw;
 }
 .imageranker{
     display: flex; 
     text-align: center;
-    margin-top: 5vw;
+    margin-top: 2.8vw;
     margin-left: 5;
-    height: 25%;
 }
-.rankfontsize{
-    font-size: 3.4vw;
+.rankfontsize {
+    font-size: 3.5vw;
     text-align: center;
-    margin-right: 5vw;
-    margin-left: 3vw;
+    margin-right: 3vw;
+    margin-left: 2vw;
     transform: translateY(15%);
     white-space: nowrap;
-    font-family: YuMincho, "Hiragino Mincho ProN", serif;
-    color:#0f1419;
+    font-family: "Yu Mincho", serif;
+    color: #D4A017;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
-.namesfontmargin{
-    font-size: 3.7vw;
+.namesfontmargin {
+    font-size: 3.5vw;
     text-align: center;
-    margin-right: 10%;
-    transform: translateY(37%);
+    white-space: nowrap;
+    font-family: "Yu Mincho", serif;
+    color: #BF2C39;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    transform: translateY(30%);
     position: absolute;
-    left: 80vw;
-    font-family: YuMincho, "Hiragino Mincho ProN", serif;
-    color:#0f1419;
-    white-space: nowrap;
+    left: 70vw;
 }
-.itemmrgin{
+.itemmrgin {
     text-align: center;
-    font-size: 3.7vw;
-    margin-right: 13%;
+    font-size: 3.5vw;
+    margin-right: 12%;
     margin-left: 3%;
+    font-family: "Yu Mincho", serif;
     transform: translateY(15%);
-    font-family: YuMincho, "Hiragino Mincho ProN", serif;
-    color:#0f1419;
+    color: #008080;
     white-space: nowrap;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 .pagessize{
-    height: 100%;
-    width: 100%;
+    height: 48vw;
+    width: 100vw;
     background-color: #FDF0C4;
     display:flex;
     flex-flow: column;
-    
 }

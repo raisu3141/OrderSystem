@@ -19,13 +19,13 @@ const Sales3rd = ({ response }) => {
                 />
                 <div className = {styles.rankfontsize}>3位</div >
                 <Image className = {styles.itemscontainer}
-                    src={response.data[no]?.productImageUrl}
+                    src={response.productImageUrl}
                     alt="商品の画像"
                     width={175}
                     height={175}
                 />
-            <div className={styles.itemmrgin}>{response.data[no]?.productName}</div> {/* 3位の商品名 */}
-            <div className={styles.namesfontmargin}>{response.data[no]?.storeName}</div> {/* 3位の屋台名 */}
+            <div className={styles.itemmrgin}>{response.productName}</div> {/* 3位の商品名 */}
+            <div className={styles.namesfontmargin}>{response.storeName}</div> {/* 3位の屋台名 */}
             </div>
             <BronzeHorizonLine/>
         </div>

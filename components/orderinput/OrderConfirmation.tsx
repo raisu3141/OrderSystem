@@ -102,7 +102,6 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         console.log('Stock status list:', stockStatusList);
         setIsOpen(true);
         onClose();
-
       } else {
         console.error('Failed to post order');
         const errorData = await response.json();
@@ -117,9 +116,20 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
     }
   };
 
+  const checkStock = () => {
+    // 在庫が10個以下のアイテムを確認
+    const lowStockItems = stockStatusList.filter(
+      (item: { productId: string; stock: number }) => item.stock <= 10
+    );
+    // 在庫が少ない商品がある場合、ページをリロード
+    if (lowStockItems.length > 0) {
+      window.location.reload();
+    }
+  };
+
   return (
     <>
-      <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[85vh] max-h-[80vh]">
+      <DialogContent className="bg-white flex flex-col items-center w-[80vw] max-w-[1200px] h-[85vh] max-h-[80vh] overflow-y-auto">
         <DialogTitle className="text-4xl font-semibold">注文確認</DialogTitle>
         <div className="w-full h-full flex flex-row items-center">
           <div className="w-[50%] h-full flex flex-col items-center">
@@ -213,7 +223,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
         <Button
           className="w-[50%] mt-4"
           onClick={() => { postOrder(); }}
-          disabled={!clientName || (depositAmount === undefined || depositAmount < totalAmount)}
+          disabled={!clientName || (depositAmount === undefined || depositAmount < totalAmount) || isLoading} 
         >
           注文
         </Button>
@@ -222,7 +232,7 @@ export default function OrderConfirmation({ cart, totalAmount, onClose, onRemove
 
       {/*注文完了ダイアログを開く  */}
       < Dialog open={isOpen} onOpenChange={setIsOpen} >
-        <OrderCompleted clientName={clientName} ticketNumber={ticketNumber} onClose={() => { setIsOpen(false); resetForm(); }} />
+        <OrderCompleted clientName={clientName} ticketNumber={ticketNumber} onClose={() => { setIsOpen(false); resetForm(); checkStock(); }} />
       </Dialog >
 
       {/* エラーダイアログ */}
