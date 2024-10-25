@@ -25,7 +25,7 @@ const Sales3rd = ({ response }) => {
                     height={175}
                 />
             <div className={styles.itemmrgin}>{response.productName}</div> {/* 3位の商品名 */}
-            <div className={styles.namesfontmargin}>{response.productName}</div> {/* 3位の屋台名 */}
+            <div className={styles.namesfontmargin}>{response.storeName}</div> {/* 3位の屋台名 */}
             </div>
             <BronzeHorizonLine/>
         </div>
