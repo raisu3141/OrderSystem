@@ -8,7 +8,7 @@ interface PropsType {
 
   const BronzeHorizontalLine = (props: PropsType) => {
     const defaultStyle = {
-      width: "95%",
+      width: "100%",
       height: "0.7vw",
       backgroundColor: "#8c4841",
     } as CSSProperties;

@@ -3,7 +3,6 @@ import { MongoClient } from 'mongodb';
 async function monitorChanges(req, res) {
     const storeName = req.query; // フロントから送られたコレクション名を取得
     const collectionName = storeName.storeName + "_orders";
-    console.log(collectionName);
 
     if (!collectionName) {
         return res.status(400).send('Collection name is required');
@@ -28,46 +27,26 @@ async function monitorChanges(req, res) {
 
         // MongoDB変更ストリームを作成
         const changeStream = collection.watch([
-            { $match: { operationType: { $in: ['insert', 'update', 'replace'] } } },
+            { $match: { operationType: { $in: ['update'] } } },
         ]);
 
         changeStream.on('change', (change) => {
             // change.operationTypeが存在するかを確認
-            if (change.operationType === 'insert') {
-                const updatedDocument = change.fullDocument;
-                console.log('Detected change:', updatedDocument);
-
-                res.write(`data: ${JSON.stringify(updatedDocument)}\n\n`);
-                res.flush();
-                
-            }else if(change.operationType === 'update'){
+            if(change.operationType === 'update'){
                 const updatedFields = change.updateDescription.updatedFields;
 
-                if (updatedFields && updatedFields.hasOwnProperty('cancelStatus')) {
-                    const updatedName = updatedFields.cancelStatus;
-                    console.log('Name field was updated:', updatedName);
-                    console.log(change);
-              
-                    // クライアントに変更された特定のフィールドを送信
-                    res.write(`data: ${JSON.stringify({ name: updatedName })}\n\n`);
-                    res.flush();
-                }
-                else if (updatedFields && updatedFields.hasOwnProperty('cookStatus')) {
+                if (updatedFields && updatedFields.hasOwnProperty('cookStatus')) {
                     const updatedName = updatedFields.cookStatus;
-                    console.log('Name field was updated:', updatedName);
-                    console.log(change);
               
                     // クライアントに変更された特定のフィールドを送信
-                    res.write(`data: ${JSON.stringify({ name: updatedName })}\n\n`);
+                    res.write(`cookStatus: ${JSON.stringify({ name: updatedName })}\n\n`);
                     res.flush();
                 }
                 else if (updatedFields && updatedFields.hasOwnProperty('getStatus')) {
                     const updatedName = updatedFields.getStatus;
-                    console.log('Name field was updated:', updatedName);
-                    console.log(change);
               
                     // クライアントに変更された特定のフィールドを送信
-                    res.write(`data: ${JSON.stringify({ name: updatedName })}\n\n`);
+                    res.write(`getStatus: ${JSON.stringify({ name: updatedName })}\n\n`);
                     res.flush();
                 }
             } else {

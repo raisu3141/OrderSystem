@@ -1,69 +1,85 @@
 .container {
     font-size: 5vw;
-    float: light;
+    left: 2vw;
+    font-family: YuMincho, "Hiragino Mincho ProN", serif;
+    color:#0f1419;
 }
 .times{
     font-size: 1.5vw;
-    float: right; 
-    margin-right: 1vw;
-    margin-top: 1vw;
+    display: inline-block;
+    position: absolute;
+    right: 1vw; 
 }
+
 .flex{
-    display: flex;            /* Flexboxを適用して横並び */
-    grid-template-columns: 1fr 1fr;
-    align-items: center;  
-    width: 100%;
+    display: flex;            
+    align-items: center;
 }
 .imagecontainer {
-    display: flex; /* Enables flexbox layout */
-    flex-direction: column; /* Align items vertically */
-    align-items: flex-start; /* Align items to the start (left) */
-    text-align: center; /* Center the text */
-    height: 14vw; /* Set height based on viewport width (20% of width) */
-    width: 14vw; /* Set width based on viewport width (20% of width) */
+    display: flex; 
+    flex-direction: column; 
+    align-items: flex-start; 
+    text-align: center; 
+    height: 13vw;
+    width: 13vw; 
     transform: translateY(-18%);
 
 }
 .itemscontainer {
-    display: flex; /*横並び*/
-    flex-direction: column; /*縦に並べる*/
-    align-items: flex-start; /* 左揃え */
+    display: flex;
+    flex-direction: column; 
+    align-items: flex-start;
     display: inline-block;
     vertical-align: bottom;
     text-align: center;
     transform: translateY(-18%);
     margin-right: 5vw;
-    height: 14vw;
-    width: 14vw;
+    height: 13vw;
+    width: 13vw;
 }
 .imageranker{
-    display: flex; /* 横並びにする */
+    display: flex; 
     text-align: center;
     margin-top: 5vw;
     margin-left: 5;
     height: 25%;
 }
 .rankfontsize{
-    font-size: 4vw;
+    font-size: 3.4vw;
     text-align: center;
-    margin-right: 5%;
-    margin-left: 3%;
+    margin-right: 5vw;
+    margin-left: 3vw;
     transform: translateY(15%);
+    white-space: nowrap;
+    font-family: YuMincho, "Hiragino Mincho ProN", serif;
+    color:#0f1419;
 }
 .namesfontmargin{
-    font-size: 4vw;
+    font-size: 3.7vw;
     text-align: center;
     margin-right: 10%;
-    transform: translateY(15%);
+    transform: translateY(37%);
+    position: absolute;
+    left: 80vw;
+    font-family: YuMincho, "Hiragino Mincho ProN", serif;
+    color:#0f1419;
+    white-space: nowrap;
 }
 .itemmrgin{
     text-align: center;
-    font-size: 4vw;
+    font-size: 3.7vw;
     margin-right: 13%;
     margin-left: 3%;
     transform: translateY(15%);
+    font-family: YuMincho, "Hiragino Mincho ProN", serif;
+    color:#0f1419;
+    white-space: nowrap;
 }
 .pagessize{
     height: 100%;
     width: 100%;
+    background-color: #FDF0C4;
+    display:flex;
+    flex-flow: column;
+    
 }

@@ -7,7 +7,7 @@ interface PropsType {
 
 const GoldHolizonLine = (props: PropsType) => {
     const defaultStyle = {
-      width: "95%" ,
+      width: "100%" ,
       height: "0.7vw",
       backgroundColor: "#e6b422",
     } as CSSProperties;

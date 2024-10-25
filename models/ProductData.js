@@ -26,7 +26,6 @@ const ProductDataSchema = new mongoose.Schema({
   "price": {
     type: mongoose.Schema.Types.Number,
     required: true,
-    min: 0,
   },
 
   // 調理時間
