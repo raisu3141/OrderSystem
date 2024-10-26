@@ -99,16 +99,16 @@ export default async function handler(req, res) {
       console.log("aggregatedOrderList", aggregatedOrderList);
 
       // 在庫数・売上個数を戻す
-      const updateStockQuery = aggregatedOrderList.map((item) => {
-        return ProductData.updateMany(
-          { _id: item.productId },
-          { $inc: { stock: item.orderQuantity, soldCount: -item.orderQuantity } },
-          { session }
-        );
-      });
-      console.log("zaiko update mae");
-      await Promise.all(updateStockQuery);
-      console.log("zaiko update ato");
+      // const updateStockQuery = aggregatedOrderList.map((item) => {
+      //   return ProductData.updateMany(
+      //     { _id: item.productId },
+      //     { $inc: { stock: item.orderQuantity, soldCount: -item.orderQuantity } },
+      //     { session }
+      //   );
+      // });
+      // console.log("zaiko update mae");
+      // await Promise.all(updateStockQuery);
+      // console.log("zaiko update ato");
 
       // 待ち時間を減らす
       const waitTimeResult = await storeWaitTimeSuber2(aggregatedOrderList, session);
@@ -118,6 +118,7 @@ export default async function handler(req, res) {
 
     console.log("commitTransaction");
     res.status(200).json({ success: true, message: "注文をキャンセルしました" });
+    
   } catch (error) {
     console.error("エラー:", error);
 
