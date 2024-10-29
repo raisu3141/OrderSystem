@@ -1,0 +1,471 @@
+@media (min-width: 1024px) {
+  .heading {
+    font-size: 2rem;
+    margin-left: 15%; 
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+  }
+  .heading {
+    font-size: 2.5vw;
+    margin-left: 10%; 
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 0.75rem;
+  }
+}
+
+@font-face {
+  font-family: "Silkscreen";
+  src: url("./Silkscreen-Bold.ttf") format("truetype");
+  src: url("./Silkscreen-Regular.ttf") format("truetype");
+}
+
+
+.header {
+  width: 100%;
+  background-color: #3a3a3a;
+  color: white;
+  font-family: 'Silkscreen', sans-serif;
+  padding-left: 4.4em;
+  text-align: left;
+}
+
+.logo {
+  font-size: 3rem;
+  letter-spacing: 0.125rem;
+  padding: 0.5rem;
+}
+
+.heading {
+  font-size: 2.5em;
+  color: #333;
+  margin: 0 5%;
+  padding: 20px 0; 
+  text-align: left;
+  font-family: sans-serif;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #ccc;
+}
+
+.leftContainer {
+  display: flex;
+  align-items: center;
+}
+
+.addButton {
+  background-color: #B8D5F4;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 100vh;
+}
+
+.addButton:hover {
+  background-color: #4d95e3;
+}
+
+.dayButtons {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 2em;
+  margin-left: 7em;
+}
+
+.dayButton {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  padding: 10px 20px;
+  cursor: pointer;
+  position: relative;
+  color: #333;
+}
+
+.dayButton:hover {
+  color: #555;
+}
+
+.active {
+  color: #000;
+}
+
+.active::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+}
+
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 0 20px;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 0;
+}
+
+
+.trashIcon {
+  font-size: 1.7rem;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.selectedCard {
+  border: 2px solid blue; /* 枠線を青くする */
+  transition: border 0.2s ease;
+}
+
+
+.selectButton {
+  background-color: #B8D5F4;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 100vh;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.selectButton.cancel {
+  background-color: #2664f6;
+  color: white;
+}
+
+.selectButton:hover {
+  background-color: #4d95e3; /* ホバー時の色も追加ボタンと統一 */
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* 背景を暗くする */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 50vw;
+  max-height: 90vh;
+  max-width: 800px;
+  overflow-y: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.formTitle {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+}
+
+.daySelection {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+  margin-top: 2vw;
+}
+
+.formDayButton {
+  background-color: #e0e0e0;
+  border: none;
+  padding: 10px 20px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.formDayButtonActive {
+  background-color: #333;
+  color: white;
+}
+
+.uploadLabel {
+  display: block;
+  margin: 20px auto;
+  text-align: center;
+  border: 2px dashed #ccc;
+  padding: 0;
+  width: 100%;
+  max-width: 400px;
+  height: 12.5rem;
+  cursor: pointer;
+  border-radius: 5px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.uploadLabel img {
+  display: none; /* デフォルトで画像を非表示にする */
+}
+
+.uploadLabel img.uploadedImage {
+  display: block; /* アップロード後に表示 */
+}
+
+.uploadInput {
+  display: none;
+}
+
+.placeholderBox {
+  font-size: 1rem;
+  color: #888;
+  margin-top: 10px;
+  line-height: 180px;
+}
+
+.uploadedImage {
+  width:100%;
+  height: 12.5rem;
+  object-fit: contain;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 5px;
+}
+
+.stallNameLabel {
+  display: block;
+  margin-bottom: 20px;
+  font-size: 1.2rem;
+  text-align: left;
+}
+
+.stallNameInput {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.submitButton {
+  background-color: #D9D9D9;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 300px;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.submitButton:hover {
+  background-color: #7d7d7d;
+}
+
+.stallList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+  padding: 1.25rem;
+  justify-items: start;
+}
+
+.stallCard {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.2s;
+  width: 100%;
+  max-width: 350px;
+}
+
+.stallCard:hover {
+  transform: translateY(-5px);
+}
+
+.stallImage {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.stallCard h2 {
+  font-size: 1.2rem;
+  margin: 10px 0;
+}
+
+.stallCard p {
+  font-size: 1rem;
+  color: #333;
+  margin: 5px 0;
+}
+
+.backButton {
+  display: inline-block;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.backArrow {
+  font-size: 2rem;
+  color: #666; /* Lighter color */
+}
+
+.titleWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  font-size: 2rem;
+  color: #333;
+  margin: 0 5%;
+  padding: 20px 0; 
+  text-align: left;
+  font-family: sans-serif;
+  display: flex;
+  justify-content: space-between;
+}
+
+.menuItem {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.productImage {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+
+.stockInputBox {
+  width: 4.5vw; /* 横幅を80pxに設定 */
+  padding: 1.5px; /* ボックス内の余白を設定 */
+  font-size: 16px; /* 文字サイズを調整 */
+  border-bottom: 1px solid #000; /* アンダーバーを追加 */
+}
+
+.adjustStockLabel {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.adjustStockInput {
+  width: 60px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.adjustButton {
+  background-color: #4CAF50;
+  color: white;
+  padding: 5px 10px;
+  margin-right: 5px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.adjustButton:hover {
+  background-color: #45a049;
+}
+
+.stallInput, .priceInput, .stockInput, .timeInput {
+  width: 100%; /* 入力フィールドを幅一杯に */
+  padding: 12px; /* 入力フィールドの内側の余白を増やす */
+  margin: 10px 0; /* 上下に余白を追加 */
+  font-size: 16px; /* フォントサイズを調整 */
+  border: 1px solid #ccc; /* ボーダーを薄いグレーに */
+  border-radius: 4px; /* 角を丸める */
+  box-sizing: border-box; /* パディングを含めた幅調整 */
+  transition: border-color 0.3s ease; /* ホバーやフォーカス時のアニメーション */
+}
+
+.stallInput:hover, .priceInput:hover, .stockInput:hover, .timeInput:hover {
+  border-color: #888; /* ホバー時にボーダーの色を少し濃く */
+}
+
+.stallInput:focus, .priceInput:focus, .stockInput:focus, .timeInput:focus {
+  border-color: #555; /* フォーカス時にボーダーの色を濃く */
+  outline: none; /* ブラウザのデフォルトのアウトラインを消す */
+  box-shadow: 0 0 5px rgba(81, 203, 238, 1); /* フォーカス時の影を追加 */
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;   /* カードの幅に合わせる */
+  height: 12.5rem; /* カードの高さに合わせる */
+  overflow: hidden; /* 画像が枠をはみ出さないようにする */
+}
+
+.uploadedImage {
+  object-fit: cover; /* 画像を枠に収める */
+  width: 100%; /* 幅を親要素に合わせる */
+  height: 12.5rem; /* 高さを親要素に合わせる */
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.hideText {
+  display: none;
+}
+
+.uploadText {
+  font-size: 1rem;
+  color: #888;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1; /* テキストを中央に配置 */
+}
+
+

@@ -1,0 +1,79 @@
+@font-face {
+    font-family: 'Silkscreen';
+    src: url('/fonts/Silkscreen-Bold.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    background-color: #f0f4f8;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .backgroundText {
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Silkscreen', sans-serif;
+    font-size: 20vw;
+    color: rgba(0, 0, 0, 0.05);
+    transform: rotate(-45deg);
+    white-space: nowrap;
+    overflow: hidden;
+    user-select: none;
+    pointer-events: none;
+  }
+  
+  .title {
+    font-size: 2.5rem;
+    font-family: 'Silkscreen', sans-serif;
+    font-weight: bold;
+    color: #2d3748;
+    margin-bottom: 2rem;
+    align-self: center;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .listContainer {
+    list-style-type: none;
+    padding: 0;
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .listItem {
+    margin-bottom: 1rem;
+  }
+  
+  .link {
+    display: block;
+    color: #4a5568;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border-left: 4px solid transparent;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .link:hover {
+    background-color: #e2e8f0;
+    color: #2d3748;
+    border-left-color: #4a5568;
+  }
