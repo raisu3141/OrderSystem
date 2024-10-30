@@ -31,6 +31,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
   const isCancelUpdateRef = useRef(false)
   const previousOrdersRef = useRef<Order[]>([])
 
+  // キャンセル通知
   const showCancelNotification = (order: Order) => {
     toast((t) => (
       <div className="flex flex-col items-start p-4 bg-white border-2 border-red-500 rounded-lg shadow-lg">
@@ -38,6 +39,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
         <p>注文番号: {order.ticketNumber}</p>
         <p>注文者名: {order.clientName}</p>
         <ul className="w-full mt-2">
+          {/* 注文のリスト */}
           {order.orderList.map((item, index) => (
             <li key={index} className="flex justify-between text-sm font-bold">
               <span>{item.productName} × {item.orderQuantity}</span>
@@ -54,6 +56,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
         </Button>
       </div>
     ), {
+      // ボタンを押されるまで無限に表示
       duration: Infinity,
       position: 'top-right',
     });
@@ -68,6 +71,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
       refetchOnMount: true, // マウント時に再フェッチを確実に行う
       refetchOnWindowFocus: true, // オプション：ウィンドウフォーカス時に再フェッチ
       onSuccess: (newOrders) => {
+        // キャンセルされた注文を発見してキャンセル通知に送る
         const updatedOrders = newOrders.map(newOrder => {
           const previousOrder = previousOrdersRef.current.find(order => order.orderId === newOrder.orderId);
           if (previousOrder && !previousOrder.cancelStatus && newOrder.cancelStatus) {
@@ -82,6 +86,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
     }
   )
 
+  // サーバーからのリアルタイム更新を受け取る
   useEffect(() => {
     const eventSource = new EventSource(`/api/StoreOrder/getter/realTimeOrders?storeName=${storeName}`);
 
@@ -131,12 +136,14 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
       const cookStatus = newStatus === 'ready' || newStatus === 'completed'
       const getStatus = newStatus === 'completed'
       
+      // 注文ステータスの更新
       await fetch(`/api/StoreOrder/update/PatchOrderStatus?storeName=${storeName}&orderId=${order.orderId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cookStatus, getStatus }),
       })
       
+      // 待ち時間の更新
       await fetch(`/api/Utils/storeWaitTimeSuber`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -149,6 +156,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
         }),
       })
     },
+    // キャッシュの更新と完了通知
     {
       onSuccess: () => {
         queryClient.invalidateQueries(['orders', storeName, 'all'])
@@ -200,6 +208,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
               </ul>
             </div>
             <div className="flex-shrink-0 pl-4 flex">
+              {/* 表示する注文のステータスでスタイルを変更する */}
               {!order.getStatus && !order.cancelStatus ? (
                 <Button 
                   onClick={() => updateOrderStatus(order, order.cookStatus ? 'completed' : 'ready')}
@@ -219,6 +228,7 @@ export default function OrderTicket({ storeName }: OrderticketProps) {
     );
   };
 
+  // ローディング中、エラーが発生した際の表示
   if (isLoadingAll) {
     return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin" /></div>
   }

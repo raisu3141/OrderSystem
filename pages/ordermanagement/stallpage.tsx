@@ -12,6 +12,7 @@ export default function StallPage() {
   const searchParams = useSearchParams()
   const storeName = searchParams.get('storeName')
 
+  // データ取得エラー時のハンドリング
   if (!storeName) {
     return (
       <div>

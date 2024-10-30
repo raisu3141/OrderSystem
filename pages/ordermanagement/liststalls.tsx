@@ -58,6 +58,7 @@ export function ListStalls() {
           <h1 className="text-4xl font-bold">屋台一覧</h1>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* 取得した屋台の数だけカードを表示 */}
           {stallList.map((stall) => (
             <StallsCard key={stall.storeName} storeName={stall.storeName} image={stall.storeImageUrl} />
           ))}
